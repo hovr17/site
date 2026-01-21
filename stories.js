@@ -21,10 +21,31 @@ class StoriesManager {
     this.init();
   }
   
+ checkBrowserSpecifics() {
+    const userAgent = navigator.userAgent;
+    
+    // Проверяем, это ли Chrome на Android
+    // (Android Chrome содержит 'Chrome' и 'Android', но не 'Edg' или 'OPR' и т.д.)
+    const isChromeAndroid = /Chrome/.test(userAgent) && /Android/.test(userAgent) && !/Edg|OPR|SamsungBrowser/i.test(userAgent);
+
+    if (isChromeAndroid) {
+      // Если это Chrome на Android — добавляем класс, который убирает отступы
+      document.documentElement.classList.add('no-lift');
+      console.log('🧭 Обнаружен Chrome Android: Подъем отключен (отступы 0)');
+    } else {
+      console.log('🧭 Обычный браузер / Safari / Яндекс: Подъем активирован');
+    }
+  }
+  // ================================
+
   init() {
+    // ВЫЗЫВАЕМ ПРОВЕРКУ БРАУЗЕРА
+    this.checkBrowserSpecifics();
+
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
     
+    // ... rest of the init method ...
     this.placeData = storiesData[this.placeId];
     
     if (!this.placeData) {
@@ -552,3 +573,4 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
