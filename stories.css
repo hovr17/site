@@ -650,6 +650,8 @@
 
 /* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
 
+/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
+
 @media (max-width: 750px) {
   .slides-container {
     background-color: #000;
@@ -660,9 +662,9 @@
     background-color: #000;
   }
 
-  /* === УПРАВЛЕНИЕ ПОДЪЕМОМ (Логика: По умолчанию 0, Включаем для Safari/Yandex) === */
+  /* === УПРАВЛЕНИЕ ПОДЪЕМОМ В ЗАВИСИМОСТИ ОТ БРАУЗЕРА === */
 
-  /* 1. ПО УМОЛЧАНИЮ (Google Chrome): Отступы равны 0 */
+  /* 1. ПО УМОЛЧАНИЮ (Google Chrome): Убираем подъем */
   .story-image {
     width: 100vw;
     height: 100%;
@@ -675,26 +677,26 @@
   }
 
   .story-caption-container {
-    bottom: 0 !important; /* Текст на месте */
+    bottom: 0 !important; /* Текст у края экрана */
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen {
-    bottom: 0 !important; /* Развернутый текст на месте */
+    bottom: 0 !important; /* Развернутый текст у края экрана */
   }
 
-  /* 2. ИСКЛЮЧЕНИЕ (Safari, Яндекс): Включаем подъем только если есть класс enable-lift */
+  /* 2. ИСКЛЮЧЕНИЕ (Safari, Яндекс): Поднимаем элементы */
   html.enable-lift .story-image {
     margin-top: -50px !important; /* Поднимаем фото */
   }
 
   html.enable-lift .story-caption-container {
-    /* Поднимаем текст и кнопку */
-    bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
+    /* Поднимаем текст и кнопку на 15px от браузерной панели */
+    bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
   }
 
   html.enable-lift .caption-overlay.mobile-overlay .caption-fullscreen {
-    /* Поднимаем развернутый текст */
-    bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
+    /* Поднимаем развернутый текст на 15px от браузерной панели */
+    bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
   }
 
   /* ============================================== */
@@ -789,7 +791,7 @@
 
   /* Текст подписи */
   .story-caption-text {
-    flex:1;
+    flex: 1;
     position: relative;
     z-index: 3;
     display: block !important; /* ВАЖНО: block вместо flex */
@@ -963,135 +965,5 @@
     font-size: 2.5vh;
     top: 3vh;
     padding-left: 0.5vh;
-  }
-}
-
-/* Специальные фиксы для очень маленьких экранов */
-@media (max-width: 375px) {
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    padding: 3vh 5vw 8vh;
-    font-size: 18px; /* Фиксированный размер для стабильности на маленьких экранах */
-  }
-}
-
-/* Специальные фиксы для ландшафтной ориентации */
-@media (max-width: 1080px) and (orientation: landscape) {
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    font-size: 18px;
-    padding: 3vh 5vw 8vh;
-  }
-
-  .story-caption-content {
-    font-size: 18px;
-    padding: 15px 20px 40px;
-  }
-
-  .caption-expand-btn {
-    width: 3.5vh; /* Фиксированные размеры */
-    height: 3.5vh;
-  }
-
-  .stories-label {
-    font-size: 2.5vh;
-    top: 3vh;
-    padding-left: 0.5vh;
-  }
-}
-
-
-@media (max-width: 750px) {
-  /* ============================================
-     ВЕРХНЯЯ ПАНЕЛЬ: Текст + кнопка в 15px от адресной строки
-     ============================================ */
-
-  /* Новый контейнер для верхней панели */
-  .story-header-panel {
-    position: sticky;
-    position: -webkit-sticky; /* Для Safari */
-    top: 15px; /* Расстояние от верхней части viewport */
-    top: calc(15px + env(safe-area-inset-top, 0px)); /* Учитываем безопасную зону iOS */
-    
-    z-index: 1010; /* Выше всех остальных элементов */
-    margin: 0 auto;
-    max-width: 95%;
-    
-    /* Визуальное оформление */
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 12px;
-    padding: 12px 20px;
-    
-    /* Типография */
-    color: #ffffff;
-    font-family: 'Crooker', sans-serif;
-    font-size: 1.7vh;
-    font-weight: 100;
-    line-height: 1.4;
-    text-align: left;
-    
-    /* Тень для глубины */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    
-    pointer-events: auto;
-  }
-
-  /* Кнопка раскрытия внутри верхней панели */
-  .header-caption-expand-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.5vh;
-    height: 3.5vh;
-    margin: 8px auto 0; /* Отступ сверху от текста */
-    padding: 0;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    pointer-events: auto;
-  }
-
-  .header-caption-expand-btn .expand-icon {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  }
-
-  /* ============================================
-     СТАРЫЕ СТИЛИ (оставляем, но корректируем)
-     ============================================ */
-
-  /* Скрываем старый нижний контейнер */
-  .story-caption-container {
-    display: none;
-  }
-
-  /* Показываем верхнюю панель когда есть текст */
-  .story-slide.has-caption .story-header-panel {
-    display: block;
-  }
-
-  /* Оверлей на весь экран при раскрытии */
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    position: fixed;
-    top: 15px;
-    top: calc(15px + env(safe-area-inset-top, 0px));
-    left: 0;
-    right: 0;
-    bottom: 0;
-    max-height: none;
-    padding: 4vh 6vw;
-    font-size: 2.2vh;
-    background: rgba(0, 0, 0, 0.95);
-    border-radius: 0;
-    z-index: 1020;
-  }
-
-  /* Обеспечиваем прокрутку текста в оверлее */
-  .caption-fullscreen-content {
-    max-height: calc(100vh - 30px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
 }
