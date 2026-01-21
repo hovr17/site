@@ -738,8 +738,9 @@
     pointer-events: auto;
     
     /* ✅ ИСПРАВЛЕНИЕ ЗДЕСЬ: Ограничиваем высоту и скрываем лишнее */
-     overflow-y: auto ; /* Было: visible */
-    max-height: 40vh; /* Ограничиваем высоту */
+      max-height: 45vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     
     box-sizing: border-box;
     border-top-left-radius: 20px;
@@ -773,8 +774,8 @@
     margin-top: auto; /* Выравнивание текста */
     box-sizing: border-box;
     /* Если внутри текста есть свои блоки, сбрасываем max-height */
-    overflow-y: auto !important; /* Было: visible */
-    max-height: 100%; /* Добавляем наследование ограничения */
+    overflow-y: visible; /* Было: visible */
+
   }
 
   .story-caption-content::before {
@@ -939,4 +940,5 @@
     max-height: 20vh; /* В ландшафте места меньше */
   }
 }
+
 
