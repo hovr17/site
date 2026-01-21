@@ -735,7 +735,7 @@
     padding: 2vh 4vw 4vh;
     pointer-events: auto;
     max-height: none;
-    min-height: 6vh;
+    min-height: 80px;
     overflow-y: visible;
     box-sizing: border-box;
     border-top-left-radius: 20px;
