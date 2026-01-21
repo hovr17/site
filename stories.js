@@ -21,39 +21,14 @@ class StoriesManager {
     this.init();
   }
   
-  // === ОБНОВЛЕННАЯ ФУНКЦИЯ ===
-  // === БЕЗОТКАЗНАЯ ЛОГИКА ===
   checkBrowserSpecifics() {
-    const ua = navigator.userAgent;
-    
-    // 1. Определяем Яндекс
-    const isYandex = /YaBrowser/i.test(ua);
-
-    // 2. Определяем Apple Safari
-    // (Важно: исключаем Chrome и CriOS, чтобы iOS Chrome считался обычным Chrome)
-    const isSafari = /^((?!chrome|crios|android).)*safari/i.test(ua);
-
-    if (isSafari || isYandex) {
-      // Включаем подъем ТОЛЬКО для Сафари и Яндекса
-      document.documentElement.classList.add('enable-lift');
-      console.log('🧭 Обнаружен Safari или Яндекс: Подъем ВКЛЮЧЕН');
-    } else {
-      // Для всех остальных (Google Chrome, Firefox и др.) - ничего не делаем (подъем отключен по умолчанию)
-      console.log('🧭 Обычный браузер (Google Chrome): Подъем ОТКЛЮЧЕН');
-    }
+    document.documentElement.classList.add('no-lift');
   }
 
-
-  // ================================
-
   init() {
-    // ВЫЗЫВАЕМ ПРОВЕРКУ БРАУЗЕРА
     this.checkBrowserSpecifics();
-
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
-    
-    // ... rest of the init method ...
     this.placeData = storiesData[this.placeId];
     
     if (!this.placeData) {
@@ -61,7 +36,6 @@ class StoriesManager {
     }
     
     this.updateLabel();
-    
     if (this.isDesktop && this.currentSlide === 0) {
       this.prevArrow.classList.add('hidden');
     }
@@ -81,14 +55,12 @@ class StoriesManager {
   loadImages() {
     this.slidesContainer.innerHTML = '';
     this.slides = [];
-    
     this.totalSlides = this.placeData.images.length;
     
     this.placeData.images.forEach((imageData, index) => {
       const slide = document.createElement('div');
       slide.className = `story-slide ${index === 0 ? 'active' : ''}`;
       slide.dataset.index = index;
-      
       slide.style.backgroundImage = `url(${imageData.src})`;
       
       const img = document.createElement('img');
@@ -116,122 +88,42 @@ class StoriesManager {
   }
   
   addCaptionToSlide(slide, index, captionText) {
-    const captionContainer = document.createElement('div');
-    captionContainer.className = 'story-caption-container';
-    
-    const captionContent = document.createElement('div');
-    captionContent.className = 'story-caption-content';
-    
-    // Проверяем длину текста на всех устройствах (ОБЩАЯ ЛОГИКА)
     const isLongText = captionText.length > 135;
     
+    // Создаем ВЕРХНЮЮ панель
+    const headerPanel = document.createElement('div');
+    headerPanel.className = 'story-header-panel';
+    
+    // Текст (обрезанный для длинных подписей)
+    const headerText = document.createElement('div');
+    headerText.className = 'story-header-text';
+    headerText.textContent = isLongText 
+      ? captionText.substring(0, 135).replace(/\s+\S*$/, '...') 
+      : captionText;
+    
+    headerPanel.appendChild(headerText);
+    
+    // Кнопка раскрытия (только для длинного текста)
     if (isLongText) {
-      // Обрезаем текст до ближайшего слова
-      const shortText = captionText.substring(0, 135);
-      const lastSpaceIndex = shortText.lastIndexOf(' ');
-      const displayText = lastSpaceIndex > 0 
-        ? shortText.substring(0, lastSpaceIndex) 
-        : shortText;
-      
-      // Создаем элемент с обрезанным текстом и многоточием
-      const textElement = document.createElement('div');
-      textElement.className = 'story-caption-text';
-      
-      const shortSpan = document.createElement('span');
-      shortSpan.className = 'caption-short';
-      shortSpan.textContent = displayText + '...';
-      
-      const fullSpan = document.createElement('span');
-      fullSpan.className = 'caption-full';
-      fullSpan.style.display = 'none';
-      fullSpan.textContent = captionText;
-      
-      textElement.appendChild(shortSpan);
-      textElement.appendChild(fullSpan);
-      captionContent.appendChild(textElement);
-      
-      // Создаем оверлей для полного текста
-      const overlay = document.createElement('div');
-      overlay.className = this.isDesktop ? 'caption-overlay' : 'caption-overlay mobile-overlay';
-      overlay.dataset.slideIndex = index;
-      
-      const fullscreenCaption = document.createElement('div');
-      fullscreenCaption.className = 'caption-fullscreen';
-      
-      const fullscreenContent = document.createElement('div');
-      fullscreenContent.className = 'caption-fullscreen-content';
-      fullscreenContent.textContent = captionText;
-      
-      fullscreenCaption.appendChild(fullscreenContent);
-      overlay.appendChild(fullscreenCaption);
-      
-      // Кнопка раскрытия (отображается на ВСЕХ устройствах для длинного текста)
       const expandBtn = document.createElement('button');
-      expandBtn.className = this.isDesktop ? 'caption-expand-btn' : 'caption-expand-btn mobile-expand-btn';
-      expandBtn.innerHTML = `
-        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
-      `;
+      expandBtn.className = 'header-caption-expand-btn';
+      expandBtn.innerHTML = `<img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">`;
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        
-        // Показываем оверлей
-        if (this.isDesktop) {
-          captionContent.classList.add('no-bg');
-        }
-        captionContainer.classList.add('hidden');
-        overlay.classList.add('active');
-        this.isOverlayOpen = true;
-        
-        if (!this.isDesktop) {
-          this.container.classList.add('overlay-open');
-        }
-        
-        setTimeout(() => {
-          fullscreenCaption.scrollTop = 0;
-          fullscreenContent.scrollTop = 0;
-        }, 10);
+        this.showFullCaptionOverlay(captionText);
       });
       
-      // Обработчик закрытия оверлея
-      const handleOverlayClick = (e) => {
-        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
-          this.closeOverlay(overlay, expandBtn);
-        }
-      };
-      
-      overlay.addEventListener('click', handleOverlayClick);
-      overlay.addEventListener('touchend', handleOverlayClick);
-      
-      captionContent.appendChild(expandBtn);
-      captionContainer.appendChild(captionContent);
-      slide.appendChild(captionContainer);
-      slide.appendChild(overlay);
-      
-      // Ограничиваем высоту на десктопе
-      if (this.isDesktop) {
-        captionContent.style.maxHeight = '150px';
-      }
-    } else {
-      // Короткий текст - отображаем без кнопки на всех устройствах
-      const textElement = document.createElement('div');
-      textElement.className = 'story-caption-text';
-      textElement.textContent = captionText;
-      captionContent.appendChild(textElement);
-      
-      if (this.isDesktop) {
-        captionContent.style.maxHeight = 'none';
-      }
-      
-      captionContainer.appendChild(captionContent);
-      slide.appendChild(captionContainer);
+      headerPanel.appendChild(expandBtn);
     }
+    
+    slide.appendChild(headerPanel);
+    slide.classList.add('has-caption');
   }
   
   createProgressBars() {
     this.progressContainer.innerHTML = '';
-    
     for (let i = 0; i < this.totalSlides; i++) {
       const progressBar = document.createElement('div');
       progressBar.className = 'progress-bar';
@@ -242,17 +134,12 @@ class StoriesManager {
       progressBar.appendChild(progressFill);
       this.progressContainer.appendChild(progressBar);
     }
-    
     this.updateProgressBars();
   }
   
   updateArrowVisibility() {
     if (this.isDesktop) {
-      if (this.currentSlide === 0) {
-        this.prevArrow.classList.add('hidden');
-      } else {
-        this.prevArrow.classList.remove('hidden');
-      }
+      this.prevArrow.classList.toggle('hidden', this.currentSlide === 0);
       this.nextArrow.classList.remove('hidden');
     } else {
       this.prevArrow.classList.add('hidden');
@@ -269,15 +156,22 @@ class StoriesManager {
       if (e.key === 'ArrowLeft') this.prevSlide();
       if (e.key === 'ArrowRight') this.nextSlide();
       if (e.key === 'Escape') {
-        const overlay = document.querySelector('.caption-overlay.active');
-        if (overlay) {
-          const slideIndex = overlay.dataset.slideIndex;
+        const headerOverlay = document.querySelector('.header-caption-overlay.active');
+        if (headerOverlay) {
+          this.closeHeaderCaptionOverlay();
+          return;
+        }
+        
+        const oldOverlay = document.querySelector('.caption-overlay.active:not(.header-caption-overlay)');
+        if (oldOverlay) {
+          const slideIndex = oldOverlay.dataset.slideIndex;
           const slide = this.slides[slideIndex];
           const expandBtn = slide.querySelector('.caption-expand-btn');
-          this.closeOverlay(overlay, expandBtn);
-        } else {
-          this.closeStories();
+          this.closeOverlay(oldOverlay, expandBtn);
+          return;
         }
+        
+        this.closeStories();
       }
     });
     
@@ -289,7 +183,6 @@ class StoriesManager {
     this.setupTouchEvents();
     this.setupTouchZones();
     
-    // Клик по чёрному фону на мобильных — закрываем оверлей
     this.container.addEventListener('click', (e) => {
       if (!this.isDesktop && this.isOverlayOpen) {
         const activeOverlay = document.querySelector('.caption-overlay.active');
@@ -302,7 +195,6 @@ class StoriesManager {
           e.stopPropagation();
           
           this.overlayJustClosed = true;
-          
           setTimeout(() => {
             this.overlayJustClosed = false;
           }, 300);
@@ -317,10 +209,7 @@ class StoriesManager {
     let isSwiping = false;
     
     this.container.addEventListener('touchstart', (e) => {
-      if (!this.isDesktop && this.isOverlayOpen) {
-        return;
-      }
-      
+      if (!this.isDesktop && this.isOverlayOpen) return;
       touchStartX = e.changedTouches[0].screenX;
       isSwiping = true;
     }, { passive: true });
@@ -354,16 +243,12 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            const slideIndex = activeOverlay.dataset.slideIndex;
-            const slide = this.slides[slideIndex];
-            const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
-            this.closeOverlay(activeOverlay, expandBtn);
+            this.closeOverlay(activeOverlay, null);
             e.preventDefault();
             e.stopPropagation();
             return;
           }
         }
-        
         if (this.overlayJustClosed) {
           e.preventDefault();
           e.stopPropagation();
@@ -383,16 +268,12 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            const slideIndex = activeOverlay.dataset.slideIndex;
-            const slide = this.slides[slideIndex];
-            const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
-            this.closeOverlay(activeOverlay, expandBtn);
+            this.closeOverlay(activeOverlay, null);
             e.preventDefault();
             e.stopPropagation();
             return;
           }
         }
-        
         if (this.overlayJustClosed) {
           e.preventDefault();
           e.stopPropagation();
@@ -410,14 +291,9 @@ class StoriesManager {
   
   handleSwipe(startX, endX) {
     if (!this.isDesktop && this.isOverlayOpen) return;
-    
     const swipeThreshold = 50;
     const diff = startX - endX;
-    
-    if (this.currentSlide === 0 && diff < 0) {
-      return;
-    }
-    
+    if (this.currentSlide === 0 && diff < 0) return;
     if (Math.abs(diff) > swipeThreshold) {
       if (diff > 0) {
         this.nextSlide();
@@ -432,10 +308,7 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      const slideIndex = activeOverlay.dataset.slideIndex;
-      const slide = this.slides[slideIndex];
-      const expandBtn = slide.querySelector('.caption-expand-btn');
-      this.closeOverlay(activeOverlay, expandBtn);
+      this.closeOverlay(activeOverlay, null);
     }
     
     this.goToSlide(this.currentSlide - 1, 'prev');
@@ -446,10 +319,7 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      const slideIndex = activeOverlay.dataset.slideIndex;
-      const slide = this.slides[slideIndex];
-      const expandBtn = slide.querySelector('.caption-expand-btn');
-      this.closeOverlay(activeOverlay, expandBtn);
+      this.closeOverlay(activeOverlay, null);
     }
     
     if (this.currentSlide < this.totalSlides - 1) {
@@ -464,14 +334,10 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      const slideIndex = activeOverlay.dataset.slideIndex;
-      const slide = this.slides[slideIndex];
-      const expandBtn = slide.querySelector('.caption-expand-btn');
-      this.closeOverlay(activeOverlay, expandBtn);
+      this.closeOverlay(activeOverlay, null);
     }
     
     this.isAnimating = true;
-    
     const isGoingBack = direction === 'prev';
     
     if (isGoingBack) {
@@ -508,54 +374,100 @@ class StoriesManager {
     this.updateArrowVisibility();
     
     setTimeout(() => {
-      const captionContent = this.slides[index].querySelector('.story-caption-content');
-      if (captionContent) {
-        captionContent.scrollTop = 0;
-      }
-      
-      const captionText = this.slides[index].querySelector('.story-caption-text');
-      if (captionText) {
-        captionText.scrollTop = 0;
-      }
-      
       this.isAnimating = false;
     }, 100);
   }
   
+  // Универсальный метод закрытия оверлея
   closeOverlay(overlay, expandBtn) {
-    const slideIndex = overlay.dataset.slideIndex;
-    const slide = this.slides[slideIndex];
+    if (!overlay) return;
     
     overlay.classList.remove('active');
+    this.isOverlayOpen = false;
+    this.container.classList.remove('overlay-open');
     
-    if (!this.isDesktop) {
-      const captionContainer = slide.querySelector('.story-caption-container');
-      if (captionContainer) {
-        captionContainer.classList.remove('hidden');
-      }
+    // Восстанавливаем управление
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 100);
+  }
+  
+  // ==================== НОВЫЙ МЕТОД: Показ полноэкранного оверлея ====================
+  /**
+   * Показывает полноэкранный оверлей с текстом подписи в верхней части экрана
+   * @param {string} captionText - Полный текст подписи для отображения
+   */
+  showFullCaptionOverlay(captionText) {
+    if (this.isOverlayOpen) return;
+    
+    // Ищем существующий оверлей или создаем новый
+    let overlay = document.querySelector('.header-caption-overlay');
+    
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'caption-overlay mobile-overlay header-caption-overlay';
       
-      this.container.classList.remove('overlay-open');
+      const fullscreen = document.createElement('div');
+      fullscreen.className = 'caption-fullscreen';
+      
+      const content = document.createElement('div');
+      content.className = 'caption-fullscreen-content';
+      content.textContent = captionText;
+      
+      fullscreen.appendChild(content);
+      overlay.appendChild(fullscreen);
+      
+      this.container.appendChild(overlay);
+      
+      // Обработчик закрытия по клику на фон
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          this.closeHeaderCaptionOverlay();
+        }
+      });
     } else {
-      const captionContent = slide.querySelector('.story-caption-content');
-      if (captionContent) {
-        captionContent.classList.remove('no-bg');
-      }
-      
-      const captionContainer = slide.querySelector('.story-caption-container');
-      if (captionContainer) {
-        captionContainer.classList.remove('hidden');
-      }
+      // Обновляем текст в существующем оверлее
+      overlay.querySelector('.caption-fullscreen-content').textContent = captionText;
     }
     
+    // Показываем оверлей
+    overlay.classList.add('active');
+    this.isOverlayOpen = true;
+    this.container.classList.add('overlay-open');
+    
+    // Прокручиваем в начало
+    setTimeout(() => {
+      overlay.scrollTop = 0;
+      overlay.querySelector('.caption-fullscreen-content').scrollTop = 0;
+    }, 10);
+    
+    console.log('🎯 Оверлей с подписью открыт');
+  }
+  
+  // ==================== НОВЫЙ МЕТОД: Закрытие оверлея ====================
+  /**
+   * Закрывает оверлей шапки (header overlay)
+   */
+  closeHeaderCaptionOverlay() {
+    const overlay = document.querySelector('.header-caption-overlay');
+    if (!overlay) return;
+    
+    overlay.classList.remove('active');
     this.isOverlayOpen = false;
+    this.container.classList.remove('overlay-open');
+    
+    // Восстанавливаем управление
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 100);
+    
+    console.log('🎯 Оверлей с подписью закрыт');
   }
   
   updateProgressBars() {
     const bars = this.progressContainer.querySelectorAll('.progress-bar');
-    
     bars.forEach((bar, index) => {
       const fill = bar.querySelector('.progress-fill');
-      
       const isViewed = index < this.currentSlide || this.visitedSlides.has(index) || index === this.currentSlide;
       
       if (isViewed) {
@@ -569,7 +481,6 @@ class StoriesManager {
   
   closeStories() {
     const referrer = document.referrer;
-    
     if (referrer && referrer !== window.location.href) {
       window.location.replace(referrer);
     } else {
@@ -581,6 +492,3 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
-
-
-
