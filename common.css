@@ -1,0 +1,102 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'Crooker';
+    src: url('fonts/crooker.otf') format('opentype');
+    font-weight: thin; 
+}
+
+@font-face {
+    font-family: 'Zametka';
+    src: url('fonts/Zametka_Parletter.otf') format('opentype');
+    font-weight: thin;
+}
+
+body {
+    font-family: 'Zametka', sans-serif;
+    height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+@media (max-width: 1080px) {
+    .container {
+        height: 100vh; /* Fallback для старых браузеров */
+        height: 100dvh; /* Dynamic Viewport Height - решает проблему с адресной строкой */
+    }
+}
+
+
+
+@media (min-width: 1081px) {
+    body {
+        background: url('backgrounds/bg_horizontal.jpg') center/cover no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .container {
+        width: auto;
+        height: 90vh;
+        max-width: 650px;
+        max-height: 1100px;
+        min-width: 300px;
+        min-height: 550px;
+        
+        /* Сохраняем пропорции 9:16 */
+        aspect-ratio: 9/16;
+        
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        border-radius: 30px;
+        overflow: hidden;
+        
+    }
+    
+    /* Дополнительные медиа-запросы для особых случаев */
+    @media (max-aspect-ratio: 9/16) {
+        /* Когда экран уже, чем 9:16 */
+        .container {
+            width: 90vw;
+            height: auto;
+        }
+    }
+}
+
+
+@media (min-width: 1081px) {
+    .footer {
+        background-color: rgba(164, 164, 164, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 0 0 30px 30px; /* Закругляем нижние углы как у контейнера */
+    }
+}
+
+/* Предотвращаем скролл страницы при открытом футере */
+body.footer-open {
+    overflow: hidden;
+}
+
+
+/* Убираем подсветку на всех мобильных браузерах (Chrome, Яндекс, Samsung, Safari) */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important; /* iOS Safari */
+  outline: none !important;
+  user-select: none !important; /* Убирает выделение текста */
+}
+
+/* Дополнительно для конкретных элементов */
+button, a, .btn, [onclick], [role="button"] {
+  -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+  -webkit-touch-callout: none !important;
+  outline: none !important;
+}

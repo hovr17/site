@@ -1,0 +1,1 @@
+const HISTORICAL_PLACES = {};

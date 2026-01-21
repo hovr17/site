@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Фото - Храм Ильи Пророка</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="stories.css">
+  
+  <!-- Подключаем данные ДО основного скрипта -->
+  <script src="stories_data.js"></script>
+</head>
+<body>
+  <div class="stories-container">
+    <!-- Текстовая метка "фото объекта" -->
+    <div class="stories-label" id="storiesLabel"></div>
+    
+    <!-- Кнопка закрытия (крестик) -->
+    <button class="close-button" id="closeBtn">
+      <img src="ui/cross.svg" alt="Закрыть">
+    </button>
+
+    <!-- Контейнер для фотографий -->
+    <div class="slides-container" id="slidesContainer">
+      <!-- Фотографии и подписи будут добавляться динамически -->
+    </div>
+
+    <!-- Навигационные стрелки -->
+    <div class="nav-arrows">
+      <button class="nav-arrow prev-arrow hidden" id="prevArrow">
+        <img src="ui/back_button.svg" alt="Предыдущее">
+      </button>
+      <button class="nav-arrow next-arrow" id="nextArrow">
+        <img src="ui/back_button.svg" alt="Следующее">
+      </button>
+    </div>
+
+    <!-- Индикатор прогресса -->
+    <div class="progress-container" id="progressContainer">
+      <!-- Прогресс-бары будут добавляться динамически -->
+    </div>
+  </div>
+
+  <script src="stories.js"></script>
+</body>
+</html>

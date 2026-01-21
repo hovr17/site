@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Фото</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="stories.css">
+</head>
+<body>
+  <div class="stories-container" id="storiesContainer">
+    <!-- Кнопка закрытия -->
+    <button class="close-btn" id="closeBtn">×</button>
+    
+    <!-- Контейнер для фото -->
+    <div class="photo-viewer" id="photoViewer">
+      <img class="story-photo active" id="photo1" src="stories_content/Ilya_Prorok/1.png" alt="Фото 1">
+      <img class="story-photo" id="photo2" src="stories_content/Ilya_Prorok/2.png" alt="Фото 2">
+      <img class="story-photo" id="photo3" src="stories_content/Ilya_Prorok/3.png" alt="Фото 3">
+      <img class="story-photo" id="photo4" src="stories_content/Ilya_Prorok/4.png" alt="Фото 4">
+    </div>
+    
+    <!-- Стрелки для навигации (видимые на ПК) -->
+    <button class="nav-arrow left-arrow" id="prevBtn">‹</button>
+    <button class="nav-arrow right-arrow" id="nextBtn">›</button>
+    
+    <!-- Индикатор прогресса -->
+    <div class="progress-indicator" id="progressIndicator">
+      <div class="progress-bar active"></div>
+      <div class="progress-bar"></div>
+      <div class="progress-bar"></div>
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+  
+  <script src="stories.js"></script>
+</body>
+</html>

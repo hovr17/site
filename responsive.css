@@ -1,0 +1,110 @@
+/* Адаптация для ПК с шириной больше 1080px */
+/*@media (min-width: 1081px) {
+    body {
+        background: url('https://thumb.cloud.mail.ru/thumb/xw1/%D0%A4%D0%BE%D0%BD%20%D0%BF%D0%BA.png?mt=1764162896000') no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    
+    .container {
+        height: 1920px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+}
+
+
+@media (max-width: 1080px) {
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .bird {
+        width: 20vw;
+        height: auto;
+        max-width: 218px;
+        max-height: 243px;
+    }
+    
+    .title1 {
+        font-size: 4.5vw;
+        top: 40%;
+    }
+    
+    .title2 {
+        font-size: 12vw;
+        top: 50%;
+    }
+    
+    .title3 {
+        font-size: 3.5vw;
+        top: 58%;
+    }
+    
+    .open-btn {
+        left: 10%;
+        right: 10%;
+        height: 10vh;
+        min-height: 80px;
+    }
+    
+    .open-btn span {
+        font-size: 8vw;
+    }
+    
+    .page-title {
+        font-size: 9vw;
+        width: 90%;
+        left: 5%;
+        transform: none;
+    }
+    
+    .buttons-container {
+        width: 90%;
+        gap: 5vh;
+    }
+    
+    .category-btn {
+        width: 100%;
+        height: 10vh;
+        min-height: 80px;
+        font-size: 6vw;
+    }
+    
+    .back-arrow {
+        left: 5%;
+        width: 8vw;
+        max-width: 46px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .title1 {
+        font-size: 5vw;
+    }
+    
+    .title2 {
+        font-size: 13vw;
+    }
+    
+    .title3 {
+        font-size: 4vw;
+    }
+    
+    .open-btn span {
+        font-size: 9vw;
+    }
+    
+    .page-title {
+        font-size: 10vw;
+        line-height: 1.2;
+    }
+    
+    .category-btn {
+        font-size: 7vw;
+    }
+}*/

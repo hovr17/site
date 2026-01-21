@@ -1,0 +1,1 @@
+const CULTURAL_PLACES = {};

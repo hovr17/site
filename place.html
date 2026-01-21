@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title><!-- Автоматически --></title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="place.css">
+  <link rel="stylesheet" href="footer.css">
+  <base target="_self">
+</head>
+<body>
+  <!-- Стрелки навигации -->
+  <div class="temple-nav-arrows" id="templeNavArrows">
+    <button class="temple-nav-arrow temple-prev-arrow" id="templePrevArrow">
+      <div class="arrow-icon arrow-prev"></div>
+    </button>
+    <button class="temple-nav-arrow temple-next-arrow" id="templeNextArrow">
+      <div class="arrow-icon arrow-next"></div>
+    </button>
+  </div>
+
+  <div class="container mode-intro" id="frame">
+    <a href="categories.html" class="back-button" id="backBtn">
+      <div class="back-icon"></div>
+    </a>
+
+    <div class="video-background" id="videoPoster"></div>
+    
+    <!-- ⚠️ ПУСТОЙ SRC, заполняется скриптом -->
+    <video class="temple-video" id="bgVideo" muted playsinline webkit-playsinline preload="auto" autoplay loop></video>
+    
+    <div class="overlay-gradient"></div>
+
+    <div class="screen">
+      <div class="scroll-zone" id="scrollZone">
+        <div class="top-spacer"></div>
+
+        <div class="title-block" id="titleBlock">
+          <h1></h1>
+          <div class="entry-note">
+            <span></span>
+            <div class="small-btn" id="paidBtn">
+              <div class="open-icon"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-details" id="heroDetails">
+          <div class="details-header">подробнее:</div>
+          <div class="photo-wrapper"></div>
+        </div>
+
+        <div id="dropdownsContainer"></div>
+      </div>
+    </div>
+
+    <div class="bottom-shadow"></div>
+  </div>
+
+  <!-- ПОРЯДОК КРИТИЧЕН! -->
+  <script src="js/categories/religious_places.js"></script>
+  <script src="js/core/categories_config.js"></script>
+  <script src="js/core/pages_manager.js"></script>
+  <script src="js/core/spa_router.js"></script>
+  <script src="js/core/place_menu.js"></script>
+  
+</body>
+</html>

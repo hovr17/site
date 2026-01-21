@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Категория</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="category.css"> <!-- Создайте под него стили -->
+  <base target="_self">
+</head>
+<body>
+  <!-- Кнопка назад -->
+  <a href="categories.html" class="back-button">
+    <div class="back-icon"></div>
+  </a>
+
+  <div class="category-container">
+    <h1 class="category-title" id="categoryTitle"></h1>
+    <div class="places-list" id="placesList"></div>
+  </div>
+
+  <!-- ПОРЯДОК СКРИПТОВ ДЛЯ КАТЕГОРИИ -->
+  <!-- 1. Все конфиги категорий (загружаем ВСЕ, чтобы CATEGORIES был полным) -->
+  <script src="js/categories/historical_places.js"></script>
+  <script src="js/categories/religious_places.js"></script>
+  <script src="js/categories/cultural_places.js"></script>
+  <script src="js/categories/nature_places.js"></script>
+  
+  <!-- 2. Главный реестр -->
+  <script src="js/core/categories_config.js"></script>
+  
+  <!-- 3. ЛОГИКА СТРАНИЦЫ КАТЕГОРИИ -->
+  <script>
+    console.log('🔥 category.html загружен');
+    
+    // Получаем категорию из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('cat');
+    
+    if (!category) {
+        console.error('❌ Не указана категория в URL');
+        document.body.innerHTML = '<h1>Ошибка: категория не выбрана</h1>';
+    }
+    
+    // Получаем название категории для отображения
+    const CATEGORY_NAMES = {
+        'historical': 'Исторические места',
+        'religious': 'Храмы и монастыри',
+        'cultural': 'Культура и искусство',
+        'nature': 'Природа и парки'
+    };
+    
+    // Устанавливаем заголовок
+    document.getElementById('categoryTitle').textContent = CATEGORY_NAMES[category] || category;
+    
+    // Генерируем список мест
+    const places = window.CATEGORIES[category];
+    const listContainer = document.getElementById('placesList');
+    
+    if (!places || Object.keys(places).length === 0) {
+        listContainer.innerHTML = '<p>Места не найдены</p>';
+    } else {
+        Object.entries(places).forEach(([placeId, config]) => {
+            const item = document.createElement('a');
+            item.className = 'place-item';
+            item.href = `place.html?id=${placeId}&cat=${category}`;
+            
+            // Создаем карточку места
+            item.innerHTML = `
+                <div class="place-image" style="background-image: url('${config.photoButtons?.[0]?.image || 'ui/default.jpg'}')"></div>
+                <div class="place-info">
+                    <h2>${config.title}</h2>
+                    <p>${config.address?.text || ''}</p>
+                </div>
+                <div class="place-arrow">
+                    <div class="arrow-icon arrow-next"></div>
+                </div>
+            `;
+            
+            listContainer.appendChild(item);
+        });
+    }
+    
+    console.log(`✅ Сгенерировано ${Object.keys(places || {}).length} мест для категории: ${category}`);
+  </script>
+</body>
+</html>

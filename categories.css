@@ -1,0 +1,203 @@
+.container {
+    background: url('backgrounds/bg_second_screen.jpg') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    
+    /* ✅ ИСПРАВЛЕНИЕ: Используем динамическую высоту */
+    height: 100dvh;
+    height: 100vh; /* Fallback */
+    
+    padding: 0;
+    padding-top: 5vh;
+    
+    /* ✅ ИСПРАВЛЕНИЕ: Добавляем отступ снизу для безопасной зоны (iPhone Home Indicator) */
+    padding-bottom: env(safe-area-inset-bottom);
+    
+    overflow: hidden;
+}
+
+/* Кнопка назад */
+.back-button {
+    position: absolute;
+    top: 3vh;
+    left: 3vw;
+    width: min(60px, 9vmin);
+    height: min(30px, 5vmin);
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+    z-index: 10;
+    text-decoration: none;
+}
+
+.back-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Заголовок */
+.title {
+    font-family: 'Zametka', sans-serif;
+    font-size: clamp(28px, 9vmin, 70px);
+    line-height: 1.1;
+    letter-spacing: 0.05em;
+    color: white;
+    text-align: center;
+    margin-top: 4.4vh;
+    margin-bottom: 4vh;
+    width: 90%;
+    max-width: 800px;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 100;
+    padding: 0 20px;
+}
+
+/* Контейнер для кнопок */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 0 20px;
+    gap: 4.3vh;
+    margin-bottom: 4vh;
+    box-sizing: border-box;
+}
+
+
+/* Кнопки категорий */
+.category-btn {
+    width: min(600px, 90%, 90vw);
+    height: min(80px, 4vh, 10vmin);
+    
+    padding-top: 0.5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    
+    color: white;
+    font-family: 'Zametka', sans-serif;
+    font-size: clamp(20px, 7vmin, 80px);
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+    text-align: center;
+    z-index: 1;
+    
+    font-weight: 100;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    
+}
+
+/* Фон кнопки */
+.category-btn::before {
+    content: "";
+    position: absolute;
+    top: -0.8vmin;
+    left: -0.8vmin;
+    right: -0.8vmin;
+    bottom: -0.8vmin;
+    background: rgba(224, 224, 224, 0.19);
+    border-radius: 60px;
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+/* Обводка кнопки */
+.category-btn::after {
+    content: "";
+    position: absolute;
+    top: -2vmin;
+    left: -2vmin;
+    right: -2vmin;
+    bottom: -2vmin;
+    border: 0.6vmin solid rgba(255, 255, 255, 0.75);
+    border-radius: 65px;
+    z-index: -2;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+
+@media (min-width: 768px) and (max-width: 1080px) {
+    .buttons-container {
+        gap: 8vh;
+    }
+}
+
+@media  (max-width: 1080px) {
+    .buttons-container {
+        gap: 5vh;
+    }
+}
+
+@media  (min-width: 960px) and (max-width: 1079px){
+    .category-btn {
+        font-size: clamp(24px, 4vmin, 40px);
+    }
+}
+
+
+/* Адаптация для ПК (широких экранов) */
+@media (min-width: 1081px) {
+    .container {
+        padding-top: 4vh;
+    }
+    
+    .back-button {
+        top: min(40px, 5vh);
+        left: min(20px, 3vw);
+        width: min(60px, 6vmin);
+        height: min(30px, 3vmin);
+    }
+    
+    .title {
+        margin-top: min(110px, 5vh);
+        margin-bottom: min(50px, 6vh);
+        font-size: clamp(35px, 4vmin, 55px);
+    }
+    
+    .buttons-container {
+        gap: 5vh;
+        margin-bottom: 3vh;
+        max-width: 700px;
+    }
+    
+    .category-btn {
+        width: min(600px, 85%, 70vw);
+        height: min(80px, 3vh, 10vmin);
+        font-size: clamp(24px, 3.5vmin, 40px);
+    }
+    
+    /* Уменьшаем отступы псевдоэлементов на ПК */
+    .category-btn::before {
+        top: -0.6vmin;
+        left: -0.6vmin;
+        right: -0.6vmin;
+        bottom: -0.6vmin;
+        border-radius: 50px;
+    }
+    
+    .category-btn::after {
+        top: -1.2vmin;
+        left: -1.2vmin;
+        right: -1.2vmin;
+        bottom: -1.2vmin;
+        border-width: 0.3vmin;
+        border-radius: 55px;
+    }
+}
+
+@media (max-height: 450px){
+    .buttons-container {
+        gap: 8vh;
+    }
+}

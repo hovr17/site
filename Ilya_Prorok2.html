@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Храм Ильи Пророка</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="Ilya_Prorok.css">
+  <link rel="stylesheet" href="footer.css">
+  <base target="_self">
+  
+</head>
+<body>
+  <!-- Стрелки навигации для ПК -->
+  <div class="temple-nav-arrows" id="templeNavArrows">
+    <button class="temple-nav-arrow temple-prev-arrow" id="templePrevArrow">
+      <div class="arrow-icon arrow-prev"></div>
+    </button>
+    <button class="temple-nav-arrow temple-next-arrow" id="templeNextArrow">
+      <div class="arrow-icon arrow-next"></div>
+    </button>
+  </div>
+
+  <div class="container mode-intro" id="frame">
+    <!-- Кнопка назад -->
+    <a href="categories.html" class="back-button" id="backBtn">
+      <div class="back-icon"></div>
+    </a>
+
+    <!-- Видео и фон -->
+    <div class="video-background" id="videoPoster"></div>
+    <video  class="temple-video" id="bgVideo" src="videos/kreml.mp4" muted playsinline preload="auto" loop autoplay></video>
+    <div class="overlay-gradient"></div>
+
+    <div class="screen">
+      <div class="scroll-zone" id="scrollZone">
+        <div class="top-spacer"></div>
+
+        <!-- Заголовок -->
+        <div class="title-block" id="titleBlock">
+          <h1> <br class="title-break"> Кремль</h1>
+          <div class="entry-note">
+            <span>вход платный</span>
+            <div class="small-btn" id="paidBtn">
+              <div class="open-icon"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- "Подробнее" + карточки Фото -->
+        <div class="hero-details" id="heroDetails">
+          <div class="details-header">подробнее:</div>
+          <div class="photo-wrapper">
+            <a href="stories.html?place=Ilya_Prorok" class="photo-card" id="photoCard1">
+              <div class="photo-label">фото</div>
+            </a>
+            <a href="stories.html?place=Ilya_Prorok2" class="photo-card" id="photoCard2">
+              <div class="photo-label">фото</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Выпадающие блоки -->
+        <div id="dropdownsContainer">
+          <div class="dropdown" id="addressDrop">
+            <div class="dropdown-header">
+              <div class="dropdown-icon geo-icon"></div>
+              <div class="dropdown-title">АДРЕС</div>
+              <div class="dropdown-arrow">
+                <div class="arrow-down-icon"></div>
+              </div>
+            </div>
+            <div class="dropdown-body">
+              <p><a href="https://yandex.ru/maps/-/CLszzBKH" class="address-link" target="_blank" rel="noopener noreferrer">кремлевская улица 20</a></p>
+            </div>
+          </div>
+
+          <div class="dropdown" id="usefulDrop">
+            <div class="dropdown-header">
+              <div class="dropdown-icon bulb-icon"></div>
+              <div class="dropdown-title">ПОЛЕЗНОЕ</div>
+              <div class="dropdown-arrow">
+                <div class="arrow-down-icon"></div>
+              </div>
+            </div>
+            <div class="dropdown-body">
+              <p>оценка на картах 4,8<br>
+                часы работы: пн,вт,чт,пт 10:00–18:00; сб 10:00–19:00; вс 10:00–18:00<br>
+                Сайт: <a href="https://www.kupibilet.ru/" class="address-link" target="_blank" rel="noopener noreferrer">spaso-evfimiev.ru</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-shadow"></div>
+  </div>
+
+  <!-- Подключение существующих скриптов -->
+  <script src="place_navigation.js"></script>
+  <script src="navigation.js"></script>
+  <script src="place_menu.js"></script>
+
+</body>
+</html>

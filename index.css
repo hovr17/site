@@ -1,0 +1,210 @@
+.container {
+    background: url('backgrounds/bg_first_screen.jpg') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-start; 
+    position: relative;
+    
+    /* ✅ ИСПРАВЛЕНИЕ 1: Используем dvh (Dynamic Viewport Height) для мобильных */
+    height: 100dvh; 
+    /* Fallback для старых браузеров */
+    height: 100vh;
+    
+    padding: 0;
+    padding-top: 5vh; 
+    
+    /* ✅ ИСПРАВЛЕНИЕ 2: Добавляем отступ снизу для iPhone Home Indicator */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bird {
+    width: 20vmin;
+    height: 22vmin;
+    min-width: 100px;
+    min-height: 110px;
+    max-width: 280px;
+    max-height: 300px;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    margin-bottom: 2vh;
+    object-fit: contain;
+}
+
+.title {
+    font-family: 'Crooker', sans-serif;
+    font-size: clamp(20px, 4.5vmin, 42px);
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    color: white;
+    text-align: center; 
+    margin-bottom: 0.5vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 100;
+    width: 100%;
+}
+
+.subtitle {
+    font-family: 'Zametka', sans-serif;
+    font-size: clamp(32px, 12vmin, 110px);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    color: white;
+    text-align: center; 
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 100;
+    width: 100%; 
+}
+
+.places {
+    font-size: clamp(16px, 3.5vmin, 32px);
+    line-height: 1.2;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    color: white;
+    text-align: center; 
+
+    width: 100%; 
+}
+
+.places-number {
+    font-family: 'Zametka', sans-serif;
+}
+
+.places-text {
+    font-family: 'Crooker', sans-serif;
+}
+
+.open-btn {
+    width: min(500px, 55%, 60vw);
+    height: min(100px, 15vh, 12vw);
+    background-color: transparent;
+    border-radius: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    position: absolute;
+    
+    /* ✅ ИСПРАВЛЕНИЕ 3: Приподнять кнопку над панелью iPhone */
+    bottom: calc(10vh + env(safe-area-inset-bottom));
+    
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: 'Zametka', sans-serif;
+    font-size: clamp(28px, 8vmin, 70px);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    z-index: 1;
+    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 100;
+    padding-top: 0.5vh;
+    padding-left: 0.6vh;
+}
+
+.open-btn::before {
+    content: "";
+    position: absolute;
+    top: -1vmin;
+    left: -1vmin;
+    right: -1vmin;
+    bottom: -1vmin;
+    background: rgba(222, 222, 222, 0.1);
+    border-radius: inherit;
+    backdrop-filter: blur(5px);
+    z-index: -1;
+}
+
+.open-btn::after {
+    content: "";
+    position: absolute;
+    top: -2vmin;
+    left: -2vmin;
+    right: -2vmin;
+    bottom: -2vmin;
+    border: 0.5vmin solid rgba(255, 255, 255, 1);
+    border-radius: 90px;
+    z-index: -2;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+}
+
+
+@media (min-width: 1081px) {
+    .container {
+        padding-top: 4vh;
+        justify-content: flex-start;
+    }
+    
+    .bird {
+        width: 12vmin; 
+        height: 13vmin;
+        min-width: 60px;
+        min-height: 65px;
+        max-width: 120px;
+        max-height: 130px;
+        margin-bottom: 3vh;
+    }
+    
+    .title {
+        font-size: clamp(20px, 3.5vmin, 27px); 
+        margin-bottom: 1vh;
+    }
+    
+    .subtitle {
+        font-size: clamp(24px, 6vmin, 70px); 
+    }
+    
+    .places {
+        font-size: clamp(14px, 2vmin, 20px);
+    }
+    
+    .open-btn {
+        width: min(300px, 70vw); 
+        height: min(60px, 8vh);
+        font-size: clamp(25px, 3.7vmin, 50px);
+        
+        /* ✅ Обновляем отступ для десктопа */
+        bottom: calc(8vh + env(safe-area-inset-bottom));
+    }
+    
+    .open-btn::before {
+        top: -0.5vmin;
+        left: -0.5vmin;
+        right: -0.5vmin;
+        bottom: -0.5vmin;
+    }
+    
+    .open-btn::after {
+        top: -1vmin;
+        left: -1vmin;
+        right: -1vmin;
+        bottom: -1vmin;
+        border: 0.3vmin solid rgba(255, 255, 255, 1);
+    }
+}
+
+/* Для очень коротких экранов на десктопах (приоритет выше) */
+@media (min-width: 1079px) and (max-height: 900px) {
+    .open-btn {
+        width: min(500px, 45%, 50vw); 
+        height: min(50px, 5vh, 6vw);
+        font-size: clamp(22px, 3.5vmin, 45px);
+        
+        /* ✅ Обновляем отступ для коротких экранов */
+        bottom: calc(6vh + env(safe-area-inset-bottom));
+    }
+    
+    .container {
+        padding-top: 3vh;
+    }
+    
+    .bird {
+        margin-bottom: 2vh;
+    }
+}

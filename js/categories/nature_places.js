@@ -1,0 +1,1 @@
+const NATURE_PLACES = {};
