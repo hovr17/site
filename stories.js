@@ -21,21 +21,29 @@ class StoriesManager {
     this.init();
   }
   
- checkBrowserSpecifics() {
-    const userAgent = navigator.userAgent;
-    
-    // Проверяем, это ли Chrome на Android
-    // (Android Chrome содержит 'Chrome' и 'Android', но не 'Edg' или 'OPR' и т.д.)
-    const isChromeAndroid = /Chrome/.test(userAgent) && /Android/.test(userAgent) && !/Edg|OPR|SamsungBrowser/i.test(userAgent);
-
-    if (isChromeAndroid) {
-      // Если это Chrome на Android — добавляем класс, который убирает отступы
-      document.documentElement.classList.add('no-lift');
-      console.log('🧭 Обнаружен Chrome Android: Подъем отключен (отступы 0)');
-    } else {
-      console.log('🧭 Обычный браузер / Safari / Яндекс: Подъем активирован');
-    }
+checkBrowserSpecifics() {
+  // Более точная проверка Chrome Android
+  const userAgent = navigator.userAgent;
+  
+  // Chrome Android имеет "Chrome" и "Mobile", но не "Edg", "OPR", "SamsungBrowser"
+  const isChromeAndroid = /Chrome/.test(userAgent) && 
+                         /Android/.test(userAgent) && 
+                         /Mobile/.test(userAgent) &&
+                         !/Edg|OPR|SamsungBrowser|YaBrowser|Firefox/.test(userAgent);
+  
+  // Современная проверка через userAgentData (если доступно)
+  const isModernChromeAndroid = navigator.userAgentData?.brands?.some(
+    b => b.brand === 'Google Chrome' && navigator.userAgentData.mobile
+  );
+  
+  if (isChromeAndroid || isModernChromeAndroid) {
+    document.documentElement.classList.add('no-lift');
+    console.log('✅ Chrome Android: отступы убраны');
+  } else {
+    console.log('⏫ Другой браузер: подъем активен');
+    console.log('User Agent:', userAgent); // Для отладки
   }
+}
   // ================================
 
   init() {
@@ -573,4 +581,5 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
