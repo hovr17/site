@@ -1,5 +1,4 @@
-
-console.log('place_menu.js загружен');
+console.log('place_menu.js загружен (с полноэкранной кнопкой)');
 
 let mode = "intro";
 let isAnimating = false;
@@ -10,71 +9,49 @@ let touchStartY = null;
 let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
-// ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ =====
+// ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ (ЯНДЕКС БРАУЗЕР СОВМЕСТИМОСТЬ) =====
 
 /**
- * Переключение полноэкранного режима
+ * Переключение полноэкранного режима с обработкой ошибок
  */
 function toggleFullscreen() {
-  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-  if (!isFullscreen) {
-    enterFullscreen();
-  } else {
-    exitFullscreen();
+  try {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      enterFullscreen();
+    } else {
+      exitFullscreen();
+    }
+  } catch (error) {
+    console.error('Ошибка при переключении полноэкранного режима:', error);
   }
 }
 
 /**
- * Вход в полноэкранный режим (Улучшенная версия для Мобильных)
+ * Вход в полноэкранный режим (с поддержкой Яндекс Браузера)
  */
 function enterFullscreen() {
   const elem = document.documentElement;
-  const body = document.body;
   
-  console.log('👆 Пытаюсь войти в полноэкранный режим...');
-  console.log('Текущий протокол:', window.location.protocol);
-
-  // Проверка протокола (Важно: File API блокируется на file://)
-  if (window.location.protocol === 'file:') {
-    console.warn('⚠️ Внимание: Полноэкранный режим может быть заблокирован, так как сайт открыт как файл. Рекомендуется HTTPS.');
-  }
-
-  let promise;
+  // Проверяем поддержку API
+  const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen;
   
-  // 1. Пытаемся через стандартный API (Chrome, Edge, Yandex)
-  if (elem.requestFullscreen) {
-    promise = elem.requestFullscreen();
-  } 
-  // 2. Фоллбек для Safari/Yandex (webkit)
-  else if (elem.webkitRequestFullscreen) {
-    promise = elem.webkitRequestFullscreen(); 
-  } 
-  // 3. В редких случаях Яндекс на Android лучше реагирует на body
-  else if (body.requestFullscreen) {
-    promise = body.requestFullscreen();
-  } else {
-    console.error('❌ Браузер не поддерживает Fullscreen API.');
-    return;
-  }
-
-  // Обработка Promise (если браузер возвращает Promise)
-  if (promise) {
-    promise
-      .then(() => {
-        console.log('✅ Успешный вход в полноэкранный режим.');
-        // Раскомментируйте строку ниже для проверки на телефоне:
-        // alert('Полноэкранный режим ВКЛЮЧЕН');
-      })
-      .catch(err => {
-        console.error('❌ Ошибка входа в полноэкранный режим:', err);
-        console.error('Причина:', err.message);
-        
-        if (err.name === 'NotAllowedError') {
-            console.error('Браузер запретил полноэкранный режим. Убедитесь, что сайт открыт по HTTPS, а не как файл.');
-            // Раскомментируйте строку ниже для проверки на телефоне:
-            // alert('Ошибка: Браузер запретил режим. Требуется HTTPS.');
+  if (requestFS) {
+    // Важно: вызываем напрямую в контексте элемента
+    const promise = requestFS.call(elem);
+    
+    if (promise) {
+      promise.catch(err => {
+        console.warn('Не удалось войти в полноэкранный режим:', err.message);
+        // Для Яндекс Браузера: возможно нужно повторить через таймаут
+        if (err.name === 'TypeError') {
+          setTimeout(() => {
+            requestFS.call(elem);
+          }, 100);
         }
       });
+    }
+  } else {
+    console.warn('Full screen API не поддерживается');
   }
 }
 
@@ -82,11 +59,16 @@ function enterFullscreen() {
  * Выход из полноэкранного режима
  */
 function exitFullscreen() {
-  console.log('👇 Выход из полноэкранного режима...');
-  if (document.exitFullscreen) {
-    document.exitFullscreen().catch(err => console.error(err));
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen();
+  const exitFS = document.exitFullscreen || document.webkitExitFullscreen;
+  
+  if (exitFS) {
+    const promise = exitFS.call(document);
+    
+    if (promise) {
+      promise.catch(err => {
+        console.warn('Не удалось выйти из полноэкранного режима:', err);
+      });
+    }
   }
 }
 
@@ -98,8 +80,9 @@ function handleFullscreenChange() {
   if (!btn) return;
   
   const icon = btn.querySelector('div');
-  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+  const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
   
+  // Обновляем иконку
   if (isFullscreen) {
     icon.classList.remove('fullscreen-icon');
     icon.classList.add('fullscreen-exit-icon');
@@ -107,6 +90,11 @@ function handleFullscreenChange() {
     icon.classList.remove('fullscreen-exit-icon');
     icon.classList.add('fullscreen-icon');
   }
+  
+  // Обновляем видимость кнопки
+  updateFullscreenButtonVisibility();
+  
+  console.log('Полноэкранный режим:', isFullscreen ? 'ВКЛ' : 'ВЫКЛ');
 }
 
 /**
@@ -118,8 +106,14 @@ function updateFullscreenButtonVisibility() {
   
   const isMobile = window.innerWidth <= 1080;
   const isIntroMode = mode === 'intro';
+  const isAlreadyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
   
-  btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
+  // Показываем только на мобильных, в режиме intro и если еще не в полноэкранном режиме
+  if (isMobile && isIntroMode && !isAlreadyFullscreen) {
+    btn.style.display = 'flex';
+  } else {
+    btn.style.display = 'none';
+  }
 }
 
 /**
@@ -127,74 +121,33 @@ function updateFullscreenButtonVisibility() {
  */
 function initializeFullscreenButton() {
   const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
+  if (!btn) {
+    console.warn('Кнопка полноэкранного режима не найдена');
+    return;
+  }
   
-  btn.addEventListener('click', toggleFullscreen);
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleFullscreen();
+  });
+  
+  // Слушаем изменения полноэкранного режима
   document.addEventListener('fullscreenchange', handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-}
-
-// ===== ГЛОБАЛЬНЫЙ КЛИК ДЛЯ ПОЛНОЭКРАННОГО РЕЖИМА (ИСПРАВЛЕННЫЙ) =====
-
-/**
- * Настраивает переход в полноэкранный режим.
- * Используем touchstart/touchend для мобильных, чтобы избежать конфликтов со свайпами.
- */
-function setupGlobalFullscreenTrigger() {
-  const frame = document.getElementById('frame');
-  if (!frame) return;
-
-  // Локальные переменные для отслеживания тапа (не путать с глобальными touchStart для свайпов)
-  let tapStartX = 0;
-  let tapStartY = 0;
-
-  frame.addEventListener('touchstart', (e) => {
-    if (mode !== 'intro') return;
-    tapStartX = e.touches[0].clientX;
-    tapStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  frame.addEventListener('touchend', (e) => {
-    // Работаем только в режиме intro
-    if (mode !== 'intro') return;
-
-    // Работаем только на мобильных
-    const isMobile = window.innerWidth <= 1080;
-    if (!isMobile) return;
-
-    // Исключаем клики по интерактивным элементам
-    const isInteractive = e.target.closest(
-      'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
-    );
-    if (isInteractive) return;
-
-    // Проверяем, что это был именно тап (смещение < 10px), а не свайп
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-    const diffX = Math.abs(endX - tapStartX);
-    const diffY = Math.abs(endY - tapStartY);
-
-    if (diffX < 10 && diffY < 10) {
-       // Это точный тап, а не свайп -> вызываем enterFullscreen
-       enterFullscreen();
-       console.log('📱 Tap по экрану (Mobile): Попытка входа в полноэкранный режим');
-    }
+  
+  // Следим за visibilitychange (когда пользователь выходит через системные кнопки)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    setTimeout(updateFullscreenButtonVisibility, 100);
   });
-
-  // Для ПК оставляем обычный клик
-  frame.addEventListener('click', (e) => {
-    if (mode !== 'intro') return;
-    const isMobile = window.innerWidth <= 1080;
-    if (isMobile) return; // На мобильных обрабатываем через touchend выше
-
-    const isInteractive = e.target.closest(
-      'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
-    );
-    if (isInteractive) return;
-
-    enterFullscreen();
-    console.log('🖱️ Клик по экрану (Desktop): Вход в полноэкранный режим');
-  });
+  
+  // Следим за изменением размера экрана
+  window.addEventListener('resize', updateFullscreenButtonVisibility);
+  
+  // Обновляем при инициализации
+  updateFullscreenButtonVisibility();
+  
+  console.log('✅ Кнопка полноэкранного режима инициализирована');
 }
 
 // ===== СУЩЕСТВУЮЩИЙ КОД =====
@@ -586,8 +539,7 @@ window.initializeMenu = function() {
     }
     
     initializeDropdownsAndButtons();
-    initializeFullscreenButton();
-    setupGlobalFullscreenTrigger();
+    initializeFullscreenButton(); // ✅ Инициализация кнопки полноэкранного режима
     setupSwipeHandlers();
     setupKeyboardHandlers();
     
@@ -605,4 +557,3 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
-
