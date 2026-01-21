@@ -224,7 +224,9 @@ class StoriesManager {
       overlay.addEventListener('click', handleOverlayClick);
       
       captionContent.appendChild(expandBtn);
-      captionContent.style.maxHeight = '150px';
+      if (this.isDesktop) {
+    captionContent.style.maxHeight = '150px';
+  }
       
       captionContent.scrollTop = 0;
       textElement.scrollTop = 0;
@@ -591,4 +593,5 @@ class StoriesManager {
 
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
+
 });
