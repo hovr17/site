@@ -1961,87 +1961,7 @@
 }
 
 
-
-/* ===== ПОЛНОЭКРАННАЯ КНОПКА (МОБИЛЬНЫЕ УСТРОЙСТВА) ===== */
-
-.fullscreen-button {
-  position: absolute;
-  top: 3vh;
-  right: 3vw;
-  width: min(60px, 9vmin);
-  height: min(30px, 5vmin);
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
-  z-index: 9999; /* МАКСИМАЛЬНЫЙ z-index */
-  background: rgba(255, 255, 255, 0.1); /* Полупрозрачный фон для видимости */
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-  cursor: pointer;
-  display: none; /* Скрыто по умолчанию */
-  padding: 0;
-  pointer-events: auto !important; /* ВКЛЮЧАЕМ ОБРАБОТКУ КЛИКОВ */
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-touch-callout: none !important;
-  outline: none !important;
-  user-select: none !important;
-}
-
-/* Показываем только на мобильных в режиме intro */
-@media (max-width: 1080px) {
-  .mode-intro .fullscreen-button {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .mode-details .fullscreen-button {
-    display: none !important;
-  }
-}
-
-/* Иконки для кнопки */
-.fullscreen-icon {
-  width: 80%;
-  height: 80%;
-  background: url('./ui/fullscreen_enter.svg') center/contain no-repeat;
-  transition: transform 0.2s ease;
-}
-
-.fullscreen-exit-icon {
-  width: 80%;
-  height: 80%;
-  background: url('./ui/fullscreen_exit.svg') center/contain no-repeat;
-  transition: transform 0.2s ease;
-}
-
-/* Текстовый фолбек (если SVG не загружен) */
-.fullscreen-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: clamp(18px, 5vmin, 28px);
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  pointer-events: none; /* Текст не мешает клику */
-}
-
-/* Эффект нажатия */
-.fullscreen-button:active .fullscreen-icon,
-.fullscreen-button:active .fullscreen-exit-icon,
-.fullscreen-button:active .fullscreen-text {
-  transform: scale(0.9);
-}
-
-/* ОТЛАДКА: Если кнопка не работает, уберите комментарий */
-/* .fullscreen-button {
-  border: 2px solid red !important;
-  background: rgba(255,0,0,0.3) !important;
-} */
-
-
-
-
-/* ===== РЕШЕНИЕ ДЛЯ ЯНДЕКС БРАУЗЕРА И MOBILE SAFARI ===== */
+/* ===== ФИКС ДЛЯ ОТОБРАЖЕНИЯ НАД БРАУЗЕРНОЙ ПАНЕЛЬЮ (как TikTok) ===== */
 
 /* Для мобильных устройств: контент над панелью браузера */
 @media (max-width: 1080px) {
@@ -2086,51 +2006,32 @@
   .scroll-zone {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
   }
-}
-
-/* Скрываем нижнюю тень на мобильных, чтобы не перекрывала контент */
-@media (max-width: 1080px) {
+  
+  /* Скрываем нижнюю тень на мобильных, чтобы не перекрывала контент */
   .bottom-shadow {
     display: none !important;
   }
 }
 
-/* ===== ПОДНЯТИЕ ЭЛЕМЕНТОВ НА 4vh ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI ===== */
-
-/* ===== ПОДНЯТИЕ ЭЛЕМЕНТОВ НА 0.5vh ТОЛЬКО ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI ===== */
-
-/* Для Яндекс Браузера (мобильный) */
-body.yandex-browser .mode-intro .title-block {
-  transform: translateY(calc(22vh - 200px - 0.5vh)) !important;
+/* ===== СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ ЯНДЕКС БРАУЗЕРА ===== */
+@media (max-width: 1080px) and (max-height: -webkit-fill-available) {
+  .yandex-browser .container {
+    height: -webkit-fill-available !important;
+    max-height: -webkit-fill-available !important;
+  }
 }
 
-body.yandex-browser .mode-intro .hero-details {
-  transform: translateY(calc(38vh - 200px - 0.5vh)) !important;
+/* ===== СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ SAFARI ===== */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 1080px) {
+    .safari-browser .container {
+      height: -webkit-fill-available !important;
+      max-height: -webkit-fill-available !important;
+    }
+    
+    .safari-browser .temple-video,
+    .safari-browser .video-background {
+      height: -webkit-fill-available !important;
+    }
+  }
 }
-
-body.yandex-browser .mode-intro #dropdownsContainer {
-  transform: translateY(calc(38vh - 200px - 0.5vh)) !important;
-}
-
-body.yandex-browser .mode-intro .entry-note {
-  margin-top: -0.5vh !important;
-}
-
-/* Для Safari (мобильный) */
-body.safari-browser .mode-intro .title-block {
-  transform: translateY(calc(22vh - 200px - 0.5vh)) !important;
-}
-
-body.safari-browser .mode-intro .hero-details {
-  transform: translateY(calc(38vh - 200px - 0.5vh)) !important;
-}
-
-body.safari-browser .mode-intro #dropdownsContainer {
-  transform: translateY(calc(38vh - 200px - 0.5vh)) !important;
-}
-
-body.safari-browser .mode-intro .entry-note {
-  margin-top: -0.5vh !important;
-}
-
-
