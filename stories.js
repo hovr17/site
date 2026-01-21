@@ -21,39 +21,18 @@ class StoriesManager {
     this.init();
   }
   
-  // === ОБНОВЛЕННАЯ ФУНКЦИЯ ===
-  // === БЕЗОТКАЗНАЯ ЛОГИКА ===
   checkBrowserSpecifics() {
-    const ua = navigator.userAgent;
-    
-    // 1. Определяем Яндекс
-    const isYandex = /YaBrowser/i.test(ua);
-
-    // 2. Определяем Apple Safari
-    // (Важно: исключаем Chrome и CriOS, чтобы iOS Chrome считался обычным Chrome)
-    const isSafari = /^((?!chrome|crios|android).)*safari/i.test(ua);
-
-    if (isSafari || isYandex) {
-      // Включаем подъем ТОЛЬКО для Сафари и Яндекса
-      document.documentElement.classList.add('enable-lift');
-      console.log('🧭 Обнаружен Safari или Яндекс: Подъем ВКЛЮЧЕН');
-    } else {
-      // Для всех остальных (Google Chrome, Firefox и др.) - ничего не делаем (подъем отключен по умолчанию)
-      console.log('🧭 Обычный браузер (Google Chrome): Подъем ОТКЛЮЧЕН');
-    }
+    // Упрощенная проверка отключена для универсального поведения
+    document.documentElement.classList.add('no-lift');
+    console.log('✅ Режим без отступов активирован для всех браузеров');
   }
 
-
-  // ================================
-
   init() {
-    // ВЫЗЫВАЕМ ПРОВЕРКУ БРАУЗЕРА
     this.checkBrowserSpecifics();
 
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
     
-    // ... rest of the init method ...
     this.placeData = storiesData[this.placeId];
     
     if (!this.placeData) {
@@ -116,117 +95,38 @@ class StoriesManager {
   }
   
   addCaptionToSlide(slide, index, captionText) {
-    const captionContainer = document.createElement('div');
-    captionContainer.className = 'story-caption-container';
-    
-    const captionContent = document.createElement('div');
-    captionContent.className = 'story-caption-content';
-    
-    // Проверяем длину текста на всех устройствах (ОБЩАЯ ЛОГИКА)
     const isLongText = captionText.length > 135;
     
+    // Создаем ВЕРХНЮЮ панель (вместо нижнего контейнера)
+    const headerPanel = document.createElement('div');
+    headerPanel.className = 'story-header-panel';
+    
+    // Текст (обрезанный для длинных подписей)
+    const headerText = document.createElement('div');
+    headerText.className = 'story-header-text';
+    headerText.textContent = isLongText 
+      ? captionText.substring(0, 135).replace(/\s+\S*$/, '...') 
+      : captionText;
+    
+    headerPanel.appendChild(headerText);
+    
+    // Кнопка раскрытия (только для длинного текста)
     if (isLongText) {
-      // Обрезаем текст до ближайшего слова
-      const shortText = captionText.substring(0, 135);
-      const lastSpaceIndex = shortText.lastIndexOf(' ');
-      const displayText = lastSpaceIndex > 0 
-        ? shortText.substring(0, lastSpaceIndex) 
-        : shortText;
-      
-      // Создаем элемент с обрезанным текстом и многоточием
-      const textElement = document.createElement('div');
-      textElement.className = 'story-caption-text';
-      
-      const shortSpan = document.createElement('span');
-      shortSpan.className = 'caption-short';
-      shortSpan.textContent = displayText + '...';
-      
-      const fullSpan = document.createElement('span');
-      fullSpan.className = 'caption-full';
-      fullSpan.style.display = 'none';
-      fullSpan.textContent = captionText;
-      
-      textElement.appendChild(shortSpan);
-      textElement.appendChild(fullSpan);
-      captionContent.appendChild(textElement);
-      
-      // Создаем оверлей для полного текста
-      const overlay = document.createElement('div');
-      overlay.className = this.isDesktop ? 'caption-overlay' : 'caption-overlay mobile-overlay';
-      overlay.dataset.slideIndex = index;
-      
-      const fullscreenCaption = document.createElement('div');
-      fullscreenCaption.className = 'caption-fullscreen';
-      
-      const fullscreenContent = document.createElement('div');
-      fullscreenContent.className = 'caption-fullscreen-content';
-      fullscreenContent.textContent = captionText;
-      
-      fullscreenCaption.appendChild(fullscreenContent);
-      overlay.appendChild(fullscreenCaption);
-      
-      // Кнопка раскрытия (отображается на ВСЕХ устройствах для длинного текста)
       const expandBtn = document.createElement('button');
-      expandBtn.className = this.isDesktop ? 'caption-expand-btn' : 'caption-expand-btn mobile-expand-btn';
-      expandBtn.innerHTML = `
-        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
-      `;
+      expandBtn.className = 'header-caption-expand-btn';
+      expandBtn.innerHTML = `<img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">`;
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        
-        // Показываем оверлей
-        if (this.isDesktop) {
-          captionContent.classList.add('no-bg');
-        }
-        captionContainer.classList.add('hidden');
-        overlay.classList.add('active');
-        this.isOverlayOpen = true;
-        
-        if (!this.isDesktop) {
-          this.container.classList.add('overlay-open');
-        }
-        
-        setTimeout(() => {
-          fullscreenCaption.scrollTop = 0;
-          fullscreenContent.scrollTop = 0;
-        }, 10);
+        this.showFullCaptionOverlay(captionText);
       });
       
-      // Обработчик закрытия оверлея
-      const handleOverlayClick = (e) => {
-        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
-          this.closeOverlay(overlay, expandBtn);
-        }
-      };
-      
-      overlay.addEventListener('click', handleOverlayClick);
-      overlay.addEventListener('touchend', handleOverlayClick);
-      
-      captionContent.appendChild(expandBtn);
-      captionContainer.appendChild(captionContent);
-      slide.appendChild(captionContainer);
-      slide.appendChild(overlay);
-      
-      // Ограничиваем высоту на десктопе
-      if (this.isDesktop) {
-        captionContent.style.maxHeight = '150px';
-      }
-    } else {
-      // Короткий текст - отображаем без кнопки на всех устройствах
-      const textElement = document.createElement('div');
-      textElement.className = 'story-caption-text';
-      textElement.textContent = captionText;
-      captionContent.appendChild(textElement);
-      
-      if (this.isDesktop) {
-        captionContent.style.maxHeight = 'none';
-      }
-      
-      captionContainer.appendChild(captionContent);
-      slide.appendChild(captionContainer);
+      headerPanel.appendChild(expandBtn);
     }
+    
+    slide.appendChild(headerPanel);
+    slide.classList.add('has-caption');
   }
   
   createProgressBars() {
@@ -269,15 +169,25 @@ class StoriesManager {
       if (e.key === 'ArrowLeft') this.prevSlide();
       if (e.key === 'ArrowRight') this.nextSlide();
       if (e.key === 'Escape') {
-        const overlay = document.querySelector('.caption-overlay.active');
-        if (overlay) {
-          const slideIndex = overlay.dataset.slideIndex;
+        // Проверяем сначала новый оверлей
+        const headerOverlay = document.querySelector('.header-caption-overlay.active');
+        if (headerOverlay) {
+          this.closeHeaderCaptionOverlay();
+          return;
+        }
+        
+        // Потом старый оверлей
+        const oldOverlay = document.querySelector('.caption-overlay.active:not(.header-caption-overlay)');
+        if (oldOverlay) {
+          const slideIndex = oldOverlay.dataset.slideIndex;
           const slide = this.slides[slideIndex];
           const expandBtn = slide.querySelector('.caption-expand-btn');
-          this.closeOverlay(overlay, expandBtn);
-        } else {
-          this.closeStories();
+          this.closeOverlay(oldOverlay, expandBtn);
+          return;
         }
+        
+        // Если нет оверлеев - закрываем stories
+        this.closeStories();
       }
     });
     
@@ -550,6 +460,77 @@ class StoriesManager {
     this.isOverlayOpen = false;
   }
   
+  // ==================== НОВЫЙ МЕТОД: Показ полноэкранного оверлея ====================
+  /**
+   * Показывает полноэкранный оверлей с текстом подписи в верхней части экрана
+   * @param {string} captionText - Полный текст подписи для отображения
+   */
+  showFullCaptionOverlay(captionText) {
+    if (this.isOverlayOpen) return;
+    
+    // Ищем существующий оверлей или создаем новый
+    let overlay = document.querySelector('.header-caption-overlay');
+    
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'caption-overlay mobile-overlay header-caption-overlay';
+      
+      const fullscreen = document.createElement('div');
+      fullscreen.className = 'caption-fullscreen';
+      
+      const content = document.createElement('div');
+      content.className = 'caption-fullscreen-content';
+      
+      fullscreen.appendChild(content);
+      overlay.appendChild(fullscreen);
+      
+      this.container.appendChild(overlay);
+      
+      // Обработчик закрытия по клику на фон
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          this.closeHeaderCaptionOverlay();
+        }
+      });
+    }
+    
+    // Заполняем текст
+    overlay.querySelector('.caption-fullscreen-content').textContent = captionText;
+    
+    // Показываем оверлей
+    overlay.classList.add('active');
+    this.isOverlayOpen = true;
+    this.container.classList.add('overlay-open');
+    
+    // Прокручиваем в начало
+    setTimeout(() => {
+      overlay.scrollTop = 0;
+      overlay.querySelector('.caption-fullscreen-content').scrollTop = 0;
+    }, 10);
+    
+    console.log('🎯 Оверлей с подписью открыт');
+  }
+  
+  // ==================== НОВЫЙ МЕТОД: Закрытие оверлея ====================
+  /**
+   * Закрывает оверлей шапки (header overlay)
+   */
+  closeHeaderCaptionOverlay() {
+    const overlay = document.querySelector('.header-caption-overlay');
+    if (!overlay) return;
+    
+    overlay.classList.remove('active');
+    this.isOverlayOpen = false;
+    this.container.classList.remove('overlay-open');
+    
+    // Восстанавливаем управление
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 100);
+    
+    console.log('🎯 Оверлей с подписью закрыт');
+  }
+  
   updateProgressBars() {
     const bars = this.progressContainer.querySelectorAll('.progress-bar');
     
@@ -581,7 +562,3 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
-
-
-
-
