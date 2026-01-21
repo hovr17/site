@@ -22,32 +22,28 @@ class StoriesManager {
   }
   
   // === ОБНОВЛЕННАЯ ФУНКЦИЯ ===
+  // === БЕЗОТКАЗНАЯ ЛОГИКА ===
   checkBrowserSpecifics() {
     const ua = navigator.userAgent;
     
-    // 1. Проверяем Яндекс
+    // 1. Определяем Яндекс
     const isYandex = /YaBrowser/i.test(ua);
-    
-    // 2. Проверяем Safari (но не Chrome)
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
 
-    // 3. Проверяем Google Chrome
-    // Ищем "Chrome" или "CriOS" (iOS Chrome),
-    // но исключаем Edge (Edg), Opera (OPR) и Яндекс
-    const isChrome = (/Chrome|CriOS/i.test(ua) && !/Edg|OPR|SamsungBrowser|YaBrowser/i.test(ua));
+    // 2. Определяем Apple Safari
+    // (Важно: исключаем Chrome и CriOS, чтобы iOS Chrome считался обычным Chrome)
+    const isSafari = /^((?!chrome|crios|android).)*safari/i.test(ua);
 
-    if (isChrome) {
-      // Если это чистый Google Chrome (Android или iOS) — добавляем класс, чтобы убрать подъем
-      document.documentElement.classList.add('no-lift');
-      console.log('🧭 Обнаружен Google Chrome: Подъем отключен (отступы 0)');
-    } else if (isYandex || isSafari) {
-      // Если это Яндекс или Safari — подъем должен быть (класс не добавляем)
-      console.log('🧭 Обнаружен Яндекс или Safari: Подъем активирован');
+    if (isSafari || isYandex) {
+      // Включаем подъем ТОЛЬКО для Сафари и Яндекса
+      document.documentElement.classList.add('enable-lift');
+      console.log('🧭 Обнаружен Safari или Яндекс: Подъем ВКЛЮЧЕН');
     } else {
-      console.log('🧭 Другой браузер: Подъем активирован');
+      // Для всех остальных (Google Chrome, Firefox и др.) - ничего не делаем (подъем отключен по умолчанию)
+      console.log('🧭 Обычный браузер (Google Chrome): Подъем ОТКЛЮЧЕН');
     }
   }
-  // =======================
+
+
   // ================================
 
   init() {
@@ -585,6 +581,7 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
