@@ -1,35 +1,18 @@
-/* ===== ДИНАМИЧЕСКАЯ ВЫСОТА ВИДОВОГО ЭКРАНА ===== */
-:root {
-  /* Fallback для старых браузеров */
-  --viewport-height: 100vh;
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Современные браузеры с поддержкой dvh */
-@supports (height: 100dvh) {
-  :root {
-    --viewport-height: 100dvh;
-  }
-}
-
-/* Альтернативная поддержка lvh */
-@supports (height: 100lvh) {
-  :root {
-    --viewport-height: 100lvh;
-  }
-}
-
-/* Отключаем прокрутку body */
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* ИСПРАВЛЕНИЕ: Фиксация страницы на весь экран без скролла body */
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Отключаем скролл браузера */
+  position: fixed; /* Фиксируем относительно окна */
+  top: 0;
+  left: 0;
+  background-color: #000;
 }
 
 /* Индикатор загрузки страницы */
@@ -50,6 +33,7 @@ body {
   opacity: 0;
 }
 
+/* ИСПРАВЛЕНИЕ: Видео на весь экран (inset: 0 это сокращение для top/right/bottom/left: 0) */
 .temple-video {
   position: absolute;
   inset: 0;
@@ -62,7 +46,7 @@ body {
 
 .video-background {
   position: absolute;
-  inset: 0;
+  inset: 0; /* ИСПРАВЛЕНО */
   z-index: 0;
 }
 
@@ -90,8 +74,6 @@ body {
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
   z-index: 10;
   text-decoration: none;
-
-  
 }
 
 .back-button img {
@@ -773,8 +755,9 @@ body {
 
 
  @media (max-width: 767px) {
+  /* ИСПРАВЛЕНИЕ: Убираем margin-top, чтобы контент прижался к самому верху экрана */
   .screen {
-    margin-top: 10px;
+    margin-top: 0 !important;
   }
 
   /*.back-button {
@@ -1987,63 +1970,3 @@ body {
   opacity: 0.3;
   pointer-events: none !important; /* ТОЛЬКО здесь отключаем события */
 }
-
-
-/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА: ПОЛНОЭКРАННЫЙ РЕЖИМ НАД ПАНЕЛЬЮ ===== */
-@media (max-width: 1080px) {
-  
-  /* Основной контейнер на всю высоту экрана */
-  #frame {
-    height: var(--viewport-height) !important;
-    max-height: none !important;
-    min-height: auto !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    aspect-ratio: auto !important;
-  }
-
-  /* Все оверлеи и видео на всю высоту */
-  .page-loading-overlay,
-  .temple-nav-arrows,
-  .video-background,
-  #bgVideo {
-    height: var(--viewport-height) !important;
-    min-height: var(--viewport-height) !important;
-  }
-
-  /* Добавляем отступ снизу для безопасной зоны (где нет критичного контента) */
-  .scroll-zone {
-    padding-bottom: var(--safe-area-bottom);
-  }
-
-  /* Убираем белую полосу внизу в режиме details */
-  .mode-details .video-background::after {
-    display: none;
-  }
-
-  /* Корректировка для очень маленьких экранов */
-  @media (max-height: 600px) {
-    #frame {
-      height: 100vh !important; /* Fallback для старых браузеров на маленьких экранах */
-    }
-  }
-}
-
-/* ДЕСКТОП: оставляем центрированный контейнер как есть */
-@media (min-width: 1081px) {
-  #frame {
-    height: 90vh !important; /* или любое другое значение по вашему вкусу */
-    max-height: 1100px !important;
-  }
-}
-
-
-
-
