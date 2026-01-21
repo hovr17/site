@@ -1,3 +1,31 @@
+/* ===== ДИНАМИЧЕСКАЯ ВЫСОТА ВИДОВОГО ЭКРАНА ===== */
+:root {
+  /* Fallback для старых браузеров */
+  --viewport-height: 100vh;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Современные браузеры с поддержкой dvh */
+@supports (height: 100dvh) {
+  :root {
+    --viewport-height: 100dvh;
+  }
+}
+
+/* Альтернативная поддержка lvh */
+@supports (height: 100lvh) {
+  :root {
+    --viewport-height: 100lvh;
+  }
+}
+
+/* Отключаем прокрутку body */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1961,77 +1989,7 @@
 }
 
 
-/* ===== ФИКС ДЛЯ ОТОБРАЖЕНИЯ НАД БРАУЗЕРНОЙ ПАНЕЛЬЮ (как TikTok) ===== */
 
-/* Для мобильных устройств: контент над панелью браузера */
-@media (max-width: 1080px) {
-  /* Основной контейнер на всю высоту с учетом системных элементов */
-  body {
-    min-height: 100dvh;
-    min-height: -webkit-fill-available; /* Для старых Safari */
-    overscroll-behavior: none;
-  }
-  
-  .container {
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    min-height: 100dvh !important;
-    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-  }
-  
-  #frame {
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    min-height: 100dvh !important;
-  }
-  
-  /* Видео на всю высоту без обрезки */
-  .temple-video {
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-  }
-  
-  .video-background {
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-  }
-  
-  /* Экран с отступом снизу для безопасной зоны */
-  .screen {
-    height: calc(100dvh - env(safe-area-inset-bottom, 0px)) !important;
-    max-height: calc(100dvh - env(safe-area-inset-bottom, 0px)) !important;
-  }
-  
-  /* Дополнительный отступ для контента внизу */
-  .scroll-zone {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
-  }
-  
-  /* Скрываем нижнюю тень на мобильных, чтобы не перекрывала контент */
-  .bottom-shadow {
-    display: none !important;
-  }
-}
 
-/* ===== СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ ЯНДЕКС БРАУЗЕРА ===== */
-@media (max-width: 1080px) and (max-height: -webkit-fill-available) {
-  .yandex-browser .container {
-    height: -webkit-fill-available !important;
-    max-height: -webkit-fill-available !important;
-  }
-}
 
-/* ===== СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ SAFARI ===== */
-@supports (-webkit-touch-callout: none) {
-  @media (max-width: 1080px) {
-    .safari-browser .container {
-      height: -webkit-fill-available !important;
-      max-height: -webkit-fill-available !important;
-    }
-    
-    .safari-browser .temple-video,
-    .safari-browser .video-background {
-      height: -webkit-fill-available !important;
-    }
-  }
-}
+
