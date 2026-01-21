@@ -753,11 +753,10 @@ html, body {
 
 
 
-
  @media (max-width: 767px) {
-  /* ИСПРАВЛЕНИЕ: Убираем margin-top, чтобы контент прижался к самому верху экрана */
+  /* ИСПРАВЛЕНИЕ: Отрицательный отступ поднимает страницу еще выше */
   .screen {
-    margin-top: 0 !important;
+    margin-top: -20px !important;
   }
 
   /*.back-button {
@@ -1970,3 +1969,4 @@ html, body {
   opacity: 0.3;
   pointer-events: none !important; /* ТОЛЬКО здесь отключаем события */
 }
+
