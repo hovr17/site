@@ -1,4 +1,4 @@
-console.log('place_menu.js загружен (TikTok viewport fix + Yandex/Safari)');
+console.log('place_menu.js загружен (TikTok viewport fix + Yandex/Safari offset)');
 
 // ===== ДИНАМИЧЕСКАЯ КОРРЕКЦИЯ ВЫСОТЫ ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI =====
 
@@ -28,6 +28,7 @@ function fixYandexBrowserViewport() {
   const isYandex = /YaBrowser/i.test(navigator.userAgent);
   if (isYandex) {
     console.log('🎯 Обнаружен Яндекс Браузер, применяю фикс');
+    document.body.classList.add('yandex-browser');
     // Дополнительный фикс для Яндекса: скрываем UI через body scroll
     document.body.style.overflow = 'hidden';
     setTimeout(() => {
@@ -44,6 +45,7 @@ function fixSafariViewport() {
     document.documentElement.style.height = '-webkit-fill-available';
     document.body.style.height = '-webkit-fill-available';
     document.querySelector('.container').style.height = '-webkit-fill-available';
+    document.body.classList.add('safari-browser');
     console.log('🍎 Обнаружен Safari, применен -webkit-fill-available');
   }
 }
@@ -52,7 +54,7 @@ function fixSafariViewport() {
 fixYandexBrowserViewport();
 fixSafariViewport();
 
-// ===== СУЩЕСТВУЮЩИЙ КОД =====
+// ===== ОСТАЛЬНОЙ КОД =====
 
 let mode = "intro";
 let isAnimating = false;
@@ -547,3 +549,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
