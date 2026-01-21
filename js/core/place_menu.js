@@ -1,13 +1,4 @@
 
-
-Вот полный обновленный файл `place_menu.js` с внесенными изменениями.
-
-**Основные изменения:**
-1.  В функции `enterFullscreen`: добавлена логика обработки ошибок (Promise), проверка протокола HTTPS и попытка запроса через `body`, если стандартный метод не сработал.
-2.  В функции `setupGlobalFullscreenTrigger`: вместо события `click` используется комбинация `touchstart` и `touchend`. Это решает проблему конфликта со свайпами (когда `preventDefault` блокирует клик) и повышает надежность срабатывания на мобильных устройствах.
-
-```javascript
-// place_menu.js - ДОБАВЛЕНА ОБРАБОТКА СВАЙПОВ, СКРОЛЛА И ПОЛНОЭКРАННОГО РЕЖИМА
 console.log('place_menu.js загружен');
 
 let mode = "intro";
@@ -614,4 +605,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
-```
+
