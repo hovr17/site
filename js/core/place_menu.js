@@ -440,13 +440,13 @@ function initializeDropdownsAndButtons() {
     }
 }
 
-window.initializeMenu = function() {
-    // В самом начале вызываем детектор
-    detectSpecificBrowsers();
+// ... (предыдущий код файла без изменений) ...
 
+window.initializeMenu = function() {
     console.log('🔄 Инициализация меню (после перехода)...');
     
-    // ... (весь остальной код функции без изменений) ...
+    // ✅ УДАЛЕНО: detectSpecificBrowsers(); // Больше не нужно проверять браузеры
+    
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
     
@@ -554,4 +554,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
 
