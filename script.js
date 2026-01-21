@@ -1,496 +1,102 @@
-class StoriesManager {
-  constructor() {
-    this.container = document.querySelector('.stories-container');
-    this.slidesContainer = document.getElementById('slidesContainer');
-    this.progressContainer = document.getElementById('progressContainer');
-    this.closeBtn = document.getElementById('closeBtn');
-    this.prevArrow = document.getElementById('prevArrow');
-    this.nextArrow = document.getElementById('nextArrow');
+document.addEventListener('DOMContentLoaded', function() {
+    const footer = document.querySelector('.footer');
+    const container = document.querySelector('.container');
+    const scrollZone = document.getElementById('scrollZone');
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isFooterActive = false;
+    const SWIPE_THRESHOLD = 50;
     
-    this.currentSlide = 0;
-    this.totalSlides = 0;
-    this.slides = [];
-    this.placeId = '';
-    this.placeData = null;
-    this.isAnimating = false;
-    this.visitedSlides = new Set();
-    this.isOverlayOpen = false;
-    this.isDesktop = window.innerWidth >= 1081;
-    this.overlayJustClosed = false;
+    console.log('Footer script loaded, scrollZone found:', !!scrollZone);
     
-    this.init();
-  }
-  
-  checkBrowserSpecifics() {
-    document.documentElement.classList.add('no-lift');
-  }
-
-  init() {
-    this.checkBrowserSpecifics();
-    const urlParams = new URLSearchParams(window.location.search);
-    this.placeId = urlParams.get('place');
-    this.placeData = storiesData[this.placeId];
-    
-    if (!this.placeData) {
-      console.error(`Данные для места "${this.placeId}" не найдены`);
+    // Проверяем, находится ли событие внутри scrollZone
+    function isInsideScrollZone(e) {
+        if (!scrollZone) return false;
+        return e.target.closest('#scrollZone') !== null;
     }
     
-    this.updateLabel();
-    if (this.isDesktop && this.currentSlide === 0) {
-      this.prevArrow.classList.add('hidden');
+    // Проверяем, достигли ли дна scrollZone
+    function isScrollZoneAtBottom() {
+        if (!scrollZone) return false;
+        // Добавляем небольшой запас (5px) для точности
+        return scrollZone.scrollTop + scrollZone.clientHeight >= scrollZone.scrollHeight - 5;
     }
     
-    this.loadImages();
-    this.setupEventListeners();
-    this.updateArrowVisibility();
-  }
-  
-  updateLabel() {
-    const oldLabel = document.getElementById('storiesLabel');
-    if (oldLabel) {
-      oldLabel.textContent = `${this.placeData.name.toLowerCase()}`;
-    }
-  }
-  
-  loadImages() {
-    this.slidesContainer.innerHTML = '';
-    this.slides = [];
-    this.totalSlides = this.placeData.images.length;
-    
-    this.placeData.images.forEach((imageData, index) => {
-      const slide = document.createElement('div');
-      slide.className = `story-slide ${index === 0 ? 'active' : ''}`;
-      slide.dataset.index = index;
-      slide.style.backgroundImage = `url(${imageData.src})`;
-      
-      const img = document.createElement('img');
-      img.className = 'story-image';
-      img.src = imageData.src;
-      img.alt = `Фото ${index + 1} - ${this.placeData.name}`;
-      img.onerror = () => {
-        console.error(`Ошибка загрузки изображения: ${imageData.src}`);
-        img.src = 'ui/placeholder.jpg';
-        slide.style.backgroundImage = 'url(ui/placeholder.jpg)';
-      };
-      
-      slide.appendChild(img);
-      
-      if (imageData.caption && imageData.caption.trim() !== '') {
-        this.addCaptionToSlide(slide, index, imageData.caption);
-      }
-      
-      this.slidesContainer.appendChild(slide);
-      this.slides.push(slide);
-    });
-    
-    this.visitedSlides.add(0);
-    this.createProgressBars();
-  }
-  
-  addCaptionToSlide(slide, index, captionText) {
-    const isLongText = captionText.length > 135;
-    
-    // Создаем НИЖНЮЮ ПАНЕЛЬ (как плашка кук)
-    const bottomPanel = document.createElement('div');
-    bottomPanel.className = 'story-bottom-panel';
-    
-    // Текст
-    const panelText = document.createElement('div');
-    panelText.className = 'story-panel-text';
-    panelText.textContent = isLongText 
-      ? captionText.substring(0, 135).replace(/\s+\S*$/, '...') 
-      : captionText;
-    
-    bottomPanel.appendChild(panelText);
-    
-    // Кнопка развернуть (только для длинного текста)
-    if (isLongText) {
-      const expandBtn = document.createElement('button');
-      expandBtn.className = 'story-panel-expand-btn';
-      expandBtn.innerHTML = `Развернуть <img src="ui/open_menu_button.svg" alt="↓">`;
-      
-      expandBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.showFullCaptionOverlay(captionText);
-      });
-      
-      bottomPanel.appendChild(expandBtn);
-    }
-    
-    slide.appendChild(bottomPanel);
-    slide.classList.add('has-panel');
-  }
-  
-  createProgressBars() {
-    this.progressContainer.innerHTML = '';
-    for (let i = 0; i < this.totalSlides; i++) {
-      const progressBar = document.createElement('div');
-      progressBar.className = 'progress-bar';
-      
-      const progressFill = document.createElement('div');
-      progressFill.className = 'progress-fill';
-      
-      progressBar.appendChild(progressFill);
-      this.progressContainer.appendChild(progressBar);
-    }
-    this.updateProgressBars();
-  }
-  
-  updateArrowVisibility() {
-    if (this.isDesktop) {
-      this.prevArrow.classList.toggle('hidden', this.currentSlide === 0);
-      this.nextArrow.classList.remove('hidden');
-    } else {
-      this.prevArrow.classList.add('hidden');
-      this.nextArrow.classList.add('hidden');
-    }
-  }
-  
-  setupEventListeners() {
-    this.closeBtn.addEventListener('click', () => this.closeStories());
-    this.prevArrow.addEventListener('click', () => this.prevSlide());
-    this.nextArrow.addEventListener('click', () => this.nextSlide());
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') this.prevSlide();
-      if (e.key === 'ArrowRight') this.nextSlide();
-      if (e.key === 'Escape') {
-        // Проверяем сначала новый оверлей
-        const bottomOverlay = document.querySelector('.bottom-caption-overlay.active');
-        if (bottomOverlay) {
-          this.closeBottomCaptionOverlay();
-          return;
+    // Обработка колеса мыши: работает ВЕЗДЕ, в том числе в scrollZone
+    document.addEventListener('wheel', function(e) {
+        // Если футер активен - скрываем колесом вверх
+        if (isFooterActive && e.deltaY < 0) {
+            e.preventDefault();
+            hideFooter();
+            return;
         }
         
-        // Потом старый оверлей
-        const oldOverlay = document.querySelector('.caption-overlay.active:not(.bottom-caption-overlay)');
-        if (oldOverlay) {
-          this.closeOverlay(oldOverlay);
-          return;
+        // На Ilya_Prorok.html в режиме details при достижении дна - показываем футер
+        if (scrollZone && isScrollZoneAtBottom() && !isFooterActive) {
+            e.preventDefault();
+            showFooter();
+            return;
         }
         
-        this.closeStories();
-      }
-    });
-    
-    window.addEventListener('resize', () => {
-      this.isDesktop = window.innerWidth >= 1081;
-      this.updateArrowVisibility();
-    });
-    
-    this.setupTouchEvents();
-    this.setupTouchZones();
-    
-    this.container.addEventListener('click', (e) => {
-      if (!this.isDesktop && this.isOverlayOpen) {
-        const activeOverlay = document.querySelector('.caption-overlay.active');
-        if (activeOverlay) {
-          if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-            this.closeBottomCaptionOverlay();
-          } else {
-            this.closeOverlay(activeOverlay);
-          }
-          e.preventDefault();
-          e.stopPropagation();
-          this.overlayJustClosed = true;
-          setTimeout(() => {
-            this.overlayJustClosed = false;
-          }, 300);
+        // Стандартное поведение: на index.html или вне scrollZone
+        if (!scrollZone || !isInsideScrollZone(e)) {
+            if (e.deltaY > 0 && !isFooterActive) {
+                showFooter();
+            } else if (e.deltaY < 0 && isFooterActive) {
+                hideFooter();
+            }
         }
-      }
-    });
-  }
-  
-  setupTouchEvents() {
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let isSwiping = false;
-    
-    this.container.addEventListener('touchstart', (e) => {
-      if (!this.isDesktop && this.isOverlayOpen) return;
-      touchStartX = e.changedTouches[0].screenX;
-      isSwiping = true;
-    }, { passive: true });
-    
-    this.container.addEventListener('touchmove', (e) => {
-      if (!isSwiping || (!this.isDesktop && this.isOverlayOpen)) return;
-      
-      if (this.currentSlide === 0) {
-        const currentX = e.changedTouches[0].screenX;
-        if (currentX > touchStartX) {
-          e.preventDefault();
-          return;
-        }
-      }
     }, { passive: false });
     
-    this.container.addEventListener('touchend', (e) => {
-      if ((!this.isDesktop && this.isOverlayOpen) || !isSwiping) return;
-      touchEndX = e.changedTouches[0].screenX;
-      this.handleSwipe(touchStartX, touchEndX);
-      isSwiping = false;
-    }, { passive: true });
-  }
-  
-  setupTouchZones() {
-    const prevZone = document.createElement('div');
-    prevZone.className = 'touch-zone prev-zone';
-    
-    prevZone.addEventListener('click', (e) => {
-      if (!this.isDesktop) {
-        if (this.isOverlayOpen) {
-          const activeOverlay = document.querySelector('.caption-overlay.active');
-          if (activeOverlay) {
-            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-              this.closeBottomCaptionOverlay();
-            } else {
-              this.closeOverlay(activeOverlay);
+    // Обработка свайпов: работает ВЕЗДЕ
+    if (container) {
+        container.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        container.addEventListener('touchmove', function(e) {
+            if (isFooterActive) {
+                e.preventDefault(); // Блокируем прокрутку при активном футере
             }
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
-        }
-        if (this.overlayJustClosed) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-      }
-      
-      if ((!this.isDesktop && this.isOverlayOpen) || this.currentSlide === 0) return;
-      this.prevSlide();
-    });
-    
-    const nextZone = document.createElement('div');
-    nextZone.className = 'touch-zone next-zone';
-    
-    nextZone.addEventListener('click', (e) => {
-      if (!this.isDesktop) {
-        if (this.isOverlayOpen) {
-          const activeOverlay = document.querySelector('.caption-overlay.active');
-          if (activeOverlay) {
-            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-              this.closeBottomCaptionOverlay();
-            } else {
-              this.closeOverlay(activeOverlay);
+        }, { passive: false });
+        
+        container.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].clientY;
+            const distance = touchStartY - touchEndY;
+            
+            if (Math.abs(distance) > SWIPE_THRESHOLD) {
+                // Свайп ВВЕРХ - показываем футер
+                if (distance > 0 && !isFooterActive) {
+                    e.preventDefault();
+                    showFooter();
+                } 
+                // Свайп ВНИЗ - скрываем футер
+                else if (distance < -SWIPE_THRESHOLD && isFooterActive) {
+                    e.preventDefault();
+                    hideFooter();
+                }
             }
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
+        }, { passive: false });
+    }
+    
+    function showFooter() {
+        footer.classList.add('active');
+        document.body.classList.add('footer-open');
+        isFooterActive = true;
+        console.log('Footer shown');
+    }
+    
+    function hideFooter() {
+        footer.classList.remove('active');
+        document.body.classList.remove('footer-open');
+        isFooterActive = false;
+        console.log('Footer hidden');
+    }
+    
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isFooterActive) {
+            hideFooter();
         }
-        if (this.overlayJustClosed) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-      }
-      
-      if (!this.isDesktop && this.isOverlayOpen) return;
-      this.nextSlide();
     });
-    
-    this.container.appendChild(prevZone);
-    this.container.appendChild(nextZone);
-  }
-  
-  handleSwipe(startX, endX) {
-    if (!this.isDesktop && this.isOverlayOpen) return;
-    const swipeThreshold = 50;
-    const diff = startX - endX;
-    if (this.currentSlide === 0 && diff < 0) return;
-    if (Math.abs(diff) > swipeThreshold) {
-      if (diff > 0) {
-        this.nextSlide();
-      } else {
-        this.prevSlide();
-      }
-    }
-  }
-  
-  prevSlide() {
-    if (this.isAnimating || (!this.isDesktop && this.isOverlayOpen) || this.currentSlide === 0) return;
-    
-    const activeOverlay = document.querySelector('.caption-overlay.active');
-    if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
-    }
-    
-    this.goToSlide(this.currentSlide - 1, 'prev');
-  }
-  
-  nextSlide() {
-    if (this.isAnimating || (!this.isDesktop && this.isOverlayOpen)) return;
-    
-    const activeOverlay = document.querySelector('.caption-overlay.active');
-    if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
-    }
-    
-    if (this.currentSlide < this.totalSlides - 1) {
-      this.goToSlide(this.currentSlide + 1, 'next');
-    } else {
-      this.closeStories();
-    }
-  }
-  
-  goToSlide(index, direction) {
-    if (this.isAnimating || index < 0 || index >= this.totalSlides) return;
-    
-    const activeOverlay = document.querySelector('.caption-overlay.active');
-    if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
-    }
-    
-    this.isAnimating = true;
-    const isGoingBack = direction === 'prev';
-    
-    if (isGoingBack) {
-      for (let i = index + 1; i < this.totalSlides; i++) {
-        this.visitedSlides.delete(i);
-      }
-    } else {
-      this.visitedSlides.add(this.currentSlide);
-    }
-    
-    const oldIndex = this.currentSlide;
-    this.currentSlide = index;
-    this.visitedSlides.add(index);
-    
-    if (this.slides[oldIndex]) {
-      const prevImg = this.slides[oldIndex].querySelector('.story-image');
-      if (prevImg) {
-        this.slides[oldIndex].style.backgroundImage = `url(${prevImg.src})`;
-      }
-    }
-    
-    const currentImg = this.slides[index].querySelector('.story-image');
-    if (currentImg) {
-      this.slides[index].style.backgroundImage = `url(${currentImg.src})`;
-    }
-    
-    this.slides[oldIndex].classList.remove('active');
-    this.slides[oldIndex].classList.add(direction === 'next' ? 'prev' : 'next');
-    
-    this.slides[index].classList.remove('prev', 'next');
-    this.slides[index].classList.add('active');
-    
-    this.updateProgressBars();
-    this.updateArrowVisibility();
-    
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 100);
-  }
-  
-  closeOverlay(overlay) {
-    if (!overlay) return;
-    
-    overlay.classList.remove('active');
-    this.isOverlayOpen = false;
-    this.container.classList.remove('overlay-open');
-    
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 100);
-  }
-  
-  showFullCaptionOverlay(captionText) {
-    if (this.isOverlayOpen) return;
-    
-    let overlay = document.querySelector('.bottom-caption-overlay');
-    
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'caption-overlay mobile-overlay bottom-caption-overlay';
-      
-      const fullscreen = document.createElement('div');
-      fullscreen.className = 'caption-fullscreen';
-      
-      const content = document.createElement('div');
-      content.className = 'caption-fullscreen-content';
-      content.textContent = captionText;
-      
-      fullscreen.appendChild(content);
-      overlay.appendChild(fullscreen);
-      
-      this.container.appendChild(overlay);
-      
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          this.closeBottomCaptionOverlay();
-        }
-      });
-    } else {
-      overlay.querySelector('.caption-fullscreen-content').textContent = captionText;
-    }
-    
-    overlay.classList.add('active');
-    this.isOverlayOpen = true;
-    this.container.classList.add('overlay-open');
-    
-    setTimeout(() => {
-      overlay.scrollTop = 0;
-      overlay.querySelector('.caption-fullscreen-content').scrollTop = 0;
-    }, 10);
-    
-    console.log('🎯 Нижний оверлей открыт');
-  }
-  
-  closeBottomCaptionOverlay() {
-    const overlay = document.querySelector('.bottom-caption-overlay');
-    if (!overlay) return;
-    
-    overlay.classList.remove('active');
-    this.isOverlayOpen = false;
-    this.container.classList.remove('overlay-open');
-    
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 100);
-    
-    console.log('🎯 Нижний оверлей закрыт');
-  }
-  
-  updateProgressBars() {
-    const bars = this.progressContainer.querySelectorAll('.progress-bar');
-    bars.forEach((bar, index) => {
-      const fill = bar.querySelector('.progress-fill');
-      const isViewed = index < this.currentSlide || this.visitedSlides.has(index) || index === this.currentSlide;
-      
-      if (isViewed) {
-        fill.style.width = '100%';
-        fill.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-      } else {
-        fill.style.width = '0%';
-      }
-    });
-  }
-  
-  closeStories() {
-    const referrer = document.referrer;
-    if (referrer && referrer !== window.location.href) {
-      window.location.replace(referrer);
-    } else {
-      window.location.replace(`${this.placeId}.html`);
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  window.storiesManager = new StoriesManager();
 });
