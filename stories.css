@@ -926,4 +926,16 @@
     font-size: 18px;
     padding: 15px 20px 40px;
   }
+
+      .caption-expand-btn {
+    width: 3.5vh; /* Фиксированные размеры */
+    height: 3.5vh;
+  }
+
+    .stories-label {
+    font-size: 2.5vh;
+    top: 3vh;
+    padding-left: 0.5vh;
+  }
 }
+
