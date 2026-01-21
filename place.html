@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <!-- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: добавлен viewport-fit=cover -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title><!-- Автоматически --></title>
@@ -27,12 +28,6 @@
       <div class="back-icon"></div>
     </a>
 
-    <!-- КНОПКА ПОЛНОЭКРАННОГО РЕЖИМА -->
-    <button class="fullscreen-button" id="fullscreenBtn" aria-label="Полноэкранный режим">
-      <div class="fullscreen-icon"></div>
-      <span class="fullscreen-text">⛶</span> <!-- ТЕКСТОВЫЙ ФОЛБЕК -->
-    </button>
-    
     <div class="video-background" id="videoPoster"></div>
     <video class="temple-video" id="bgVideo" muted playsinline webkit-playsinline preload="auto" autoplay loop></video>
     <div class="overlay-gradient"></div>
