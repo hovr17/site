@@ -1,7 +1,15 @@
+/* ==================== БАЗОВЫЕ СТИЛИ (Desktop + Mobile) ==================== */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .stories-container {
@@ -104,7 +112,6 @@
   height: auto;
   object-fit: contain;
   border-radius: 0;
-
 }
 
 .nav-arrows {
@@ -204,194 +211,7 @@
   height: 100%;
 }
 
-.story-caption-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  pointer-events: none;
-  z-index: 1003;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-mask-image: none;
-  mask-image: none;
-  opacity: 1;
-}
-
-.story-caption-container.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.story-caption-content {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  color: #ffffff;
-  font-family: 'Crooker', sans-serif;
-  font-size: 18px;
-  font-weight: 100;
-  line-height: 1.5;
-  padding: 20px 25px 50px;
-  pointer-events: auto;
-  max-height: 250px;
-  min-height: 80px;
-  overflow-y: auto;
-  box-sizing: border-box;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  background-color: transparent;
-}
-
-.story-caption-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: -1;
-  -webkit-mask-image: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.9) 20%,
-    rgba(0, 0, 0, 0.8) 40%,
-    rgba(0, 0, 0, 0.6) 60%,
-    rgba(0, 0, 0, 0.3) 80%,
-    rgba(0, 0, 0, 0.1) 90%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.9) 20%,
-    rgba(0, 0, 0, 0.8) 40%,
-    rgba(0, 0, 0, 0.6) 60%,
-    rgba(0, 0, 0, 0.3) 80%,
-    rgba(0, 0, 0, 0.1) 90%,
-    transparent 100%
-  );
-}
-
-.story-caption-content.no-bg::before {
-  background: transparent;
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.story-caption-text {
-  flex: 1;
-  padding-right: 30px;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  min-height: 100%;
-  width: 100%;
-  text-align: left;
-}
-
-.caption-expand-btn {
-  position: absolute;
-  left: 50%;
-  bottom: 15px;
-  transform: translateX(-50%);
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  margin: 0;
-  width: 70px;
-  height: 70px;
-}
-
-.caption-expand-btn:hover {
-  transform: translateX(-50%) scale(1.1);
-}
-
-.caption-expand-btn:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-.caption-expand-btn .expand-icon {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-.story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
-  padding: 10px 25px 15px;
-  min-height: auto;
-  justify-content: flex-end;
-}
-
-.story-caption-container:not(:has(.caption-expand-btn)) .story-caption-text {
-  justify-content: flex-end;
-  margin-top: auto;
-}
-
-.caption-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1010;
-  display: none;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.caption-overlay.active {
-  display: block;
-}
-
-.caption-fullscreen {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  max-height: 90%;
-  padding: 2vh 2vh 2vh;
-  box-sizing: border-box;
-  color: white;
-  font-family: 'Crooker', sans-serif;
-  font-size: 34px;
-  font-weight: 100;
-  line-height: 1.5;
-  overflow-y: auto;
-  z-index: 1011;
-  pointer-events: auto;
-  background-color: transparent;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.caption-fullscreen-content {
-  pointer-events: auto;
-  padding-right: 30px;
-}
+/* ==================== DESKTOP STYLES (min-width: 1081px) ==================== */
 
 @media (min-width: 1081px) {
   .stories-container {
@@ -468,62 +288,70 @@
     margin-left: -30px;
   }
 
-  .prev-arrow:hover {
-    transform: translateX(-100%) translateY(-50%);
-  }
-
   .next-arrow {
     right: 0;
     transform: translateX(100%) translateY(-50%);
     margin-right: -30px;
   }
 
-  .next-arrow:hover {
-    transform: translateX(100%) translateY(-50%);
-  }
-
   .touch-zone {
     display: none;
   }
 
+  /* СТАРЫЙ НИЖНИЙ КОНТЕЙНЕР (для десктопа) */
   .story-caption-container {
-    border-radius: 0 0 30px 30px;
-    min-height: 200px;
-  }
-
-  .story-caption-container.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .story-caption-content {
-    font-size: 1.5vh;
-    padding: 20px 25px 40px;
-    max-height: 500px;
-    min-height: 220px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1003;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-mask-image: none;
+    mask-image: none;
+    opacity: 1;
   }
 
-  .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
-    padding: 10px 25px 15px;
-    min-height: auto;
-    justify-content: flex-end;
-    max-height: 300px;
-  }
-
-  .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-text {
-    justify-content: flex-end;
-    margin-top: auto;
+  .story-caption-content {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    color: #ffffff;
+    font-family: 'Crooker', sans-serif;
+    font-size: 1.5vh;
+    font-weight: 100;
+    line-height: 1.5;
+    padding: 20px 25px 40px;
+    pointer-events: auto;
+    max-height: 500px;
+    min-height: 220px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: transparent;
   }
 
   .story-caption-content::before {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.9);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    z-index: -1;
     -webkit-mask-image: linear-gradient(
       to top,
       rgba(0, 0, 0, 1) 0%,
@@ -546,34 +374,10 @@
     );
   }
 
-  .story-caption-content.no-bg::before {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: transparent;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  .story-caption-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    min-height: 100%;
-  }
-
-  .story-caption-content.expanded {
-    max-height: 700px;
-  }
-
   .caption-expand-btn {
     width: 2.2vh;
     height: 2.2vh;
     bottom: 1vh;
-  }
-
-  .caption-expand-btn .expand-icon {
-    width: 100%;
-    height: 100%;
   }
 
   .caption-overlay {
@@ -587,26 +391,194 @@
     font-size: 1.5vh;
     max-height: 85%;
     border-radius: 0 0 30px 30px;
-    background-color: transparent;
-    z-index: 1006;
-  }
-
-  .nav-arrow.hidden {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  .prev-arrow.hidden {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  .nav-arrow:not(.hidden) {
-    display: flex !important;
   }
 }
+
+/* ==================== MOBILE STYLES (max-width: 750px) ==================== */
+
+@media (max-width: 750px) {
+  .story-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ПРОГРЕСС-БАР: Увеличен */
+  .progress-bar {
+    height: 3px;
+  }
+
+  .progress-container {
+    top: 1.8vh;
+    z-index: 1022;
+  }
+
+  /* КНОПКА ЗАКРЫТИЯ: Увеличена */
+  .close-button {
+    width: min(7vmin, 10vmin);
+    height: min(7vmin, 10vmin);
+    top: 2.5vh;
+    z-index: 1022;
+  }
+
+  .close-button img {
+    width: 70%;
+    height: 70%;
+  }
+
+  /* ==================== НИЖНЯЯ ПАНЕЛЬ: КАК ПЛАШКА КУК ==================== */
+
+  /* Нижняя панель (основной контейнер) */
+  .story-bottom-panel {
+    position: fixed !important; /* Фиксируем относительно viewport */
+    bottom: 15px !important; /* 15px от нижней панели браузера */
+    bottom: calc(15px + env(safe-area-inset-bottom, 0px)) !important; /* Учитываем iOS */
+    
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    
+    width: 92% !important;
+    max-width: 500px !important;
+    
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    
+    color: #ffffff !important;
+    font-family: 'Crooker', sans-serif !important;
+    font-size: 16px !important; /* Фиксированный размер */
+    font-weight: 100 !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+    
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important; /* Тень вверх */
+    pointer-events: auto !important;
+    z-index: 1010 !important;
+    
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Текст в панели */
+  .story-panel-text {
+    display: block !important;
+    width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    margin-bottom: 8px !important; /* Отступ до кнопки */
+  }
+
+  /* Кнопка развернуть */
+  .story-panel-expand-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 8px !important;
+    
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    
+    color: #ffffff !important;
+    font-family: 'Crooker', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 100 !important;
+    
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    transition: all 0.2s !important;
+    
+    /* Центрируем кнопку */
+    position: relative !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .story-panel-expand-btn:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .story-panel-expand-btn:active {
+    transform: translateX(-50%) scale(0.95) !important;
+  }
+
+  .story-panel-expand-btn img {
+    width: 16px !important;
+    height: 16px !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) !important;
+  }
+
+  /* ОВЕРЛЕЙ: Развернутый текст */
+  .bottom-caption-overlay.caption-overlay.mobile-overlay {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    z-index: 2000 !important;
+    display: none !important;
+    pointer-events: auto !important;
+  }
+
+  .bottom-caption-overlay.caption-overlay.mobile-overlay.active {
+    display: block !important;
+  }
+
+  .bottom-caption-overlay .caption-fullscreen {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    font-size: 18px !important;
+    line-height: 1.5 !important;
+    -webkit-overflow-scrolling: touch !important;
+    color: white !important;
+    font-family: 'Crooker', sans-serif !important;
+  }
+
+  .bottom-caption-overlay .caption-fullscreen-content {
+    max-height: none !important;
+    padding: 0 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Старый оверлей: Если вдруг где-то остался, скрываем */
+  .caption-overlay:not(.bottom-caption-overlay) {
+    display: none !important;
+  }
+
+  /* Зоны касания */
+  .touch-zone {
+    z-index: 1002;
+  }
+
+  .stories-container.overlay-open .touch-zone {
+    z-index: 1019;
+    pointer-events: auto;
+  }
+
+  /* Убеждаемся, что нет горизонтальной прокрутки */
+  .stories-container,
+  .story-panel-text,
+  .caption-fullscreen-content {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+}
+
+/* ==================== СЛУЖЕБНЫЕ СТИЛИ ==================== */
 
 .story-slide::after {
   content: '';
@@ -625,345 +597,11 @@
 }
 
 .story-slide.active::after {
-  opacity:1;
+  opacity: 1;
 }
 
 @media (min-width: 1081px) {
   .story-slide::after {
     display: none;
-  }
-}
-
-@media (max-width: 1080px) {
-  .story-image {
- width: 100%;
-  height: 100%;
-  object-fit: contain;
-  }
-}
-
-/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
-
-/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
-
-/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
-
-/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
-
-/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
-
-@media (max-width: 750px) {
-  .slides-container {
-    background-color: #000;
-    z-index:1;
-  }
-
-  .story-slide {
-    background-color: #000;
-  }
-
-  /* === УПРАВЛЕНИЕ ПОДЪЕМОМ В ЗАВИСИМОСТИ ОТ БРАУЗЕРА === */
-
-  /* 1. ПО УМОЛЧАНИЮ (Google Chrome): Убираем подъем */
-  .story-image {
-    width: 100vw;
-    height: 100%;
-    max-width: 100vw;
-    max-height: 100%;
-    object-fit: cover;
-    margin: 0 !important; /* Фото на месте */
-    padding: 0;
-    border-radius: 0;
-  }
-
-  .story-caption-container {
-    bottom: 0 !important; /* Текст у края экрана */
-  }
-
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    bottom: 0 !important; /* Развернутый текст у края экрана */
-  }
-
-  /* 2. ИСКЛЮЧЕНИЕ (Safari, Яндекс): Поднимаем элементы */
-  html.enable-lift .story-image {
-    margin-top: -50px !important; /* Поднимаем фото */
-  }
-
-  html.enable-lift .story-caption-container {
-    /* Поднимаем текст и кнопку на 15px от браузерной панели */
-    bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
-  }
-
-  html.enable-lift .caption-overlay.mobile-overlay .caption-fullscreen {
-    /* Поднимаем развернутый текст на 15px от браузерной панели */
-    bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
-  }
-
-  /* ============================================== */
-
-  .stories-label {
-    font-size: 2.5vh;
-    top: 3vh;
-    z-index: 1022;
-    padding-left: 0.5vh;
-  }
-
-  /* Контейнер подписи для мобильных (общие стили) */
-  .story-caption-container {
-    position: absolute;
-    bottom: 0; /* Значение меняется выше */
-    left: 0;
-    width: 100%;
-    height: auto;
-    max-height: 80vh;
-    min-height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    pointer-events: none;
-    z-index: 10;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  /* Подложка под текст */
-  .story-caption-container::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, 
-      rgba(0, 0, 0, 0.95) 0%, 
-      rgba(0, 0, 0, 0.8) 30%, 
-      rgba(0, 0, 0, 0.4) 70%, 
-      transparent 100%);
-    z-index: 1;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-  }
-
-  .story-caption-container.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* При открытом оверлее контейнер подписи скрывается */
-  .stories-container.overlay-open .story-caption-container {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* ==================== ИСПРАВЛЕНИЕ: УБИРАЕМ ПРОБЛЕМЫ С ТЕКСТОМ ==================== */
-
-  /* Контент подписи */
-  .story-caption-content {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    color: #ffffff;
-    font-family: 'Crooker', sans-serif;
-    font-size: 1.8vh;
-    font-weight: 100;
-    line-height: 1.4;
-    padding: 2vh 4vw 4vh;
-    pointer-events: auto;
-    max-height: none;
-    min-height: 80px;
-    overflow-y: visible;
-    box-sizing: border-box;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start; /* ВАЖНО: выравниваем по левому краю */
-    background-color: transparent;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
-    z-index: 2;
-    bottom: 0;
-  }
-
-  /* Текст подписи */
-  .story-caption-text {
-    flex: 1;
-    position: relative;
-    z-index: 3;
-    display: block !important; /* ВАЖНО: block вместо flex */
-    justify-content: flex-end;
-    align-items: flex-start; /* ВАЖНО: выравниваем по левому краю */
-    width: 100%;
-    text-align: left !important; /* ВАЖНО: текст по левому краю */
-    padding: 0;
-    max-height: none;
-    overflow-y: visible;
-    word-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    overflow-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    margin-top: auto;
-    box-sizing: border-box;
-  }
-
-  .story-caption-content::before {
-    display: none;
-  }
-
-  /* Оверлей для мобильных */
-  .caption-overlay.mobile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 1020;
-    display: none;
-    cursor: pointer;
-    pointer-events: auto;
-  }
-
-  .caption-overlay.mobile-overlay.active {
-    display: block;
-  }
-
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    /* ИСПРАВЛЕНИЕ: УБРАЛИ ФИКСИРОВАННЫЙ padding: 30px 350px 100px */
-    padding: 4vh 6vw 10vh; /* АДАПТИВНЫЕ ОТСТУПЫ */
-    line-height: 1.5;
-    border-radius: 20px 20px 0 0;
-    z-index: 1021;
-    background: linear-gradient(to top, 
-      rgba(0, 0, 0, 0.95) 0%, 
-      rgba(0, 0, 0, 0.8) 30%, 
-      rgba(0, 0, 0, 0.4) 70%, 
-      transparent 100%);
-    font-size: 2.2vh; /* АДАПТИВНЫЙ РАЗМЕР ШРИФТА */
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    
-    /* Значение bottom устанавливается в логике выше */
-  }
-
-  .caption-fullscreen {
-    font-size: 1.8vh;
-  }
-
-  .caption-overlay.mobile-overlay .caption-fullscreen-content {
-    padding-right: 0; /* УБРАЛИ padding-right, который выталкивал текст */
-    pointer-events: auto;
-    word-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    overflow-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    text-align: left; /* ВАЖНО: текст по левому краю */
-    box-sizing: border-box;
-  }
-
-  /* Когда оверлей открыт, зоны касания должны быть под ним */
-  .stories-container.overlay-open .touch-zone {
-    z-index: 1019;
-    pointer-events: auto;
-  }
-
-  /* Увеличиваем прогресс-бары */
-  .progress-bar {
-    height: 3px;
-  }
-
-  .progress-container {
-    top: 1.8vh;
-    z-index: 1022;
-  }
-
-  /* Увеличиваем кнопку закрытия */
-  .close-button {
-    width: min(7vmin, 10vmin);
-    height: min(7vmin, 10vmin);
-    top: 2.5vh;
-    z-index: 1022;
-  }
-
-  .close-button img {
-    width: 70%;
-    height: 70%;
-  }
-
-  /* Зоны касания должны быть ПОД оверлеем когда он открыт */
-  .stories-container:not(.overlay-open) .touch-zone {
-    z-index: 1002;
-  }
-
-  /* Когда оверлей открыт, все остальные элементы кроме кнопки закрытия должны быть под ним */
-  .stories-container.overlay-open .slides-container,
-  .stories-container.overlay-open .progress-container,
-  .stories-container.overlay-open .stories-label {
-    z-index: 1018;
-  }
-
-  /* Гарантируем, что кнопка всегда видна на мобильных */
-  .caption-expand-btn {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: absolute !important;
-    bottom: 1vh;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    width: 3.5vh; /* Фиксированные размеры */
-    height: 3.5vh;
-  }
-
-  /* Убираем padding-right, который выталкивал текст */
-  .story-caption-text {
-    padding-right: 0 !important;
-  }
-
-  /* Для контейнера без кнопки */
-  .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
-    padding: 2vh 4vw 2vh;
-  }
-
-  /* Убеждаемся, что нет горизонтальной прокрутки */
-  .stories-container,
-  .story-caption-content,
-  .caption-fullscreen-content {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
-  }
-}
-
-/* Специальные фиксы для очень маленьких экранов */
-@media (max-width: 375px) {
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    padding: 3vh 5vw 8vh;
-    font-size: 18px; /* Фиксированный размер для стабильности на маленьких экранах */
-  }
-}
-
-/* Специальные фиксы для ландшафтной ориентации */
-@media (max-width: 1080px) and (orientation: landscape) {
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    font-size: 18px;
-    padding: 3vh 5vw 8vh;
-  }
-
-  .story-caption-content {
-    font-size: 18px;
-    padding: 15px 20px 40px;
-  }
-
-  .caption-expand-btn {
-    width: 3.5vh; /* Фиксированные размеры */
-    height: 3.5vh;
-  }
-
-  .stories-label {
-    font-size: 2.5vh;
-    top: 3vh;
-    padding-left: 0.5vh;
   }
 }
