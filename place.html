@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <!-- Для полноэкранного режима -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title><!-- Автоматически --></title>
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="place.css">
@@ -32,19 +30,16 @@
     <!-- КНОПКА ПОЛНОЭКРАННОГО РЕЖИМА -->
     <button class="fullscreen-button" id="fullscreenBtn" aria-label="Полноэкранный режим">
       <div class="fullscreen-icon"></div>
+      <span class="fullscreen-text">⛶</span> <!-- ТЕКСТОВЫЙ ФОЛБЕК -->
     </button>
     
     <div class="video-background" id="videoPoster"></div>
-    
-    <!-- ⚠️ ПУСТОЙ SRC, заполняется скриптом -->
     <video class="temple-video" id="bgVideo" muted playsinline webkit-playsinline preload="auto" autoplay loop></video>
-    
     <div class="overlay-gradient"></div>
 
     <div class="screen">
       <div class="scroll-zone" id="scrollZone">
         <div class="top-spacer"></div>
-
         <div class="title-block" id="titleBlock">
           <h1></h1>
           <div class="entry-note">
@@ -54,25 +49,20 @@
             </div>
           </div>
         </div>
-
         <div class="hero-details" id="heroDetails">
           <div class="details-header">подробнее:</div>
           <div class="photo-wrapper"></div>
         </div>
-
         <div id="dropdownsContainer"></div>
       </div>
     </div>
-
     <div class="bottom-shadow"></div>
   </div>
 
-  <!-- ПОРЯДОК КРИТИЧЕН! -->
   <script src="js/categories/religious_places.js"></script>
   <script src="js/core/categories_config.js"></script>
   <script src="js/core/pages_manager.js"></script>
   <script src="js/core/spa_router.js"></script>
   <script src="js/core/place_menu.js"></script>
-  
 </body>
 </html>
