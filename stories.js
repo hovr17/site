@@ -21,29 +21,33 @@ class StoriesManager {
     this.init();
   }
   
-checkBrowserSpecifics() {
-  // Более точная проверка Chrome Android
-  const userAgent = navigator.userAgent;
-  
-  // Chrome Android имеет "Chrome" и "Mobile", но не "Edg", "OPR", "SamsungBrowser"
-  const isChromeAndroid = /Chrome/.test(userAgent) && 
-                         /Android/.test(userAgent) && 
-                         /Mobile/.test(userAgent) &&
-                         !/Edg|OPR|SamsungBrowser|YaBrowser|Firefox/.test(userAgent);
-  
-  // Современная проверка через userAgentData (если доступно)
-  const isModernChromeAndroid = navigator.userAgentData?.brands?.some(
-    b => b.brand === 'Google Chrome' && navigator.userAgentData.mobile
-  );
-  
-  if (isChromeAndroid || isModernChromeAndroid) {
-    document.documentElement.classList.add('no-lift');
-    console.log('✅ Chrome Android: отступы убраны');
-  } else {
-    console.log('⏫ Другой браузер: подъем активен');
-    console.log('User Agent:', userAgent); // Для отладки
+  // === ОБНОВЛЕННАЯ ФУНКЦИЯ ===
+  checkBrowserSpecifics() {
+    const ua = navigator.userAgent;
+    
+    // 1. Проверяем Яндекс
+    const isYandex = /YaBrowser/i.test(ua);
+    
+    // 2. Проверяем Safari (но не Chrome)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+    // 3. Проверяем Google Chrome
+    // Ищем "Chrome" или "CriOS" (iOS Chrome),
+    // но исключаем Edge (Edg), Opera (OPR) и Яндекс
+    const isChrome = (/Chrome|CriOS/i.test(ua) && !/Edg|OPR|SamsungBrowser|YaBrowser/i.test(ua));
+
+    if (isChrome) {
+      // Если это чистый Google Chrome (Android или iOS) — добавляем класс, чтобы убрать подъем
+      document.documentElement.classList.add('no-lift');
+      console.log('🧭 Обнаружен Google Chrome: Подъем отключен (отступы 0)');
+    } else if (isYandex || isSafari) {
+      // Если это Яндекс или Safari — подъем должен быть (класс не добавляем)
+      console.log('🧭 Обнаружен Яндекс или Safari: Подъем активирован');
+    } else {
+      console.log('🧭 Другой браузер: Подъем активирован');
+    }
   }
-}
+  // =======================
   // ================================
 
   init() {
@@ -581,5 +585,6 @@ checkBrowserSpecifics() {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
