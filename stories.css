@@ -644,6 +644,8 @@
 
 /* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
 
+/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
+
 @media (max-width: 750px) {
   .slides-container {
     background-color: #000;
@@ -655,14 +657,14 @@
   }
 
   .story-image {
-      width: 100vw ;        /* От левого края до правого */
-  height: 100% ;
-  max-width: 100vw ;
-  max-height: 100% ;
-  object-fit: cover ;    /* Заполняет всё, обрезая лишнее */
-  margin: 0 ;
-  padding: 0 ;
-   border-radius: 0;
+    width: 100vw;        /* От левого края до правого */
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100%;
+    object-fit: cover;   /* Заполняет всё, обрезая лишнее */
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
   }
 
   .stories-label {
@@ -691,7 +693,7 @@
     box-sizing: border-box;
   }
 
-  /* Подложка под текст */
+  /* Подложка под текст (градиент) */
   .story-caption-container::before {
     content: '';
     position: absolute;
@@ -699,10 +701,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, 
-      rgba(0, 0, 0, 0.95) 0%, 
-      rgba(0, 0, 0, 0.8) 30%, 
-      rgba(0, 0, 0, 0.4) 70%, 
+    background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.8) 30%,
+      rgba(0, 0, 0, 0.4) 70%,
       transparent 100%);
     z-index: 1;
     border-top-left-radius: 20px;
@@ -720,7 +722,7 @@
     pointer-events: none;
   }
 
-  /* ==================== ИСПРАВЛЕНИЕ: УБИРАЕМ ПРОБЛЕМЫ С ТЕКСТОМ ==================== */
+  /* ==================== ИСПРАВЛЕНИЕ: ОГРАНИЧИВАЕМ ВЫСОТУ ТЕКСТА ==================== */
 
   /* Контент подписи */
   .story-caption-content {
@@ -732,11 +734,13 @@
     font-size: 1.8vh;
     font-weight: 100;
     line-height: 1.4;
-    padding: 2vh 4vw 4vh;
+    padding: 2vh 4vw 6vh; /* Увеличили отступ снизу, чтобы текст не налазил на кнопку */
     pointer-events: auto;
-     max-height: 40vh !important;   /* Максимум 40% высоты экрана */
-    min-height: auto !important;   /* Минимальная высота по содержимому */
-    overflow-y: hidden !important; /* Скрываем всё, что выходит за пределы */
+    
+    /* ✅ ИСПРАВЛЕНИЕ ЗДЕСЬ: Ограничиваем высоту и скрываем лишнее */
+    max-height: 25vh; 
+    overflow: hidden; 
+    
     box-sizing: border-box;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -745,14 +749,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: flex-start; /* ВАЖНО: выравниваем по левому краю */
+    align-items: flex-start;
     background-color: transparent;
     -webkit-overflow-scrolling: touch;
     flex: 1;
     z-index: 2;
     bottom: 0;
-
-    flex-shrink: 0 !important;
   }
 
   /* Текст подписи */
@@ -760,32 +762,25 @@
     flex: 1;
     position: relative;
     z-index: 3;
-    display: block !important; /* ВАЖНО: block вместо flex */
+    display: block !important;
     justify-content: flex-end;
-    align-items: flex-start; /* ВАЖНО: выравниваем по левому краю */
+    align-items: flex-start;
     width: 100%;
-    text-align: left !important; /* ВАЖНО: текст по левому краю */
+    text-align: left !important;
     padding: 0;
-    max-height: none;
-    overflow-y: visible;
-    word-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    overflow-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    margin-top: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    margin-top: auto; /* Выравнивание текста */
     box-sizing: border-box;
-
-
-    overflow: hidden !important;   /* Обрезаем текст */
-    text-overflow: ellipsis !important; /* Троеточие в конце */
-    display: -webkit-box !important; /* Webkit для многострочного обрезания */
-    -webkit-line-clamp: 4 !important; /* Максимум 4 строки */
-    -webkit-box-orient: vertical !important;
+    /* Если внутри текста есть свои блоки, сбрасываем max-height */
+    max-height: 100%; 
   }
 
   .story-caption-content::before {
     display: none;
   }
 
-  /* Оверлей для мобильных */
+  /* Оверлей для мобильных (полный экран) */
   .caption-overlay.mobile-overlay {
     position: fixed;
     top: 0;
@@ -804,20 +799,22 @@
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen {
-    /* ИСПРАВЛЕНИЕ: УБРАЛИ ФИКСИРОВАННЫЙ padding: 30px 350px 100px */
-    padding: 4vh 6vw 10vh; /* АДАПТИВНЫЕ ОТСТУПЫ */
+    padding: 4vh 6vw 10vh;
     line-height: 1.5;
     border-radius: 20px 20px 0 0;
     z-index: 1021;
-    background: linear-gradient(to top, 
-      rgba(0, 0, 0, 0.95) 0%, 
-      rgba(0, 0, 0, 0.8) 30%, 
-      rgba(0, 0, 0, 0.4) 70%, 
+    background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.8) 30%,
+      rgba(0, 0, 0, 0.4) 70%,
       transparent 100%);
-    font-size: 2.2vh; /* АДАПТИВНЫЙ РАЗМЕР ШРИФТА */
+    font-size: 2.2vh;
     max-width: 100%;
     width: 100%;
     box-sizing: border-box;
+    /* ✅ В полноэкранном режиме разрешаем скролл */
+    overflow-y: auto;
+    max-height: 100vh;
   }
 
   .caption-fullscreen {
@@ -825,11 +822,11 @@
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen-content {
-    padding-right: 0; /* УБРАЛИ padding-right, который выталкивал текст */
+    padding-right: 0;
     pointer-events: auto;
-    word-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    overflow-wrap: break-word; /* ВАЖНО: перенос длинных слов */
-    text-align: left; /* ВАЖНО: текст по левому краю */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-align: left;
     box-sizing: border-box;
   }
 
@@ -891,8 +888,9 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 4;
-    width: 3.5vh; /* Фиксированные размеры */
+    width: 3.5vh;
     height: 3.5vh;
+    pointer-events: auto; /* Важно, чтобы кнопку можно было нажать */
   }
 
   /* Убираем padding-right, который выталкивал текст */
@@ -900,9 +898,10 @@
     padding-right: 0 !important;
   }
 
-  /* Для контейнера без кнопки */
+  /* Для контейнера без кнопки (если вдруг где-то используется) */
   .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
     padding: 2vh 4vw 2vh;
+    max-height: 30vh; /* Ограничиваем и тут */
   }
 
   /* Убеждаемся, что нет горизонтальной прокрутки */
@@ -918,7 +917,11 @@
 @media (max-width: 375px) {
   .caption-overlay.mobile-overlay .caption-fullscreen {
     padding: 3vh 5vw 8vh;
-    font-size: 18px; /* Фиксированный размер для стабильности на маленьких экранах */
+    font-size: 18px;
+  }
+  
+  .story-caption-content {
+    max-height: 28vh; /* Чуть больше места на маленьких экранах */
   }
 }
 
@@ -932,5 +935,6 @@
   .story-caption-content {
     font-size: 18px;
     padding: 15px 20px 40px;
+    max-height: 20vh; /* В ландшафте места меньше */
   }
 }
