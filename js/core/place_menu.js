@@ -14,6 +14,25 @@ const SWIPE_THRESHOLD = 50;
 /**
  * Переключение полноэкранного режима
  */
+function detectSpecificBrowsers() {
+    const userAgent = navigator.userAgent;
+    
+    // Проверяем Safari (но исключаем Chrome, так как у него тоже есть слово Safari в UA)
+    // Регулярка ищет "Safari", но НЕ ищет "Chrome", "CriOS", "FxiOS"
+    const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
+    
+    // Проверяем Яндекс Браузер
+    const isYandex = /YaBrowser/i.test(userAgent);
+
+    if (isSafari || isYandex) {
+        // Добавляем класс к тегу HTML, который мы задействовали в CSS
+        document.documentElement.classList.add('safari-yandex-fix');
+        console.log('🧭 Обнаружен Safari или Яндекс Браузер: применен подъем элементов.');
+    } else {
+        console.log('🧭 Обычный браузер (Chrome и др.): стандартное расположение.');
+    }
+}
+
 function toggleFullscreen() {
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
     enterFullscreen();
@@ -422,8 +441,12 @@ function initializeDropdownsAndButtons() {
 }
 
 window.initializeMenu = function() {
+    // В самом начале вызываем детектор
+    detectSpecificBrowsers();
+
     console.log('🔄 Инициализация меню (после перехода)...');
     
+    // ... (весь остальной код функции без изменений) ...
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
     
@@ -531,3 +554,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
