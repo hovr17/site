@@ -998,3 +998,100 @@
   }
 }
 
+
+@media (max-width: 750px) {
+  /* ============================================
+     ВЕРХНЯЯ ПАНЕЛЬ: Текст + кнопка в 15px от адресной строки
+     ============================================ */
+
+  /* Новый контейнер для верхней панели */
+  .story-header-panel {
+    position: sticky;
+    position: -webkit-sticky; /* Для Safari */
+    top: 15px; /* Расстояние от верхней части viewport */
+    top: calc(15px + env(safe-area-inset-top, 0px)); /* Учитываем безопасную зону iOS */
+    
+    z-index: 1010; /* Выше всех остальных элементов */
+    margin: 0 auto;
+    max-width: 95%;
+    
+    /* Визуальное оформление */
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px;
+    padding: 12px 20px;
+    
+    /* Типография */
+    color: #ffffff;
+    font-family: 'Crooker', sans-serif;
+    font-size: 1.7vh;
+    font-weight: 100;
+    line-height: 1.4;
+    text-align: left;
+    
+    /* Тень для глубины */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    
+    pointer-events: auto;
+  }
+
+  /* Кнопка раскрытия внутри верхней панели */
+  .header-caption-expand-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5vh;
+    height: 3.5vh;
+    margin: 8px auto 0; /* Отступ сверху от текста */
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .header-caption-expand-btn .expand-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  /* ============================================
+     СТАРЫЕ СТИЛИ (оставляем, но корректируем)
+     ============================================ */
+
+  /* Скрываем старый нижний контейнер */
+  .story-caption-container {
+    display: none;
+  }
+
+  /* Показываем верхнюю панель когда есть текст */
+  .story-slide.has-caption .story-header-panel {
+    display: block;
+  }
+
+  /* Оверлей на весь экран при раскрытии */
+  .caption-overlay.mobile-overlay .caption-fullscreen {
+    position: fixed;
+    top: 15px;
+    top: calc(15px + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: none;
+    padding: 4vh 6vw;
+    font-size: 2.2vh;
+    background: rgba(0, 0, 0, 0.95);
+    border-radius: 0;
+    z-index: 1020;
+  }
+
+  /* Обеспечиваем прокрутку текста в оверлее */
+  .caption-fullscreen-content {
+    max-height: calc(100vh - 30px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
