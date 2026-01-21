@@ -734,9 +734,9 @@
     line-height: 1.4;
     padding: 2vh 4vw 4vh;
     pointer-events: auto;
-    max-height: none;
-    min-height: 80px;
-    overflow-y: visible;
+     max-height: 40vh !important;   /* Максимум 40% высоты экрана */
+    min-height: auto !important;   /* Минимальная высота по содержимому */
+    overflow-y: hidden !important; /* Скрываем всё, что выходит за пределы */
     box-sizing: border-box;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -751,6 +751,8 @@
     flex: 1;
     z-index: 2;
     bottom: 0;
+
+    flex-shrink: 0 !important;
   }
 
   /* Текст подписи */
@@ -770,6 +772,13 @@
     overflow-wrap: break-word; /* ВАЖНО: перенос длинных слов */
     margin-top: auto;
     box-sizing: border-box;
+
+
+    overflow: hidden !important;   /* Обрезаем текст */
+    text-overflow: ellipsis !important; /* Троеточие в конце */
+    display: -webkit-box !important; /* Webkit для многострочного обрезания */
+    -webkit-line-clamp: 4 !important; /* Максимум 4 строки */
+    -webkit-box-orient: vertical !important;
   }
 
   .story-caption-content::before {
