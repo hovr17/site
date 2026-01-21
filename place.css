@@ -2041,3 +2041,56 @@
 
 
 
+/* ===== РЕШЕНИЕ ДЛЯ ЯНДЕКС БРАУЗЕРА И MOBILE SAFARI ===== */
+
+/* Для мобильных устройств: контент над панелью браузера */
+@media (max-width: 1080px) {
+  /* Основной контейнер на всю высоту с учетом системных элементов */
+  body {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available; /* Для старых Safari */
+    overscroll-behavior: none;
+  }
+  
+  .container {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  
+  #frame {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+  
+  /* Видео на всю высоту без обрезки */
+  .temple-video {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+  
+  .video-background {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+  
+  /* Экран с отступом снизу для безопасной зоны */
+  .screen {
+    height: calc(100dvh - env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100dvh - env(safe-area-inset-bottom, 0px)) !important;
+  }
+  
+  /* Дополнительный отступ для контента внизу */
+  .scroll-zone {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
+  }
+}
+
+/* Скрываем нижнюю тень на мобильных, чтобы не перекрывала контент */
+@media (max-width: 1080px) {
+  .bottom-shadow {
+    display: none !important;
+  }
+}
