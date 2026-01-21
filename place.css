@@ -1989,6 +1989,60 @@ body {
 }
 
 
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА: ПОЛНОЭКРАННЫЙ РЕЖИМ НАД ПАНЕЛЬЮ ===== */
+@media (max-width: 1080px) {
+  
+  /* Основной контейнер на всю высоту экрана */
+  #frame {
+    height: var(--viewport-height) !important;
+    max-height: none !important;
+    min-height: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: auto !important;
+  }
+
+  /* Все оверлеи и видео на всю высоту */
+  .page-loading-overlay,
+  .temple-nav-arrows,
+  .video-background,
+  #bgVideo {
+    height: var(--viewport-height) !important;
+    min-height: var(--viewport-height) !important;
+  }
+
+  /* Добавляем отступ снизу для безопасной зоны (где нет критичного контента) */
+  .scroll-zone {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
+  /* Убираем белую полосу внизу в режиме details */
+  .mode-details .video-background::after {
+    display: none;
+  }
+
+  /* Корректировка для очень маленьких экранов */
+  @media (max-height: 600px) {
+    #frame {
+      height: 100vh !important; /* Fallback для старых браузеров на маленьких экранах */
+    }
+  }
+}
+
+/* ДЕСКТОП: оставляем центрированный контейнер как есть */
+@media (min-width: 1081px) {
+  #frame {
+    height: 90vh !important; /* или любое другое значение по вашему вкусу */
+    max-height: 1100px !important;
+  }
+}
 
 
 
