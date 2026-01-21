@@ -625,7 +625,7 @@
 }
 
 .story-slide.active::after {
-  opacity: 1;
+  opacity:1;
 }
 
 @media (min-width: 1081px) {
@@ -661,6 +661,10 @@
   max-height: 100% ;
   object-fit: cover ;    /* Заполняет всё, обрезая лишнее */
   margin: 0 ;
+  
+  /* ИСПРАВЛЕНИЕ: Поднимаем фото, убирая верхний отступ (было 10vh, теперь 0) */
+  margin-top: 0 !important; 
+  
   padding: 0 ;
    border-radius: 0;
   }
@@ -689,6 +693,9 @@
     z-index: 10;
     padding: 0;
     box-sizing: border-box;
+    
+    /* ИСПРАВЛЕНИЕ: Поднимаем текст и кнопку раскрытия снизу вверх на 65px */
+    bottom: 65px !important;
   }
 
   /* Подложка под текст */
@@ -811,6 +818,9 @@
     max-width: 100%;
     width: 100%;
     box-sizing: border-box;
+    
+    /* ИСПРАВЛЕНИЕ: Поднимаем развернутый текст на 65px */
+    bottom: 65px !important;
   }
 
   .caption-fullscreen {
@@ -838,7 +848,7 @@
   }
 
   .progress-container {
-    top: 1.8vh;
+    top:1.8vh;
     z-index: 1022;
   }
 
@@ -853,13 +863,6 @@
   .close-button img {
     width: 70%;
     height: 70%;
-  }
-
-  /* Изображение немного сдвигаем вверх */
-  .story-image {
-    max-height: 85%;
-    margin-bottom: auto;
-    margin-top: 10vh;
   }
 
   /* Зоны касания должны быть ПОД оверлеем когда он открыт */
@@ -938,4 +941,3 @@
     padding-left: 0.5vh;
   }
 }
-
