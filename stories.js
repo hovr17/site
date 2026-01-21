@@ -93,74 +93,18 @@ class StoriesManager {
     const captionContent = document.createElement('div');
     captionContent.className = 'story-caption-content';
     
-    if (!this.isDesktop) {
-      // Мобильная логика
-      const textElement = document.createElement('div');
-      textElement.className = 'story-caption-text';
-      textElement.textContent = captionText;
-      captionContent.appendChild(textElement);
-      
-      // Оверлей для мобильных
-      const overlay = document.createElement('div');
-      overlay.className = 'caption-overlay mobile-overlay';
-      overlay.dataset.slideIndex = index;
-      
-      const fullscreenCaption = document.createElement('div');
-      fullscreenCaption.className = 'caption-fullscreen';
-      
-      const fullscreenContent = document.createElement('div');
-      fullscreenContent.className = 'caption-fullscreen-content';
-      fullscreenContent.textContent = captionText;
-      
-      fullscreenCaption.appendChild(fullscreenContent);
-      overlay.appendChild(fullscreenCaption);
-      
-      // Кнопка раскрытия (стрелка) для мобильных
-      const expandBtn = document.createElement('button');
-      expandBtn.className = 'caption-expand-btn mobile-expand-btn';
-      expandBtn.innerHTML = `
-        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
-      `;
-      
-      expandBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        // Показываем оверлей
-        overlay.classList.add('active');
-        captionContainer.classList.add('hidden');
-        this.isOverlayOpen = true;
-        this.container.classList.add('overlay-open');
-      });
-      
-      // Обработчик клика по оверлею для закрытия
-      const handleOverlayClick = (e) => {
-        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
-          this.closeOverlay(overlay, expandBtn);
-        }
-      };
-      
-      overlay.addEventListener('click', handleOverlayClick);
-      overlay.addEventListener('touchend', handleOverlayClick);
-      
-      captionContent.appendChild(expandBtn);
-      captionContainer.appendChild(captionContent);
-      slide.appendChild(captionContainer);
-      slide.appendChild(overlay);
-      return;
-    }
-    
-    // Десктопная логика
+    // Проверяем длину текста на всех устройствах (ОБЩАЯ ЛОГИКА)
     const isLongText = captionText.length > 135;
     
     if (isLongText) {
+      // Обрезаем текст до ближайшего слова
       const shortText = captionText.substring(0, 135);
       const lastSpaceIndex = shortText.lastIndexOf(' ');
-      
       const displayText = lastSpaceIndex > 0 
         ? shortText.substring(0, lastSpaceIndex) 
         : shortText;
       
+      // Создаем элемент с обрезанным текстом и многоточием
       const textElement = document.createElement('div');
       textElement.className = 'story-caption-text';
       
@@ -177,8 +121,9 @@ class StoriesManager {
       textElement.appendChild(fullSpan);
       captionContent.appendChild(textElement);
       
+      // Создаем оверлей для полного текста
       const overlay = document.createElement('div');
-      overlay.className = 'caption-overlay';
+      overlay.className = this.isDesktop ? 'caption-overlay' : 'caption-overlay mobile-overlay';
       overlay.dataset.slideIndex = index;
       
       const fullscreenCaption = document.createElement('div');
@@ -191,22 +136,28 @@ class StoriesManager {
       fullscreenCaption.appendChild(fullscreenContent);
       overlay.appendChild(fullscreenCaption);
       
-      slide.appendChild(overlay);
-      
+      // Кнопка раскрытия (отображается на ВСЕХ устройствах для длинного текста)
       const expandBtn = document.createElement('button');
-      expandBtn.className = 'caption-expand-btn';
+      expandBtn.className = this.isDesktop ? 'caption-expand-btn' : 'caption-expand-btn mobile-expand-btn';
       expandBtn.innerHTML = `
         <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
       `;
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         
         // Показываем оверлей
-        captionContent.classList.add('no-bg');
+        if (this.isDesktop) {
+          captionContent.classList.add('no-bg');
+        }
         captionContainer.classList.add('hidden');
         overlay.classList.add('active');
         this.isOverlayOpen = true;
+        
+        if (!this.isDesktop) {
+          this.container.classList.add('overlay-open');
+        }
         
         setTimeout(() => {
           fullscreenCaption.scrollTop = 0;
@@ -214,7 +165,7 @@ class StoriesManager {
         }, 10);
       });
       
-      // Обработчик клика по оверлею для закрытия
+      // Обработчик закрытия оверлея
       const handleOverlayClick = (e) => {
         if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
           this.closeOverlay(overlay, expandBtn);
@@ -222,24 +173,31 @@ class StoriesManager {
       };
       
       overlay.addEventListener('click', handleOverlayClick);
+      overlay.addEventListener('touchend', handleOverlayClick);
       
       captionContent.appendChild(expandBtn);
-      if (this.isDesktop) {
-    captionContent.style.maxHeight = '150px';
-  }
+      captionContainer.appendChild(captionContent);
+      slide.appendChild(captionContainer);
+      slide.appendChild(overlay);
       
-      captionContent.scrollTop = 0;
-      textElement.scrollTop = 0;
+      // Ограничиваем высоту на десктопе
+      if (this.isDesktop) {
+        captionContent.style.maxHeight = '150px';
+      }
     } else {
+      // Короткий текст - отображаем без кнопки на всех устройствах
       const textElement = document.createElement('div');
       textElement.className = 'story-caption-text';
       textElement.textContent = captionText;
       captionContent.appendChild(textElement);
-      captionContent.style.maxHeight = 'none';
+      
+      if (this.isDesktop) {
+        captionContent.style.maxHeight = 'none';
+      }
+      
+      captionContainer.appendChild(captionContent);
+      slide.appendChild(captionContainer);
     }
-    
-    captionContainer.appendChild(captionContent);
-    slide.appendChild(captionContainer);
   }
   
   createProgressBars() {
@@ -593,5 +551,4 @@ class StoriesManager {
 
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
-
 });
