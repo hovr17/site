@@ -1962,6 +1962,8 @@
 
 
 
+/* ===== ПОЛНОЭКРАННАЯ КНОПКА (МОБИЛЬНЫЕ УСТРОЙСТВА) ===== */
+
 .fullscreen-button {
   position: absolute;
   top: 3vh;
@@ -1969,21 +1971,24 @@
   width: min(60px, 9vmin);
   height: min(30px, 5vmin);
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
-  z-index: 10;
-  background: none;
-  border: none;
+  z-index: 9999; /* МАКСИМАЛЬНЫЙ z-index */
+  background: rgba(255, 255, 255, 0.1); /* Полупрозрачный фон для видимости */
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
   cursor: pointer;
   display: none; /* Скрыто по умолчанию */
   padding: 0;
+  pointer-events: auto !important; /* ВКЛЮЧАЕМ ОБРАБОТКУ КЛИКОВ */
   -webkit-tap-highlight-color: transparent !important;
   -webkit-touch-callout: none !important;
   outline: none !important;
+  user-select: none !important;
 }
 
 /* Показываем только на мобильных в режиме intro */
 @media (max-width: 1080px) {
   .mode-intro .fullscreen-button {
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
   }
@@ -1993,26 +1998,45 @@
   }
 }
 
-/* Иконки для кнопки (SVG или эмодзи) */
+/* Иконки для кнопки */
 .fullscreen-icon {
-  width: 100%;
-  height: 100%;
-  background: url('./ui/expand_button.svg') center/contain no-repeat;
+  width: 80%;
+  height: 80%;
+  background: url('./ui/fullscreen_enter.svg') center/contain no-repeat;
   transition: transform 0.2s ease;
 }
 
 .fullscreen-exit-icon {
-  width: 100%;
-  height: 100%;
-  background: url('./ui/eхpand_button_cancel.svg') center/contain no-repeat;
+  width: 80%;
+  height: 80%;
+  background: url('./ui/fullscreen_exit.svg') center/contain no-repeat;
   transition: transform 0.2s ease;
+}
+
+/* Текстовый фолбек (если SVG не загружен) */
+.fullscreen-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(18px, 5vmin, 28px);
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  pointer-events: none; /* Текст не мешает клику */
 }
 
 /* Эффект нажатия */
 .fullscreen-button:active .fullscreen-icon,
-.fullscreen-button:active .fullscreen-exit-icon {
+.fullscreen-button:active .fullscreen-exit-icon,
+.fullscreen-button:active .fullscreen-text {
   transform: scale(0.9);
 }
+
+/* ОТЛАДКА: Если кнопка не работает, уберите комментарий */
+/* .fullscreen-button {
+  border: 2px solid red !important;
+  background: rgba(255,0,0,0.3) !important;
+} */
 
 
 
