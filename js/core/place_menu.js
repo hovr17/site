@@ -1,46 +1,50 @@
-console.log('place_menu.js загружен (TikTok viewport fix + Yandex/Safari offset 0.5vh)');
+console.log('place_menu.js загружен (TikTok viewport fix)');
 
-// ===== ОПРЕДЕЛЕНИЕ БРАУЗЕРА (отлаженное) =====
+// ===== ФИКС ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI - ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ UI =====
 
-function detectBrowser() {
-  // Очищаем старые классы перед проверкой
-  document.body.classList.remove('yandex-browser', 'safari-browser');
-  
-  const ua = navigator.userAgent.toLowerCase();
+function forceHideBrowserUI() {
   const isMobile = window.innerWidth <= 1080;
+  if (!isMobile) return;
   
-  if (!isMobile) return; // Только для мобильных
+  // Трюк из TikTok: прокрутка скрывает UI браузера
+  setTimeout(() => {
+    window.scrollTo(0, 1);
+    document.body.style.height = `${window.innerHeight}px`;
+  }, 100);
   
-  // Яндекс Браузер: проверяем YaBrowser или Yowser
-  const isYandex = ua.includes('yabrowser') || ua.includes('yowser');
+  // Пересчитываем при изменении размера/ориентации
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      window.scrollTo(0, 1);
+      document.body.style.height = `${window.innerHeight}px`;
+    }, 100);
+  });
   
-  // Safari: проверяем safari и исключаем Chrome, Edge, Firefox, Opera
-  const isSafari = ua.includes('safari') && 
-                   !ua.includes('chrome') && 
-                   !ua.includes('crios') && 
-                   !ua.includes('fxios') && 
-                   !ua.includes('edge') && 
-                   !ua.includes('opera') && 
-                   !ua.includes('opr') &&
-                   !ua.includes('yabrowser'); // Явно исключаем Яндекс
-  
-  // Добавляем классы к body
+  // Для Яндекса: дополнительный фикс через overflow
+  const isYandex = navigator.userAgent.includes('YaBrowser');
   if (isYandex) {
-    document.body.classList.add('yandex-browser');
-    console.log('🎯 Яндекс Браузер обнаружен');
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    setTimeout(() => {
+      document.body.style.overflow = 'auto';
+      document.body.style.position = '';
+    }, 200);
   }
   
+  // Для Safari: используем -webkit-fill-available
+  const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
   if (isSafari) {
-    document.body.classList.add('safari-browser');
-    console.log('🍎 Safari обнаружен');
+    document.documentElement.style.height = '-webkit-fill-available';
+    document.body.style.height = '-webkit-fill-available';
+    document.querySelector('.container').style.height = '-webkit-fill-available';
   }
 }
 
-// Запускаем после DOM готовности и при изменении размера
-document.addEventListener('DOMContentLoaded', () => {
-  detectBrowser();
-  window.addEventListener('resize', detectBrowser);
-});
+// Запускаем при загрузке
+forceHideBrowserUI();
 
 // ===== ОСТАЛЬНОЙ КОД =====
 
@@ -52,6 +56,8 @@ let touchStartX = null;
 let touchStartY = null;
 let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
+
+// ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ =====
 
 function toggleFullscreen() {
   try {
@@ -67,23 +73,15 @@ function toggleFullscreen() {
 
 function enterFullscreen() {
   const elem = document.documentElement;
-  const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.webkitRequestFullScreen;
+  const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen;
   
   if (requestFS) {
-    const promise = requestFS.call(elem);
-    if (promise) {
-      promise.catch(err => {
-        console.warn('Не удалось войти в полноэкранный режим:', err.message);
-        if (err.name === 'TypeError' || err.name === 'SecurityError') {
-          setTimeout(() => requestFS.call(elem), 100);
-        }
-      });
-    }
+    requestFS.call(elem);
   }
 }
 
 function exitFullscreen() {
-  const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+  const exitFS = document.exitFullscreen || document.webkitExitFullscreen;
   if (exitFS) exitFS.call(document);
 }
 
@@ -101,8 +99,6 @@ function handleFullscreenChange() {
     icon.classList.remove('fullscreen-exit-icon');
     icon.classList.add('fullscreen-icon');
   }
-  
-  updateFullscreenButtonVisibility();
 }
 
 function updateFullscreenButtonVisibility() {
@@ -111,15 +107,8 @@ function updateFullscreenButtonVisibility() {
   
   const isMobile = window.innerWidth <= 1080;
   const isIntroMode = mode === 'intro';
-  const isAlreadyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
   
-  if (isMobile && isIntroMode && !isAlreadyFullscreen) {
-    btn.style.display = 'flex';
-    btn.style.pointerEvents = 'auto';
-  } else {
-    btn.style.display = 'none';
-    btn.style.pointerEvents = 'none';
-  }
+  btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
 }
 
 function initializeFullscreenButton() {
@@ -130,13 +119,6 @@ function initializeFullscreenButton() {
   btn.parentNode.replaceChild(newBtn, btn);
   
   newBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    toggleFullscreen();
-  }, { passive: false });
-  
-  newBtn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-  newBtn.addEventListener('touchend', (e) => {
     e.stopPropagation();
     e.preventDefault();
     toggleFullscreen();
@@ -161,6 +143,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
     const scrollZone = document.getElementById('scrollZone');
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
+    
+    updateFullscreenButtonVisibility();
     
     if (videoPoster) {
         videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
@@ -522,7 +506,6 @@ window.initializeMenu = function() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded');
-    detectBrowser(); // Вызов здесь обязателен
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
