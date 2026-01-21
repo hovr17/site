@@ -2100,30 +2100,30 @@
 /* Для Яндекс Браузера на мобильных */
 @media (max-width: 1080px) {
   .yandex-browser .mode-intro .title-block {
-    transform: translateY(calc(22vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(22vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
   
   .yandex-browser .mode-intro .hero-details {
-    transform: translateY(calc(38vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(38vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
   
   .yandex-browser .mode-intro #dropdownsContainer {
-    transform: translateY(calc(38vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(38vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
 }
 
 /* Для Safari на мобильных */
 @media (max-width: 1080px) {
   .safari-browser .mode-intro .title-block {
-    transform: translateY(calc(22vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(22vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
   
   .safari-browser .mode-intro .hero-details {
-    transform: translateY(calc(38vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(38vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
   
   .safari-browser .mode-intro #dropdownsContainer {
-    transform: translateY(calc(38vh - 200px - 4vh)) !important; /* Подняли на 4vh */
+    transform: translateY(calc(38vh - 200px - 0.5vh)) !important; /* Подняли на 4vh */
   }
 }
 
@@ -2131,6 +2131,7 @@
 @media (max-width: 1080px) {
   .yandex-browser .mode-intro .entry-note,
   .safari-browser .mode-intro .entry-note {
-    margin-top: -4vh; /* Дополнительный отрицательный отступ для entry-note */
+    margin-top: -0.5vh; /* Дополнительный отрицательный отступ для entry-note */
   }
 }
+
