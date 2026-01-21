@@ -1,52 +1,4 @@
-console.log('place_menu.js загружен (TikTok viewport fix)');
-
-// ===== ФИКС ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI - ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ UI =====
-
-function forceHideBrowserUI() {
-  const isMobile = window.innerWidth <= 1080;
-  if (!isMobile) return;
-  
-  // Трюк из TikTok: прокрутка скрывает UI браузера
-  setTimeout(() => {
-    window.scrollTo(0, 1);
-    document.body.style.height = `${window.innerHeight}px`;
-  }, 100);
-  
-  // Пересчитываем при изменении размера/ориентации
-  window.addEventListener('resize', () => {
-    setTimeout(() => {
-      window.scrollTo(0, 1);
-      document.body.style.height = `${window.innerHeight}px`;
-    }, 100);
-  });
-  
-  // Для Яндекса: дополнительный фикс через overflow
-  const isYandex = navigator.userAgent.includes('YaBrowser');
-  if (isYandex) {
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    
-    setTimeout(() => {
-      document.body.style.overflow = 'auto';
-      document.body.style.position = '';
-    }, 200);
-  }
-  
-  // Для Safari: используем -webkit-fill-available
-  const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
-  if (isSafari) {
-    document.documentElement.style.height = '-webkit-fill-available';
-    document.body.style.height = '-webkit-fill-available';
-    document.querySelector('.container').style.height = '-webkit-fill-available';
-  }
-}
-
-// Запускаем при загрузке
-forceHideBrowserUI();
-
-// ===== ОСТАЛЬНОЙ КОД =====
+console.log('place_menu.js загружен');
 
 let mode = "intro";
 let isAnimating = false;
@@ -59,38 +11,50 @@ const SWIPE_THRESHOLD = 50;
 
 // ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ =====
 
+/**
+ * Переключение полноэкранного режима
+ */
 function toggleFullscreen() {
-  try {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      enterFullscreen();
-    } else {
-      exitFullscreen();
-    }
-  } catch (error) {
-    console.error('Ошибка при переключении полноэкранного режима:', error);
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    enterFullscreen();
+  } else {
+    exitFullscreen();
   }
 }
 
+/**
+ * Вход в полноэкранный режим
+ */
 function enterFullscreen() {
   const elem = document.documentElement;
-  const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen;
   
-  if (requestFS) {
-    requestFS.call(elem);
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
   }
 }
 
+/**
+ * Выход из полноэкранного режима
+ */
 function exitFullscreen() {
-  const exitFS = document.exitFullscreen || document.webkitExitFullscreen;
-  if (exitFS) exitFS.call(document);
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
 }
 
+/**
+ * Обработчик изменения состояния полноэкранного режима
+ */
 function handleFullscreenChange() {
   const btn = document.getElementById('fullscreenBtn');
   if (!btn) return;
   
   const icon = btn.querySelector('div');
-  const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
   
   if (isFullscreen) {
     icon.classList.remove('fullscreen-icon');
@@ -101,6 +65,9 @@ function handleFullscreenChange() {
   }
 }
 
+/**
+ * МГНОВЕННОЕ обновление видимости кнопки полноэкранного режима
+ */
 function updateFullscreenButtonVisibility() {
   const btn = document.getElementById('fullscreenBtn');
   if (!btn) return;
@@ -111,24 +78,52 @@ function updateFullscreenButtonVisibility() {
   btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
 }
 
+/**
+ * Инициализация кнопки полноэкранного режима
+ */
 function initializeFullscreenButton() {
   const btn = document.getElementById('fullscreenBtn');
   if (!btn) return;
   
-  const newBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(newBtn, btn);
-  
-  newBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    toggleFullscreen();
-  }, { passive: false });
-  
+  btn.addEventListener('click', toggleFullscreen);
   document.addEventListener('fullscreenchange', handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-  window.addEventListener('resize', updateFullscreenButtonVisibility);
-  updateFullscreenButtonVisibility();
 }
+
+// ===== ГЛОБАЛЬНЫЙ КЛИК ДЛЯ ПОЛНОЭКРАННОГО РЕЖИМА (ТОЛЬКО MOBILE) =====
+
+/**
+ * Настраивает переход в полноэкранный режим при любом клике на экране (в режиме intro)
+ */
+function setupGlobalFullscreenTrigger() {
+  const frame = document.getElementById('frame');
+  if (!frame) return;
+
+  frame.addEventListener('click', (e) => {
+    // 1. Если мы уже в полноэкранном режиме — ничего не делаем
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+
+    // 2. Работаем только в режиме intro
+    if (mode !== 'intro') return;
+
+    // 3. ✅ НОВАЯ ПРОВЕРКА: Работаем только на мобильных устройствах (ширина <= 1080px)
+    const isMobile = window.innerWidth <= 1080;
+    if (!isMobile) return;
+
+    // 4. Исключаем клики по интерактивным элементам, чтобы не ломать навигацию и кнопки
+    const isInteractive = e.target.closest(
+      'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
+    );
+
+    if (isInteractive) return;
+
+    // 5. Если клик пришелся на фон или видео -> открываем полноэкранный режим
+    enterFullscreen();
+    console.log('📱 Клик по экрану (Mobile): Вход в полноэкранный режим');
+  });
+}
+
+// ===== СУЩЕСТВУЮЩИЙ КОД =====
 
 function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === newMode || isAnimating) return;
@@ -158,14 +153,20 @@ function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === "details") {
         frame.classList.remove("mode-intro");
         frame.classList.add("mode-details");
+        
         scrollZone.classList.add('animating');
-        if (bgVideo) bgVideo.pause();
+        
+        if (bgVideo) {
+            bgVideo.pause(); // ✅ СТАВИМ НА ПАУЗУ при открытии меню
+        }
+        
         if (expandUseful && usefulDrop) {
             setTimeout(() => {
                 usefulDrop.classList.add("open");
                 sessionStorage.setItem('usefulDropdownState', 'open');
             }, 600);
         }
+        
         setTimeout(() => {
             scrollZone.classList.remove('animating');
             isAnimating = false;
@@ -173,12 +174,18 @@ function setMode(newMode, { expandUseful = false } = {}) {
     } else {
         frame.classList.remove("mode-details");
         frame.classList.add("mode-intro");
+        
         scrollZone.classList.add('animating');
-        if (bgVideo) bgVideo.play();
+        
+        if (bgVideo) {
+            bgVideo.play(); // ✅ ВОЗОБНОВЛЯЕМ при закрытии меню
+        }
+        
         smoothScrollTo(0, 700);
         if (addressDrop) addressDrop.classList.remove("open");
         if (usefulDrop) usefulDrop.classList.remove("open");
         sessionStorage.removeItem('usefulDropdownState');
+        
         setTimeout(() => {
             scrollZone.classList.remove('animating');
             isAnimating = false;
@@ -429,16 +436,29 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
-    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ
+    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ для мгновенного отображения
     if (shouldOpenMenu) {
+        // Добавляем класс, который отключает transitions для всей страницы
         document.body.classList.add('no-transition');
-        const elementsToDisable = [frame, bgVideo, scrollZone, document.querySelector('.title-block'), 
-                                  document.querySelector('.hero-details'), document.getElementById('dropdownsContainer'), 
-                                  document.querySelector('.entry-note'), document.getElementById('paidBtn')].filter(el => el);
+        
+        // Принудительно отключаем у ключевых элементов
+        const elementsToDisable = [
+            frame,
+            bgVideo,
+            scrollZone,
+            document.querySelector('.title-block'),
+            document.querySelector('.hero-details'),
+            document.getElementById('dropdownsContainer'),
+            document.querySelector('.entry-note'),
+            document.getElementById('paidBtn')
+        ].filter(el => el);
+        
         elementsToDisable.forEach(el => {
             el.style.transition = 'none !important';
             el.style.animation = 'none !important';
         });
+        
+        // Включаем анимации обратно через очень короткий таймаут
         setTimeout(() => {
             elementsToDisable.forEach(el => {
                 el.style.transition = '';
@@ -448,7 +468,7 @@ window.initializeMenu = function() {
         }, 10);
     }
     
-    // Применяем классы
+    // Применяем классы без анимации
     if (frame) {
         if (shouldOpenMenu) {
             frame.classList.remove('mode-intro');
@@ -459,12 +479,13 @@ window.initializeMenu = function() {
         }
     }
     
-    // ✅ УПРАВЛЕНИЕ ВИДЕО
+    // ✅ УПРАВЛЕНИЕ ВИДЕО: пауза при открытом меню
     if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
         bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
+        
         if (shouldOpenMenu) {
             bgVideo.pause();
         } else {
@@ -482,7 +503,7 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
-    // Восстанавливаем dropdown
+    // Восстанавливаем состояние dropdown
     const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
     if (savedDropdownState === 'open' && usefulDrop) {
         usefulDrop.classList.add("open");
@@ -492,6 +513,7 @@ window.initializeMenu = function() {
     
     initializeDropdownsAndButtons();
     initializeFullscreenButton();
+    setupGlobalFullscreenTrigger();
     setupSwipeHandlers();
     setupKeyboardHandlers();
     
@@ -501,11 +523,11 @@ window.initializeMenu = function() {
         sessionStorage.removeItem('usefulDropdownState');
     }, 100);
     
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
+    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded');
+    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
