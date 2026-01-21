@@ -90,24 +90,24 @@ class StoriesManager {
   addCaptionToSlide(slide, index, captionText) {
     const isLongText = captionText.length > 135;
     
-    // Создаем ВЕРХНЮЮ панель
-    const headerPanel = document.createElement('div');
-    headerPanel.className = 'story-header-panel';
+    // Создаем НИЖНЮЮ ПАНЕЛЬ (как плашка кук)
+    const bottomPanel = document.createElement('div');
+    bottomPanel.className = 'story-bottom-panel';
     
-    // Текст (обрезанный для длинных подписей)
-    const headerText = document.createElement('div');
-    headerText.className = 'story-header-text';
-    headerText.textContent = isLongText 
+    // Текст
+    const panelText = document.createElement('div');
+    panelText.className = 'story-panel-text';
+    panelText.textContent = isLongText 
       ? captionText.substring(0, 135).replace(/\s+\S*$/, '...') 
       : captionText;
     
-    headerPanel.appendChild(headerText);
+    bottomPanel.appendChild(panelText);
     
-    // Кнопка раскрытия (только для длинного текста)
+    // Кнопка развернуть (только для длинного текста)
     if (isLongText) {
       const expandBtn = document.createElement('button');
-      expandBtn.className = 'header-caption-expand-btn';
-      expandBtn.innerHTML = `<img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">`;
+      expandBtn.className = 'story-panel-expand-btn';
+      expandBtn.innerHTML = `Развернуть <img src="ui/open_menu_button.svg" alt="↓">`;
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -115,11 +115,11 @@ class StoriesManager {
         this.showFullCaptionOverlay(captionText);
       });
       
-      headerPanel.appendChild(expandBtn);
+      bottomPanel.appendChild(expandBtn);
     }
     
-    slide.appendChild(headerPanel);
-    slide.classList.add('has-caption');
+    slide.appendChild(bottomPanel);
+    slide.classList.add('has-panel');
   }
   
   createProgressBars() {
@@ -156,18 +156,17 @@ class StoriesManager {
       if (e.key === 'ArrowLeft') this.prevSlide();
       if (e.key === 'ArrowRight') this.nextSlide();
       if (e.key === 'Escape') {
-        const headerOverlay = document.querySelector('.header-caption-overlay.active');
-        if (headerOverlay) {
-          this.closeHeaderCaptionOverlay();
+        // Проверяем сначала новый оверлей
+        const bottomOverlay = document.querySelector('.bottom-caption-overlay.active');
+        if (bottomOverlay) {
+          this.closeBottomCaptionOverlay();
           return;
         }
         
-        const oldOverlay = document.querySelector('.caption-overlay.active:not(.header-caption-overlay)');
+        // Потом старый оверлей
+        const oldOverlay = document.querySelector('.caption-overlay.active:not(.bottom-caption-overlay)');
         if (oldOverlay) {
-          const slideIndex = oldOverlay.dataset.slideIndex;
-          const slide = this.slides[slideIndex];
-          const expandBtn = slide.querySelector('.caption-expand-btn');
-          this.closeOverlay(oldOverlay, expandBtn);
+          this.closeOverlay(oldOverlay);
           return;
         }
         
@@ -187,13 +186,13 @@ class StoriesManager {
       if (!this.isDesktop && this.isOverlayOpen) {
         const activeOverlay = document.querySelector('.caption-overlay.active');
         if (activeOverlay) {
-          const slideIndex = activeOverlay.dataset.slideIndex;
-          const slide = this.slides[slideIndex];
-          const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
-          this.closeOverlay(activeOverlay, expandBtn);
+          if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+            this.closeBottomCaptionOverlay();
+          } else {
+            this.closeOverlay(activeOverlay);
+          }
           e.preventDefault();
           e.stopPropagation();
-          
           this.overlayJustClosed = true;
           setTimeout(() => {
             this.overlayJustClosed = false;
@@ -243,7 +242,11 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            this.closeOverlay(activeOverlay, null);
+            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+              this.closeBottomCaptionOverlay();
+            } else {
+              this.closeOverlay(activeOverlay);
+            }
             e.preventDefault();
             e.stopPropagation();
             return;
@@ -268,7 +271,11 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            this.closeOverlay(activeOverlay, null);
+            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+              this.closeBottomCaptionOverlay();
+            } else {
+              this.closeOverlay(activeOverlay);
+            }
             e.preventDefault();
             e.stopPropagation();
             return;
@@ -308,7 +315,11 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      this.closeOverlay(activeOverlay, null);
+      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+        this.closeBottomCaptionOverlay();
+      } else {
+        this.closeOverlay(activeOverlay);
+      }
     }
     
     this.goToSlide(this.currentSlide - 1, 'prev');
@@ -319,7 +330,11 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      this.closeOverlay(activeOverlay, null);
+      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+        this.closeBottomCaptionOverlay();
+      } else {
+        this.closeOverlay(activeOverlay);
+      }
     }
     
     if (this.currentSlide < this.totalSlides - 1) {
@@ -334,7 +349,11 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      this.closeOverlay(activeOverlay, null);
+      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
+        this.closeBottomCaptionOverlay();
+      } else {
+        this.closeOverlay(activeOverlay);
+      }
     }
     
     this.isAnimating = true;
@@ -378,34 +397,26 @@ class StoriesManager {
     }, 100);
   }
   
-  // Универсальный метод закрытия оверлея
-  closeOverlay(overlay, expandBtn) {
+  closeOverlay(overlay) {
     if (!overlay) return;
     
     overlay.classList.remove('active');
     this.isOverlayOpen = false;
     this.container.classList.remove('overlay-open');
     
-    // Восстанавливаем управление
     setTimeout(() => {
       this.isAnimating = false;
     }, 100);
   }
   
-  // ==================== НОВЫЙ МЕТОД: Показ полноэкранного оверлея ====================
-  /**
-   * Показывает полноэкранный оверлей с текстом подписи в верхней части экрана
-   * @param {string} captionText - Полный текст подписи для отображения
-   */
   showFullCaptionOverlay(captionText) {
     if (this.isOverlayOpen) return;
     
-    // Ищем существующий оверлей или создаем новый
-    let overlay = document.querySelector('.header-caption-overlay');
+    let overlay = document.querySelector('.bottom-caption-overlay');
     
     if (!overlay) {
       overlay = document.createElement('div');
-      overlay.className = 'caption-overlay mobile-overlay header-caption-overlay';
+      overlay.className = 'caption-overlay mobile-overlay bottom-caption-overlay';
       
       const fullscreen = document.createElement('div');
       fullscreen.className = 'caption-fullscreen';
@@ -419,49 +430,40 @@ class StoriesManager {
       
       this.container.appendChild(overlay);
       
-      // Обработчик закрытия по клику на фон
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
-          this.closeHeaderCaptionOverlay();
+          this.closeBottomCaptionOverlay();
         }
       });
     } else {
-      // Обновляем текст в существующем оверлее
       overlay.querySelector('.caption-fullscreen-content').textContent = captionText;
     }
     
-    // Показываем оверлей
     overlay.classList.add('active');
     this.isOverlayOpen = true;
     this.container.classList.add('overlay-open');
     
-    // Прокручиваем в начало
     setTimeout(() => {
       overlay.scrollTop = 0;
       overlay.querySelector('.caption-fullscreen-content').scrollTop = 0;
     }, 10);
     
-    console.log('🎯 Оверлей с подписью открыт');
+    console.log('🎯 Нижний оверлей открыт');
   }
   
-  // ==================== НОВЫЙ МЕТОД: Закрытие оверлея ====================
-  /**
-   * Закрывает оверлей шапки (header overlay)
-   */
-  closeHeaderCaptionOverlay() {
-    const overlay = document.querySelector('.header-caption-overlay');
+  closeBottomCaptionOverlay() {
+    const overlay = document.querySelector('.bottom-caption-overlay');
     if (!overlay) return;
     
     overlay.classList.remove('active');
     this.isOverlayOpen = false;
     this.container.classList.remove('overlay-open');
     
-    // Восстанавливаем управление
     setTimeout(() => {
       this.isAnimating = false;
     }, 100);
     
-    console.log('🎯 Оверлей с подписью закрыт');
+    console.log('🎯 Нижний оверлей закрыт');
   }
   
   updateProgressBars() {
