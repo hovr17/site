@@ -1,174 +1,48 @@
-console.log('place_menu.js загружен (TikTok viewport fix + Yandex/Safari offset)');
+console.log('place_menu.js загружен (Browser-specific offset 0.5vh)');
 
-// ===== ДИНАМИЧЕСКАЯ КОРРЕКЦИЯ ВЫСОТЫ ДЛЯ ЯНДЕКС БРАУЗЕРА И SAFARI =====
+// ===== ОПРЕДЕЛЕНИЕ БРАУЗЕРА (отлаженное) =====
 
-function fixYandexBrowserViewport() {
+function detectBrowser() {
+  const ua = navigator.userAgent.toLowerCase();
   const isMobile = window.innerWidth <= 1080;
   
-  if (!isMobile) return;
+  if (!isMobile) return; // Только для мобильных
   
-  // Для Яндекс Браузера и других мобильных браузеров
-  const setHeight = () => {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-    
-    // Принудительно скрываем UI браузера через прокрутку (как TikTok)
-    setTimeout(() => {
-      window.scrollTo(0, 1);
-    }, 100);
-  };
+  // Яндекс Браузер: проверяем YaBrowser или Yowser
+  const isYandex = ua.includes('yabrowser') || ua.includes('yowser');
   
-  setHeight();
+  // Safari: проверяем safari и исключаем другие браузеры
+  const isSafari = ua.includes('safari') && 
+                   !ua.includes('chrome') && 
+                   !ua.includes('crios') && 
+                   !ua.includes('edge') && 
+                   !ua.includes('firefox') && 
+                   !ua.includes('opera') && 
+                   !ua.includes('opr');
   
-  // Пересчитываем при изменении размера/ориентации
-  window.addEventListener('resize', setHeight);
-  window.addEventListener('orientationchange', setHeight);
-  
-  // Проверяем, если это Яндекс Браузер
-  const isYandex = /YaBrowser/i.test(navigator.userAgent);
+  // Добавляем классы к body
   if (isYandex) {
-    console.log('🎯 Обнаружен Яндекс Браузер, применяю фикс');
     document.body.classList.add('yandex-browser');
-    // Дополнительный фикс для Яндекса: скрываем UI через body scroll
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-      document.body.style.overflow = '';
-    }, 200);
+    console.log('🎯 Яндекс Браузер обнаружен');
   }
-}
-
-function fixSafariViewport() {
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   
-  if (isSafari && window.innerWidth <= 1080) {
-    // Safari использует -webkit-fill-available
-    document.documentElement.style.height = '-webkit-fill-available';
-    document.body.style.height = '-webkit-fill-available';
-    document.querySelector('.container').style.height = '-webkit-fill-available';
+  if (isSafari) {
     document.body.classList.add('safari-browser');
-    console.log('🍎 Обнаружен Safari, применен -webkit-fill-available');
+    console.log('🍎 Safari обнаружен');
   }
 }
 
-// Запускаем при загрузке
-fixYandexBrowserViewport();
-fixSafariViewport();
+// Запускаем при загрузке и при изменении размера
+detectBrowser();
+window.addEventListener('resize', detectBrowser);
 
 // ===== ОСТАЛЬНОЙ КОД =====
-
 let mode = "intro";
 let isAnimating = false;
-
-// Переменные для обработки свайпов
 let touchStartX = null;
 let touchStartY = null;
 let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
-
-// ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ (опционально, для кнопки) =====
-
-function toggleFullscreen() {
-  try {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      enterFullscreen();
-    } else {
-      exitFullscreen();
-    }
-  } catch (error) {
-    console.error('Ошибка при переключении полноэкранного режима:', error);
-  }
-}
-
-function enterFullscreen() {
-  const elem = document.documentElement;
-  const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.webkitRequestFullScreen;
-  
-  if (requestFS) {
-    const promise = requestFS.call(elem);
-    if (promise) {
-      promise.catch(err => {
-        console.warn('Не удалось войти в полноэкранный режим:', err.message);
-        if (err.name === 'TypeError' || err.name === 'SecurityError') {
-          setTimeout(() => requestFS.call(elem), 100);
-        }
-      });
-    }
-  }
-}
-
-function exitFullscreen() {
-  const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
-  if (exitFS) exitFS.call(document);
-}
-
-function handleFullscreenChange() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  const icon = btn.querySelector('div');
-  const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  
-  if (isFullscreen) {
-    icon.classList.remove('fullscreen-icon');
-    icon.classList.add('fullscreen-exit-icon');
-  } else {
-    icon.classList.remove('fullscreen-exit-icon');
-    icon.classList.add('fullscreen-icon');
-  }
-  
-  updateFullscreenButtonVisibility();
-}
-
-function updateFullscreenButtonVisibility() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  const isMobile = window.innerWidth <= 1080;
-  const isIntroMode = mode === 'intro';
-  const isAlreadyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  
-  if (isMobile && isIntroMode && !isAlreadyFullscreen) {
-    btn.style.display = 'flex';
-    btn.style.pointerEvents = 'auto';
-  } else {
-    btn.style.display = 'none';
-    btn.style.pointerEvents = 'none';
-  }
-}
-
-function initializeFullscreenButton() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  // Очищаем старые слушатели
-  const newBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(newBtn, btn);
-  
-  // Добавляем новый слушатель
-  newBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    toggleFullscreen();
-  }, { passive: false });
-  
-  // Touch events
-  newBtn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-  newBtn.addEventListener('touchend', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    toggleFullscreen();
-  }, { passive: false });
-  
-  // Слушаем изменения полноэкранного режима
-  document.addEventListener('fullscreenchange', handleFullscreenChange);
-  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-  
-  // Обновляем видимость
-  window.addEventListener('resize', updateFullscreenButtonVisibility);
-  updateFullscreenButtonVisibility();
-}
-
-// ===== ОСТАЛЬНЫЕ ФУНКЦИИ =====
 
 function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === newMode || isAnimating) return;
@@ -183,8 +57,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
     const scrollZone = document.getElementById('scrollZone');
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
-    
-    updateFullscreenButtonVisibility();
     
     if (videoPoster) {
         videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
@@ -469,7 +341,7 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
-    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ для мгновенного отображения
+    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         const elementsToDisable = [frame, bgVideo, scrollZone, document.querySelector('.title-block'), 
@@ -488,7 +360,7 @@ window.initializeMenu = function() {
         }, 10);
     }
     
-    // Применяем классы без анимации
+    // Применяем классы
     if (frame) {
         if (shouldOpenMenu) {
             frame.classList.remove('mode-intro');
@@ -522,7 +394,7 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
-    // Восстанавливаем состояние dropdown
+    // Восстанавливаем dropdown
     const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
     if (savedDropdownState === 'open' && usefulDrop) {
         usefulDrop.classList.add("open");
@@ -531,7 +403,6 @@ window.initializeMenu = function() {
     }
     
     initializeDropdownsAndButtons();
-    initializeFullscreenButton(); // ✅ Инициализация кнопки
     setupSwipeHandlers();
     setupKeyboardHandlers();
     
@@ -545,8 +416,7 @@ window.initializeMenu = function() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
+    console.log('place_menu.js: DOMContentLoaded');
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
-
