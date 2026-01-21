@@ -662,8 +662,8 @@
   object-fit: cover ;    /* Заполняет всё, обрезая лишнее */
   margin: 0 ;
   
-  /* ИСПРАВЛЕНИЕ: Поднимаем фото, убирая верхний отступ (было 10vh, теперь 0) */
-  margin-top: 0 !important; 
+  /* ИСПРАВЛЕНИЕ: Поднимаем фото на 50px вверх */
+  margin-top: -50px !important; 
   
   padding: 0 ;
    border-radius: 0;
@@ -694,8 +694,10 @@
     padding: 0;
     box-sizing: border-box;
     
-    /* ИСПРАВЛЕНИЕ: Поднимаем текст и кнопку раскрытия снизу вверх на 65px */
-    bottom: 65px !important;
+    /* ИСПРАВЛЕНИЕ: Расстояние рассчитывается от панели браузера, а не низа страницы */
+    /* env(safe-area-inset-bottom) - это отступ панели браузера */
+    /* 115px - наш подъем */
+    bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
   }
 
   /* Подложка под текст */
@@ -764,9 +766,9 @@
 
   /* Текст подписи */
   .story-caption-text {
-    flex: 1;
+    flex:1;
     position: relative;
-    z-index: 3;
+    z-index:3;
     display: block !important; /* ВАЖНО: block вместо flex */
     justify-content: flex-end;
     align-items: flex-start; /* ВАЖНО: выравниваем по левому краю */
@@ -819,8 +821,8 @@
     width: 100%;
     box-sizing: border-box;
     
-    /* ИСПРАВЛЕНИЕ: Поднимаем развернутый текст на 65px */
-    bottom: 65px !important;
+    /* ИСПРАВЛЕНИЕ: Расстояние рассчитывается от панели браузера, а не низа страницы */
+    bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
   }
 
   .caption-fullscreen {
@@ -844,7 +846,7 @@
 
   /* Увеличиваем прогресс-бары */
   .progress-bar {
-    height: 3px;
+    height:3px;
   }
 
   .progress-container {
