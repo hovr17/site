@@ -648,6 +648,8 @@
 
 /* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
 
+/* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
+
 @media (max-width: 750px) {
   .slides-container {
     background-color: #000;
@@ -658,9 +660,9 @@
     background-color: #000;
   }
 
-  /* === УПРАВЛЕНИЕ ПОДЪЕМОМ В ЗАВИСИМОСТИ ОТ БРАУЗЕРА === */
+  /* === УПРАВЛЕНИЕ ПОДЪЕМОМ (Логика: По умолчанию 0, Включаем для Safari/Yandex) === */
 
-  /* 1. ПО УМОЛЧАНИЮ (Google Chrome): Убираем подъем, возвращаем стандарт */
+  /* 1. ПО УМОЛЧАНИЮ (Google Chrome): Отступы равны 0 */
   .story-image {
     width: 100vw;
     height: 100%;
@@ -680,18 +682,17 @@
     bottom: 0 !important; /* Развернутый текст на месте */
   }
 
-  /* 2. ИСКЛЮЧЕНИЕ (Safari, Яндекс, iOS и др.): Применяем подъем */
-  /* Селектор сработает, если у html НЕТ класса no-lift */
-  html:not(.no-lift) .story-image {
+  /* 2. ИСКЛЮЧЕНИЕ (Safari, Яндекс): Включаем подъем только если есть класс enable-lift */
+  html.enable-lift .story-image {
     margin-top: -50px !important; /* Поднимаем фото */
   }
 
-  html:not(.no-lift) .story-caption-container {
+  html.enable-lift .story-caption-container {
     /* Поднимаем текст и кнопку */
     bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
   }
 
-  html:not(.no-lift) .caption-overlay.mobile-overlay .caption-fullscreen {
+  html.enable-lift .caption-overlay.mobile-overlay .caption-fullscreen {
     /* Поднимаем развернутый текст */
     bottom: calc(env(safe-area-inset-bottom) + 115px) !important;
   }
@@ -788,7 +789,7 @@
 
   /* Текст подписи */
   .story-caption-text {
-    flex: 1;
+    flex:1;
     position: relative;
     z-index: 3;
     display: block !important; /* ВАЖНО: block вместо flex */
@@ -964,3 +965,36 @@
     padding-left: 0.5vh;
   }
 }
+
+/* Специальные фиксы для очень маленьких экранов */
+@media (max-width: 375px) {
+  .caption-overlay.mobile-overlay .caption-fullscreen {
+    padding: 3vh 5vw 8vh;
+    font-size: 18px; /* Фиксированный размер для стабильности на маленьких экранах */
+  }
+}
+
+/* Специальные фиксы для ландшафтной ориентации */
+@media (max-width: 1080px) and (orientation: landscape) {
+  .caption-overlay.mobile-overlay .caption-fullscreen {
+    font-size: 18px;
+    padding: 3vh 5vw 8vh;
+  }
+
+  .story-caption-content {
+    font-size: 18px;
+    padding: 15px 20px 40px;
+  }
+
+  .caption-expand-btn {
+    width: 3.5vh; /* Фиксированные размеры */
+    height: 3.5vh;
+  }
+
+  .stories-label {
+    font-size: 2.5vh;
+    top: 3vh;
+    padding-left: 0.5vh;
+  }
+}
+
