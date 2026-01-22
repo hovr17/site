@@ -130,13 +130,13 @@
   display: block;
 }
 
-/* Общий стиль стрелок */
+/* Общий стиль кнопки */
 .temple-nav-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px; /* ИЗМЕНЕНО: Было 40px */
-  height: 50px; /* ИЗМЕНЕНО: Было 40px */
+  width: 50px; 
+  height: 50px; 
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
@@ -145,36 +145,44 @@
   justify-content: center;
   pointer-events: auto;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-  transition: none; /* Сохраняем отсутствие стандартного transition, как в Stories */
+  transition: none; 
   display: none;
   z-index: 1001;
 }
 
-/* Стиль при наведении (как в Stories) */
+/* Эффект при наведении */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%) scale(1.1); /* ИЗМЕНЕНО: Добавлен scale(1.1) */
+  transform: translateY(-50%) scale(1.1); 
 }
 
-/* Иконка внутри стрелки */
-.temple-nav-arrow img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
+/* === ИСПРАВЛЕНИЕ: Размер для DIV-иконки (вместо img) === */
+.temple-nav-arrow .arrow-icon {
+  width: 60%;  /* Было 100%, теперь 60% как в сторис */
+  height: 60%; /* Было 100%, теперь 60% как в сторис */
+  margin: auto; /* Центрирование внутри flex-контейнера */
+  background-size: contain !important; /* Гарантируем, что фон вписывается */
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
-/* Позиционирование левой стрелки */
+/* Позиционирование стрелок */
 .temple-prev-arrow {
   left: 10px;
 }
 
-/* Позиционирование правой стрелки */
 .temple-next-arrow {
   right: 10px;
 }
 
-/* Скрытое состояние стрелок */
+/* Вращение стрелки вправо (сохраняем этот стиль) */
+.arrow-next {
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+  transform: rotate(180deg);
+}
+
+/* Скрытое состояние */
 .temple-nav-arrow.hidden {
   opacity: 0.3;
   pointer-events: none;
@@ -182,7 +190,7 @@
   display: flex !important;
 }
 
-/* Логика отображения в режимах */
+/* Отображение по режимам */
 .mode-intro .temple-nav-arrow {
   display: flex;
 }
@@ -671,6 +679,13 @@
     height: min(30px, 3vmin);
   }
 
+ .back-button {
+    top: min(40px, 5vh);
+    left: min(20px, 3vw);
+    width: min(60px, 6vmin);
+    height: min(30px, 3vmin);
+  }
+
   .temple-nav-arrows {
     position: fixed !important;
     top: 50% !important;
@@ -694,10 +709,18 @@
     z-index: 1011;
   }
 
+  /* Ховер эффект для ПК */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
     transform: translateY(-50%) scale(1.1) !important;
+  }
+
+  /* Иконка на ПК */
+  .temple-nav-arrow .arrow-icon {
+    width: 60% !important;
+    height: 60% !important;
+    margin: auto;
   }
 
   .temple-prev-arrow {
@@ -1032,6 +1055,7 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
+
 
 
 
