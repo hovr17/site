@@ -1,161 +1,14 @@
 /* ==========================================
-   АНИМАЦИИ ПЕРЕХОДОВ (ПОЛНЫЙ НАБОР)
+   БАЗОВЫЕ СТИЛИ И RESET
    ========================================== */
 
-@keyframes pageSlideOutLeft {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(-100%); opacity: 1; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@keyframes pageSlideOutRight {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(100%); opacity: 1; }
-}
-
-@keyframes pageSlideInLeft {
-  0% { transform: translateX(100%); opacity: 1; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes pageSlideInRight {
-  0% { transform: translateX(-100%); opacity: 1; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes parallaxOutBackLeft {
-  0% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-  100% { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
-}
-
-@keyframes parallaxOutBackRight {
-  0% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-  100% { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
-}
-
-@keyframes parallaxInBackLeft {
-  0% { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
-  100% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInBackRight {
-  0% { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
-  100% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxOutContentLeft {
-  0% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-  100% { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
-}
-
-@keyframes parallaxOutContentRight {
-  0% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-  100% { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
-}
-
-@keyframes parallaxInContentLeft {
-  0% { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
-  100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInContentRight {
-  0% { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
-  100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxOutUILeft {
-  0% { transform: translateX(0) translateY(0); opacity: 1; }
-  100% { transform: translateX(-50px) translateY(50px); opacity: 0; }
-}
-
-@keyframes parallaxOutUIRight {
-  0% { transform: translateX(0) translateY(0); opacity: 1; }
-  100% { transform: translateX(50px) translateY(50px); opacity: 0; }
-}
-
-@keyframes parallaxInUILeft {
-  0% { transform: translateX(-50px) translateY(-50px); opacity: 0; }
-  100% { transform: translateX(0) translateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInUIRight {
-  0% { transform: translateX(50px) translateY(-50px); opacity: 0; }
-  100% { transform: translateX(0) translateY(0); opacity: 1; }
-}
-
-.page-exit-left { animation: pageSlideOutLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
-.page-exit-right { animation: pageSlideOutRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
-.page-enter-left { animation: pageSlideInLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
-.page-enter-right { animation: pageSlideInRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
-
-.page-exit-parallax .temple-video,
-.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
-
-.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
-
-.page-exit-parallax .back-button,
-.page-exit-parallax .temple-nav-arrows { animation: parallaxOutUI 0.4s ease-out forwards; }
-
-.page-enter-parallax .temple-video,
-.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
-
-.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
-
-.page-exit-parallax-left .temple-video,
-.page-exit-parallax-left .video-background { animation: parallaxOutBackLeft 0.6s ease-out forwards; }
-
-.page-exit-parallax-left .screen { animation: parallaxOutContentLeft 0.5s ease-out forwards; }
-
-.page-exit-parallax-left .back-button,
-.page-exit-parallax-left .temple-nav-arrows { animation: parallaxOutUILeft 0.4s ease-out forwards; }
-
-.page-exit-parallax-right .temple-video,
-.page-exit-parallax-right .video-background { animation: parallaxOutBackRight 0.6s ease-out forwards; }
-
-.page-exit-parallax-right .screen { animation: parallaxOutContentRight 0.5s ease-out forwards; }
-
-.page-exit-parallax-right .back-button,
-.page-exit-parallax-right .temple-nav-arrows { animation: parallaxOutUIRight 0.4s ease-out forwards; }
-
-.page-enter-parallax-left .temple-video,
-.page-enter-parallax-left .video-background { animation: parallaxInBackLeft 0.6s ease-out forwards; }
-
-.page-enter-parallax-left .screen { animation: parallaxInContentLeft 0.5s ease-out forwards; }
-
-.page-enter-parallax-left .back-button,
-.page-enter-parallax-left .temple-nav-arrows { animation: parallaxInUIRight 0.4s ease-out forwards; }
-
-.page-enter-parallax-right .temple-video,
-.page-enter-parallax-right .video-background { animation: parallaxInBackRight 0.6s ease-out forwards; }
-
-.page-enter-parallax-right .screen { animation: parallaxInContentRight 0.5s ease-out forwards; }
-
-.page-enter-parallax-right .back-button,
-.page-enter-parallax-right .temple-nav-arrows { animation: parallaxInUILeft 0.4s ease-out forwards; }
-
-.page-transition-active {
-  overflow: hidden !important;
-}
-
-.no-transition,
-.no-transition * {
-  transition: none !important;
-  animation: none !important;
-}
-
-#frame {
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-#spa-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
+/* Индикатор загрузки */
 .page-loading-overlay {
   position: fixed;
   top: 0;
@@ -172,6 +25,10 @@
 .page-loading-overlay.hidden {
   opacity: 0;
 }
+
+/* ==========================================
+   VIDEO BACKGROUND & OVERLAYS
+   ========================================== */
 
 .temple-video {
   position: absolute;
@@ -202,6 +59,10 @@
   z-index: 2;
 }
 
+/* ==========================================
+   КНОПКА "НАЗАД"
+   ========================================== */
+
 .back-button {
   position: absolute;
   top: 3vh;
@@ -218,6 +79,10 @@
   height: 100%;
   object-fit: contain;
 }
+
+/* ==========================================
+   НАВИГАЦИОННЫЕ СТРЕЛКИ
+   ========================================== */
 
 .temple-nav-arrows {
   position: fixed;
@@ -277,6 +142,10 @@
   display: none;
 }
 
+/* ==========================================
+   ОСНОВНОЙ КОНТЕЙНЕР И СКРОЛЛ
+   ========================================== */
+
 .screen {
   position: relative;
   z-index: 5;
@@ -311,9 +180,9 @@
   overscroll-behavior: none;
 }
 
-.top-spacer {
-  flex-shrink: 0;
-}
+/* ==========================================
+   ЗАГОЛОВОК И ТЕКСТ "ПОДРОБНЕЕ"
+   ========================================== */
 
 .title-block,
 .hero-details {
@@ -399,6 +268,10 @@
   transform: scale(0.95);
 }
 
+/* ==========================================
+   КАРТОЧКИ "ФОТО"
+   ========================================== */
+
 .photo-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -447,6 +320,10 @@
 .mode-details .photo-label {
   opacity: 1;
 }
+
+/* ==========================================
+   ДРОПДАУНЫ
+   ========================================== */
 
 .dropdown {
   margin-top: 45px;
@@ -548,6 +425,17 @@
   padding-left: 15px;
 }
 
+/* ==========================================
+   ЭФФЕКТЫ И ПЕРЕХОДЫ
+   ========================================== */
+
+.no-transition,
+.no-transition * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Подъем в режиме details */
 .mode-details .title-block {
   transform: translateY(-100px);
 }
@@ -560,152 +448,305 @@
   transform: translateY(-50px);
 }
 
-@media (min-width: 1081px) {
-  .back-button {
-    top: min(40px, 5vh);
-    left: min(20px, 3vw);
+/* ==========================================
+   АНИМАЦИИ ПЕРЕХОДОВ
+   ========================================== */
+
+@keyframes pageSlideOutLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100%); opacity: 1; }
+}
+
+@keyframes pageSlideOutRight {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 1; }
+}
+
+@keyframes pageSlideInLeft {
+  0% { transform: translateX(100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pageSlideInRight {
+  0% { transform: translateX(-100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes parallaxOutBack {
+  to {
+    transform: translateZ(-300px) scale(1.5) rotateY(5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutContent {
+  to {
+    transform: translateX(-100%) translateZ(0) rotateY(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutUI {
+  to {
+    transform: translateX(-50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInBack {
+  from {
+    transform: translateZ(-300px) scale(1.5) rotateY(-5deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInContent {
+  from {
+    transform: translateX(100%) translateZ(0) rotateY(10deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxOutUILeft {
+  to { transform: translateX(-50px) translateY(50px); opacity: 0; }
+}
+
+@keyframes parallaxOutUIRight {
+  to { transform: translateX(50px) translateY(50px); opacity: 0; }
+}
+
+@keyframes parallaxInUILeft {
+  from { transform: translateX(-50px) translateY(-50px); opacity: 0; }
+  to { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+@keyframes parallaxInUIRight {
+  from { transform: translateX(50px) translateY(-50px); opacity: 0; }
+  to { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+/* Применение анимаций */
+.page-exit-left { animation: pageSlideOutLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1000; }
+.page-exit-right { animation: pageSlideOutRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1000; }
+.page-enter-left { animation: pageSlideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1001; }
+.page-enter-right { animation: pageSlideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1001; }
+
+.page-exit-parallax .temple-video,
+.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
+
+.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
+
+.page-exit-parallax .back-button,
+.page-exit-parallax .temple-nav-arrows { animation: parallaxOutUI 0.4s ease-out forwards; }
+
+.page-enter-parallax .temple-video,
+.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
+
+.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
+
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows { animation: parallaxInUIRight 0.4s ease-out forwards; }
+
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows { animation: parallaxOutUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows { animation: parallaxInUILeft 0.4s ease-out forwards; }
+
+.page-transition-active {
+  overflow: hidden !important;
+}
+
+#frame {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+#spa-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ==========================================
+   UI ИКОНКИ
+   ========================================== */
+
+.back-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+}
+
+.open-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+  transform: rotate(180deg);
+}
+
+.geo-icon {
+  background: url('./ui/geo_tag.svg') center/contain no-repeat;
+}
+
+.bulb-icon {
+  background: url('./ui/bulb.svg') center/contain no-repeat;
+}
+
+.arrow-down-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/open_menu_button.svg') center/contain no-repeat;
+  transition: transform 0.25s ease;
+}
+
+.dropdown.open .arrow-down-icon {
+  transform: rotate(180deg);
+}
+
+.arrow-prev {
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+}
+
+.arrow-next {
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+  transform: rotate(180deg);
+}
+
+/* ==========================================
+   СЕТКА ДЛЯ ФОТО
+   ========================================== */
+
+.photo-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.photo-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 50%;
+}
+
+/* ==========================================
+   100VH FIX ДЛЯ МОБИЛЬНЫХ
+   ========================================== */
+
+.container, #frame {
+  height: calc(var(--vh, 1vh) * 100) !important;
+}
+
+.video-background,
+.temple-nav-arrows {
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* ==========================================
+   ПОДЪЕМ ЭЛЕМЕНТОВ ТОЛЬКО ДЛЯ МОБИЛЬНОГО ЯНДЕКС.БРАУЗЕРА
+   ========================================== */
+
+/*
+   КОД, ОТВЕЧАЮЩИЙ ЗА ПОДЪЕМ ЭЛЕМЕНТОВ:
+   
+   1. ЯНДЕКС.БРАУЗЕР (ТОЛЬКО МОБИЛЬНЫЙ):
+      - Селектор: .yandex-browser .mode-intro .[элемент]
+      - Механизм: transform: translateY(calc(... - 55px))
+      - Применяется: только при max-width: 767px
+*/
+
+@media (max-width: 767px) {
+  .yandex-browser .mode-intro .title-block {
+    transform: translateY(calc(50vh - 200px - 55px)) !important;
   }
 
-  .temple-nav-arrows {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: calc(100% + 100px);
-    max-width: 750px;
-    height: 90vh;
-    max-height: 1100px;
-    z-index: 1010;
+  .yandex-browser .mode-intro .hero-details {
+    transform: translateY(calc(55vh - 200px - 55px)) !important;
   }
 
-  .temple-nav-arrow {
-    position: absolute;
-    top: 50%;
-    width: 50px;
-    height: 50px;
-    opacity: 0.7;
-    transform: translateY(-50%);
+  .yandex-browser .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 200px - 55px)) !important;
   }
 
-  .temple-prev-arrow {
-    left: 0;
-    transform: translateX(-100%) translateY(-50%);
-    margin-left: -30px;
+  .yandex-browser .mode-intro .photo-wrapper {
+    transform: translateY(-55px) !important;
   }
 
-  .temple-next-arrow {
-    right: 0;
-    transform: translateX(100%) translateY(-50%);
-    margin-right: -30px;
+  .yandex-browser .mode-intro .title-block h1 {
+    position: relative;
+    top: -55px !important;
   }
 
-  .temple-nav-arrow.hidden {
-    display: none;
+  .yandex-browser .mode-intro .details-header {
+    position: relative;
+    top: -65px !important;
   }
 
-  .screen {
-    padding: 0 24px;
-    margin-top: 10px;
+  .yandex-browser .mode-intro .entry-note {
+    transform: translateY(-55px) !important;
   }
 
-  .title-block h1 {
-    font-size: clamp(28px, 5vmin, 62px);
-    padding-top: 13vh;
+  /* Для очень коротких экранов (iPhone SE) */
+  @media (max-height: 700px) {
+    .yandex-browser .mode-intro .title-block,
+    .yandex-browser .mode-intro .hero-details,
+    .yandex-browser .mode-intro #dropdownsContainer {
+      transform: translateY(calc(50vh - 60px - 55px)) !important;
+    }
   }
+}
 
-  .mode-intro .title-block {
-    transform: translateY(43vh);
+/* ==========================================
+   ПОДЪЕМ ДЛЯ ДРУГИХ МОБИЛЬНЫХ БРАУЗЕРОВ
+   ========================================== */
+
+@media (max-width: 767px) {
+  .mode-intro .title-block,
+  .mode-intro .hero-details,
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
   }
 
   .mode-intro .hero-details {
-    transform: translateY(47vh);
-  }
-
-  .mode-intro #dropdownsContainer {
-    transform: translateY(47vh);
-  }
-
-  .photo-card {
-    width: 21vh;
-    height: auto;
-    aspect-ratio: 166 / 225;
-    max-width: 35vh;
-    border-radius: 3.6vh;
-    border-width: 0.3vh;
-  }
-
-  .photo-wrapper {
-    justify-content: flex-start;
-    gap: 1.9vh;
-  }
-
-  .details-header {
-    font-size: clamp(20px, 2.5vmin, 30px);
-  }
-
-  .photo-label {
-    font-size: clamp(20px, 2.5vmin, 32px);
-    bottom: 1.2vh;
-  }
-
-  .dropdown {
-    margin-inline: 1.5vh;
-    margin-top: 40px;
-    max-height: 5.5vh;
-    border-radius: 2.7vh;
-  }
-
-  .dropdown-header {
-    height: 5.5vh;
-    padding: 0 2.1vh;
-  }
-
-  .dropdown-icon {
-    width: 3.2vh;
-    height: 3.2vh;
-  }
-
-  .dropdown-title {
-    font-size: clamp(16px, 1.8vw, 26px);
-  }
-
-  .dropdown-arrow {
-    width: 3.2vh;
-    height: 3.2vh;
+    transform: translateY(55vh);
   }
 
   .dropdown-body {
-    padding: 0 2vh;
-  }
-
-  .dropdown-body p {
-    font-size: clamp(16px, 1.5vmin, 20px);
-  }
-
-  .small-btn {
-    height: 1.3vh;
-    width: auto;
-  }
-
-  #frame {
-    position: absolute !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    margin: auto !important;
-    width: auto !important;
-    height: 90vh !important;
-    max-width: 650px !important;
-    max-height: 1100px !important;
-    min-width: 300px !important;
-    min-height: 550px !important;
-    aspect-ratio: 9/16 !important;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    border-radius: 30px;
-    overflow: hidden;
+    padding: 0vh 4vw;
   }
 }
+
+@media (max-width: 767px) and (max-height: 700px) {
+  .mode-intro .title-block,
+  .mode-intro .hero-details,
+  .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 60px));
+  }
+  
+  .mode-intro .hero-details {
+    transform: translateY(calc(55vh - 60px));
+  }
+}
+
+/* ==========================================
+   МЕДИА-ЗАПРОСЫ: ПЛАНШЕТЫ (768px-1080px)
+   ========================================== */
 
 @media (min-width: 768px) and (max-width: 1080px) {
   .mode-details .title-block {
@@ -793,6 +834,10 @@
   }
 }
 
+/* ==========================================
+   МЕДИА-ЗАПРОСЫ: МОБИЛЬНЫЕ (0-767px)
+   ========================================== */
+
 @media (max-width: 767px) {
   .screen {
     margin-top: 10px;
@@ -829,6 +874,7 @@
     transform: translateY(50vh);
   }
 
+  /* КАРТОЧКИ */
   .photo-wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -853,6 +899,7 @@
     bottom: 1vh;
   }
 
+  /* ДРОПДАУНЫ */
   .dropdown {
     border-radius: 27px;
     max-height: 55px;
@@ -905,6 +952,7 @@
     font-size: clamp(16px, 4vmin, 50px);
   }
 
+  /* СКРЫТИЕ СТРЕЛОК НА МОБИЛЬНЫХ */
   .temple-nav-arrows,
   .temple-nav-arrow {
     display: none;
@@ -937,6 +985,10 @@
   }
 }
 
+/* ==========================================
+   СПЕЦИАЛЬНЫЕ СЦЕНАРИИ: КОРОТКИЕ ЭКРАНЫ
+   ========================================== */
+
 @media (max-width: 767px) and (max-height: 700px) {
   .mode-intro .title-block,
   .mode-intro .hero-details,
@@ -968,98 +1020,163 @@
   }
 }
 
-/* === ПОДЪЕМ ЭЛЕМЕНТОВ ТОЛЬКО ДЛЯ МОБИЛЬНОГО ЯНДЕКС.БРАУЗЕРА === */
-@media (max-width: 767px) {
-  .yandex-browser .mode-intro .title-block {
-    transform: translateY(calc(50vh - 200px - 55px)) !important;
-  }
 
-  .yandex-browser .mode-intro .hero-details {
-    transform: translateY(calc(55vh - 200px - 55px)) !important;
-  }
+/* === ОСНОВНЫЕ АНИМАЦИИ СТРАНИЦ (ИСПОЛЬЗУЮТСЯ JS) === */
 
-  .yandex-browser .mode-intro #dropdownsContainer {
-    transform: translateY(calc(50vh - 200px - 55px)) !important;
-  }
-
-  .yandex-browser .mode-intro .photo-wrapper {
-    transform: translateY(-55px) !important;
-  }
-
-  .yandex-browser .mode-intro .title-block h1 {
-    position: relative;
-    top: -55px !important;
-  }
-
-  .yandex-browser .mode-intro .details-header {
-    position: relative;
-    top: -65px !important;
-  }
-
-  .yandex-browser .mode-intro .entry-note {
-    transform: translateY(-55px) !important;
-  }
-
-  @media (max-height: 700px) {
-    .yandex-browser .mode-intro .title-block,
-    .yandex-browser .mode-intro .hero-details,
-    .yandex-browser .mode-intro #dropdownsContainer {
-      transform: translateY(calc(50vh - 60px - 55px)) !important;
-    }
-  }
+/* Выезд страницы влево */
+@keyframes pageSlideOutLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100%); opacity: 1; }
 }
 
-.back-icon {
+/* Выезд страницы вправо */
+@keyframes pageSlideOutRight {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 1; }
+}
+
+/* Заезд страницы слева */
+@keyframes pageSlideInLeft {
+  0% { transform: translateX(100); opacity: 1; } /* Ошибка: отсутствует 'px' */
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Заезд страницы справа */
+@keyframes pageSlideInRight {
+  0% { transform: translateX(-100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* === ПАРАЛЛАКС-АНИМАЦИИ ДЛЯ ФОНА И КОНТЕНТА === */
+
+/* Фон отъезжает влево */
+@keyframes parallaxOutBackLeft {
+  0% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
+  100% { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
+}
+
+/* Фон отъезжает вправо */
+@keyframes parallaxOutBackRight {
+  0% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
+  100% { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
+}
+
+/* Фон заезжает слева */
+@keyframes parallaxInBackLeft {
+  0% { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
+  100% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
+}
+
+/* Фон заезжает справа */
+@keyframes parallaxInBackRight {
+  0% { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
+  100% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
+}
+
+/* Контент уезжает влево */
+@keyframes parallaxOutContentLeft {
+  0% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
+  100% { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
+}
+
+/* Контент уезжает вправо */
+@keyframes parallaxOutContentRight {
+  0% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
+  100% { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
+}
+
+/* Контент заезжает слева */
+@keyframes parallaxInContentLeft {
+  0% { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
+  100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
+}
+
+/* Контент заезжает справа */
+@keyframes parallaxInContentRight {
+  0% { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
+  100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
+}
+
+/* === ПАРАЛЛАКС-АНИМАЦИИ ДЛЯ UI ЭЛЕМЕНТОВ === */
+
+/* UI уезжает влево */
+@keyframes parallaxOutUILeft {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  100% { transform: translateX(-50px) translateY(50px); opacity: 0; }
+}
+
+/* UI уезжает вправо */
+@keyframes parallaxOutUIRight {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  100% { transform: translateX(50px) translateY(50px); opacity: 0; }
+}
+
+/* UI заезжает слева */
+@keyframes parallaxInUILeft {
+  0% { transform: translateX(-50px) translateY(-50px); opacity: 0; }
+  100% { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+/* UI заезжает справа */
+@keyframes parallaxInUIRight {
+  0% { transform: translateX(50px) translateY(-50px); opacity: 0; }
+  100% { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+/* === КЛАССЫ, АКТИВИРУЮЩИЕ АНИМАЦИИ (КРИТИЧНО ВАЖНО!) === */
+
+/* Простые слайды */
+.page-exit-left { animation: pageSlideOutLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
+.page-exit-right { animation: pageSlideOutRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
+.page-enter-left { animation: pageSlideInLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
+.page-enter-right { animation: pageSlideInRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
+
+/* Параллакс для фона и контента */
+.page-exit-parallax .temple-video,
+.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
+
+.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
+
+.page-enter-parallax .temple-video,
+.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
+
+.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
+
+/* Параллакс для UI */
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows { animation: parallaxOutUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows { animation: parallaxInUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows { animation: parallaxInUILeft 0.4s ease-out forwards; }
+
+/* === УТИЛИТАРНЫЕ КЛАССЫ === */
+
+.page-transition-active {
+  overflow: hidden !important;
+}
+
+.no-transition,
+.no-transition * {
+  transition: none !important;
+  animation: none !important;
+}
+
+#frame {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+#spa-container {
+  position: relative;
   width: 100%;
-  height: 100%;
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-}
-
-.open-icon {
-  width: 100%;
-  height: 100%;
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
-}
-
-.geo-icon {
-  background: url('./ui/geo_tag.svg') center/contain no-repeat;
-}
-
-.bulb-icon {
-  background: url('./ui/bulb.svg') center/contain no-repeat;
-}
-
-.arrow-down-icon {
-  width: 100%;
-  height: 100%;
-  background: url('./ui/open_menu_button.svg') center/contain no-repeat;
-  transition: transform 0.25s ease;
-}
-
-.dropdown.open .arrow-down-icon {
-  transform: rotate(180deg);
-}
-
-.arrow-prev {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-}
-
-.arrow-next {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
-}
-
-.photo-wrapper {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.photo-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  justify-self: center;
-  max-width: 50%;
+  height: 100vh;
+  overflow: hidden;
 }
