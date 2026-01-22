@@ -260,31 +260,22 @@ function setupSwipeHandlers() {
         isHorizontalSwipe = false;
         isSwipeInProgress = false;
     }, { passive: false });
-}
 
-function setupKeyboardHandlers() {
-    document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    // ===== ДОБАВЛЕННАЯ ЛОГИКА ДЛЯ ПК (СКРОЛЛ) =====
+    scrollZone.addEventListener("wheel", (e) => {
+        if (isAnimating) {
+            if (e.cancelable) e.preventDefault();
             return;
         }
         
-        switch(e.key) {
-            case 'ArrowLeft':
-                e.preventDefault();
-                navigateToPrevPlace();
-                break;
-            case 'ArrowRight':
-                e.preventDefault();
-                navigateToNextPlace();
-                break;
-            case 'Escape':
-                if (mode === "details") {
-                    e.preventDefault();
-                    setMode("intro");
-                }
-                break;
+        if (mode === "intro" && e.deltaY > 10) {
+            if (e.cancelable) e.preventDefault();
+            setMode("details");
+        } else if (mode === "details" && scrollZone.scrollTop <= 0 && e.deltaY < -10) {
+            if (e.cancelable) e.preventDefault();
+            setMode("intro");
         }
-    });
+    }, { passive: false });
 }
 
 function initializeDropdownsAndButtons() {
@@ -447,7 +438,7 @@ window.initializeMenu = function() {
     }
     
     initializeDropdownsAndButtons();
-    setupSwipeHandlers();
+    setupSwipeHandlers(); // Теперь содержит логику для скролла на ПК
     
     // Убраны: initializeFullscreenButton(), setupGlobalFullscreenTrigger(), setupKeyboardHandlers()
     
