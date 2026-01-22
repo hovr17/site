@@ -719,6 +719,7 @@
     left: auto !important;
     right: auto !important;
   }
+  
 
   /* Ховер эффект */
   .temple-nav-arrow:hover {
@@ -727,20 +728,21 @@
     transform: translateY(-50%) !important;
   }
 
-  /* Общая иконка */
   .temple-nav-arrow .arrow-icon {
-    width: 60% !important;
-    height: 60% !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: auto;
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-  }
+  width: 60% !important;
+  height: 60% !important;
+  margin: auto; /* Flexbox + margin = идеальный центр */
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  /* position и transform УБРАНЫ */
+}
 
+/* Поворот правой стрелки (как в Stories) */
+.temple-next-arrow .arrow-icon {
+  transform: rotate(180deg);
+}
+  
   /* ИСПРАВЛЕНИЕ: Правая иконка с поворотом */
   .temple-next-arrow .arrow-icon {
     width: 60% !important;
@@ -1101,3 +1103,4 @@
     transform: translate(-50%, -50%) rotate(180deg) !important;
   }
 }
+
