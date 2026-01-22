@@ -2172,3 +2172,106 @@
 
 
 
+
+/* =============================================================================
+   СПЕЦИАЛЬНЫЕ СТИЛИ ДЛЯ ЯНДЕКС.БРАУЗЕРА
+   Подъем элементов на 55px вверх в режиме intro
+   ========================================================================= */
+
+/* Для мобильных устройств (там где чаще всего нужен подъем) */
+@media (max-width: 767px) {
+    /* Заголовок h1 */
+    .yandex-browser .mode-intro .title-block {
+        transform: translateY(calc(50vh - 200px - 55px)) !important;
+    }
+    
+    /* Текст "подробнее:" и кнопка paidBtn */
+    .yandex-browser .mode-intro .hero-details {
+        transform: translateY(calc(55vh - 200px - 55px)) !important;
+    }
+    
+    /* Контейнер с дропдаунами */
+    .yandex-browser .mode-intro #dropdownsContainer {
+        transform: translateY(calc(50vh - 200px - 55px)) !important;
+    }
+    
+    /* Кнопки "фото"/"фото кремля" */
+    .yandex-browser .mode-intro .photo-wrapper {
+        transform: translateY(-55px) !important;
+    }
+}
+
+/* Для планшетов (768px-1080px) */
+@media (min-width: 768px) and (max-width: 1080px) {
+    .yandex-browser .mode-intro .title-block {
+        transform: translateY(calc(40vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro .hero-details {
+        transform: translateY(calc(45vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro #dropdownsContainer {
+        transform: translateY(calc(50vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro .photo-wrapper {
+        transform: translateY(-55px) !important;
+    }
+}
+
+/* Для десктопов (1081px и выше) */
+@media (min-width: 1081px) {
+    .yandex-browser .mode-intro .title-block {
+        transform: translateY(calc(43vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro .hero-details {
+        transform: translateY(calc(47vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro #dropdownsContainer {
+        transform: translateY(calc(47vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro .photo-wrapper {
+        transform: translateY(-55px) !important;
+    }
+}
+
+/* Для очень коротких экранов (iPhone SE и подобные) */
+@media (max-width: 767px) and (max-height: 700px) {
+    .yandex-browser .mode-intro .title-block,
+    .yandex-browser .mode-intro .hero-details,
+    .yandex-browser .mode-intro #dropdownsContainer {
+        transform: translateY(calc(50vh - 60px - 55px)) !important; /* Дополнительный подъем */
+    }
+}
+
+/* Для очень низких экранов (< 500px) */
+@media (max-height: 500px) {
+    .yandex-browser .mode-intro .title-block {
+        transform: translateY(calc(-25vh - 55px)) !important;
+    }
+    
+    .yandex-browser .mode-intro .hero-details {
+        transform: translateY(calc(-10vh - 55px)) !important;
+    }
+}
+
+/* Дополнительно: подъем самого заголовка h1 внутри title-block */
+.yandex-browser .mode-intro .title-block h1 {
+    position: relative;
+    top: -55px !important;
+}
+
+/* Подъем текста "подробнее:" */
+.yandex-browser .mode-intro .details-header {
+    position: relative;
+    top: -65px !important; /* Дополнительный сдвиг для текста */
+}
+
+/* Запасной вариант: если transform не срабатывает */
+.yandex-browser .mode-intro .entry-note {
+    transform: translateY(-55px) !important;
+}
