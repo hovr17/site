@@ -1,3 +1,16 @@
+/* ===== SAFE AREA INSETS ДЛЯ МОБИЛЬНЫХ БРАУЗЕРОВ ===== */
+:root {
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --content-padding-bottom: max(30px, var(--safe-area-inset-bottom));
+}
+
+/* Фолбэк для старых браузеров */
+@supports not (bottom: env(safe-area-inset-bottom)) {
+  :root {
+    --safe-area-inset-bottom: 0px;
+    --content-padding-bottom: 30px;
+  }
+}
 
 * {
   box-sizing: border-box;
@@ -263,7 +276,21 @@
 
 }
 
+/* Основной стиль (около строки 270) */
+.mode-details .scroll-zone {
+  overflow-y: auto;
+  padding-bottom: var(--content-padding-bottom); /* Динамический отступ */
+}
 
+/* Мобильные (около строки 325) */
+@media (max-width: 767px) {
+  .mode-details .scroll-zone {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-y: scroll;
+    padding-bottom: var(--content-padding-bottom); /* Динамический отступ */
+  }
+}
 .small-btn img {
   width: 100%;
   height: 100%;
@@ -746,6 +773,13 @@
 
 
  @media (max-width: 767px) {
+
+  .mode-details .scroll-zone {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-y: scroll;
+    padding-bottom: var(--content-padding-bottom); /* Динамический отступ */
+  }
   .screen {
     margin-top: 10px;
   }
@@ -1962,214 +1996,6 @@
 }
 
 
-
-
-
- @media (max-width: 767px) {
-  
-  /* === ИСПРАВЛЕНИЕ: Полноэкранное видео и читаемый текст === */
-  
-  /* 1. Растягиваем контейнер на весь физический экран (под панели браузера) */
-  .container, #frame {
-    width: 100vw !important;
-    height: 100vh !important;
-  }
-
-  /* 2. Добавляем отступы в контейнер текста, чтобы "оттолкнуть" его от краев */
-  .screen {
-    height: 100%;
-    padding-top: env(safe-area-inset-top) !important;    /* Отступ от верхней панели (адресная строка) */
-    padding-bottom: env(safe-area-inset-bottom) !important; /* Отступ от нижней панели (home indicator) */
-  }
-
-  /* === КОНЕЦ ИСПРАВЛЕНИЯ === */
-
-  /*.back-button {
-    top: min(50px, 6.75vh);
-    left: min(20px, 2.25vw);
-    width: min(120px, 10.8vmin);
-    height: min(60px, 5.4vmin);
-  }*/
-  
-  .title-block h1 {
-   font-size: clamp(36px, 11vw, 100px);
-    padding-top: 150px;
-  }
-
-/* === АДАПТИВНЫЙ ТЕКСТ "подробнее" === */
-  .details-header {
-    font-size: clamp(16px, 6vw, 72px);  /* min: 16px, adaptive: 4.5vw, max: 24px */
-    line-height: 1.2;                     /* Оптимальный интерлиньяж */
-  }
-
-  .entry-note {
-    font-size: clamp(14px, 3.3vmin, 65px);
-     gap: 0.4vh;      
-  }
-  
-  .small-btn {
-    height: 13px;
-  }
-
-  .mode-intro .hero-details {
-    transform: translateY(55vh);
-  }
-
-  .mode-intro .title-block {
-    transform: translateY(50vh);
-  }
-
-  /* === КАРТОЧКИ === */
-  .photo-wrapper {
-    display: grid ;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4vw ;
-    justify-items: center;
-    padding-left: 0 ;
-  }
-
-  .photo-card {
-    width: 42vw ;
-    height: auto ;
-    aspect-ratio: 166 / 225 ;
-    max-width: 42vw ;
-    border-radius: 7vw ;
-    border-width: 0.8vw ;
-  }
-
-  .photo-label {
-    font-size: clamp(20px, 5vmin, 55px);
-    left: 4vw ;
-    right:4vw;
-    bottom: 1vh ;
-  }
-
-  /* === ДРОПДАУНЫ — ЦЕНТРИРОВАНИЕ ЧЕРЕЗ GRID === */
-  .dropdown {
-    border-radius: 27px;
-    max-height: 55px;
-
-    margin-inline: 3vw;
-    padding-top: 0.3vh;
-     margin-top: 3.5vh;
-  }
-
-  /* ОБНОВЛЕННЫЙ HEADER С ПРИНУДИТЕЛЬНЫМ ЦЕНТРИРОВАНИЕМ */
-  .dropdown-header {
-    display: grid ;
-    grid-template-columns: auto 1fr auto; /* иконка | текст | стрелка */
-    align-items: center ;       /* ВЕРТИКАЛЬНО ПО ЦЕНТРУ */
-    justify-items: center;                /* ГОРИЗОНТАЛЬНО ПО ЦЕНТРУ */
-    padding: 0 5vw ;
-    min-height: 50px ;          /* МИНИМАЛЬНАЯ ВЫСОТА ВМЕСТО ФИКСИРОВАННОЙ */
-    height: auto ;              /* СБРАСЫВАЕМ height: 60px */
-    margin: 0 ;
-  }
-
-  /* ПРИНУДИТЕЛЬНОЕ ЦЕНТРИРОВАНИЕ ЭЛЕМЕНТОВ */
-  .dropdown-icon,
-  .dropdown-arrow {
-    margin: 0 ;
-    padding: 0 ;
-    align-self: center ;
-    justify-self: center ;
-  }
-
-  .dropdown-title {
-    font-size: clamp(18px, 5vmin, 44px);
-    margin: 0 ;
-    padding: 0 ;
-    text-align: center ;
-  }
-
-  .dropdown-icon {
-    width: 8vw ;
-    height: 8vw ;
-  }
-
-  .dropdown-arrow {
-    width: 6.5vw ;
-    height: 6.5vw ;
-  }
-
-  .dropdown-body p {
-    font-size: clamp(16px, 4vmin, 50px);
-  }
-
-
-  /* СКРЫТИЕ СТРЕЛОК */
-  .temple-nav-arrows,
-  .temple-nav-arrow {
-    display: none ;
-    pointer-events: none;
-  }
-
-  .mode-intro #dropdownsContainer {
-    transform: translateY(50vh);
-  }
-
-   .mode-details .video-background::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;              /* Высота полосы, можно изменить */
-    background: white;
-    z-index: 3;                /* Над overlay-gradient */
-  }
-
-  .video-background {
-    position: absolute ;
-    inset: 0 ;
-    width: 100% ;
-    height: 100% ;
-    min-height: 100vh ;
-    z-index: -1 ;
-  }
-
-  /* Мгновенный белый фон при размытии (без transition) */
-  .mode-details .video-background {
-    background: white ;
-    transition: none ; /* Убирает плавный переход */
-  }
-  
-}
-
-/* Было: */
-.container, #frame {
-  height: 100vh !important;
-}
-
-/* Стало: */
-.container, #frame {
-  /* Используем динамическую переменную */
-  height: calc(var(--vh, 1vh) * 100) !important;
-}
-
-/* Было: */
-.video-background {
-  min-height: 100vh;
-  z-index: -1;
-}
-
-/* Стало: */
-.video-background {
-  min-height: calc(var(--vh, 1vh) * 100);
-  z-index: -1;
-}
-
-/* Было: */
-.temple-nav-arrows {
-  height: 100vh;
-  ...
-}
-
-/* Стало: */
-.temple-nav-arrows {
-  height: calc(var(--vh, 1vh) * 100);
-
-}
 
 
 
