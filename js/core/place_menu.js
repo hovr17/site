@@ -531,3 +531,69 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
+
+// === ДЕБАГ: ВЫВОД ВЫСОТЫ ПАНЕЛИ БРАУЗЕРА ===
+
+// 1. Создаем элемент для отладки
+const debugOverlay = document.createElement('div');
+debugOverlay.id = 'debug-overlay';
+debugOverlay.style.cssText = `
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  z-index: 999999; /* Поверх всего */
+  pointer-events: none; /* Чтобы не мешал кликам */
+  text-align: center;
+  border: 3px solid yellow;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  font-family: sans-serif;
+`;
+
+document.body.appendChild(debugOverlay);
+
+// 2. Функция для получения и отображения информации
+function updateDebugInfo() {
+  if (!window.visualViewport) {
+    debugOverlay.textContent = "VisualViewport API не поддерживается";
+    return;
+  }
+
+  // Visual Top - это то, на сколько браузер "поднял" контент сверху.
+  // Это примерно равно высоте адресной строки (если она видна).
+  const visualTop = Math.round(window.visualViewport.offsetTop);
+  
+  // Safe Area Inset Top - это "безопасная зона" сверху.
+  // Включает адресную строку браузера + статус-бар (время/батарея).
+  const safeAreaTop = getComputedStyle(document.documentElement)
+    .getPropertyValue('safe-area-inset-top').trim();
+
+  // Высота видимой части окна
+  const viewportHeight = Math.round(window.visualViewport.height);
+
+  debugOverlay.innerHTML = `
+    <div style="color: #ffff00; margin-bottom: 10px;">ОТЛАДКА БРАУЗЕРА</div>
+    <div>Высота верхней панели (ScrollTop):</div>
+    <div style="font-size: 40px; color: #00ff00;">${visualTop} px</div>
+    <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
+      Safe Area Top: ${safeAreaTop}<br>
+      Viewport Height: ${viewportHeight}px
+    </div>
+  `;
+}
+
+// 3. Слушаем изменения размера вьюпорта (при скролле или повороте экрана)
+window.visualViewport.addEventListener('resize', updateDebugInfo);
+window.visualViewport.addEventListener('scroll', updateDebugInfo);
+
+// Запускаем сразу при загрузке
+updateDebugInfo();
+
+// ================= КОНЕЦ ДЕБАГА =================
