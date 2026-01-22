@@ -1123,3 +1123,62 @@
   100% { transform: translateX(0) translateY(0); opacity: 1; }
 }
 
+/* === КЛАССЫ, АКТИВИРУЮЩИЕ АНИМАЦИИ (КРИТИЧНО ВАЖНО!) === */
+
+/* Простые слайды */
+.page-exit-left { animation: pageSlideOutLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
+.page-exit-right { animation: pageSlideOutRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1000; }
+.page-enter-left { animation: pageSlideInLeft 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
+.page-enter-right { animation: pageSlideInRight 0.5s cubic-bezier(0.4, 0, 0.3, 1) forwards; z-index: 1001; }
+
+/* Параллакс для фона и контента */
+.page-exit-parallax .temple-video,
+.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
+
+.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
+
+.page-enter-parallax .temple-video,
+.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
+
+.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
+
+/* Параллакс для UI */
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows { animation: parallaxOutUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows { animation: parallaxInUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows { animation: parallaxInUILeft 0.4s ease-out forwards; }
+
+/* === УТИЛИТАРНЫЕ КЛАССЫ === */
+
+.page-transition-active {
+  overflow: hidden !important;
+}
+
+.no-transition,
+.no-transition * {
+  transition: none !important;
+  animation: none !important;
+}
+
+#frame {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+#spa-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
