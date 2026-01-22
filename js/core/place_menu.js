@@ -528,96 +528,7 @@ window.initializeMenu = function() {
 
 
 
-// === ДЕБАГ: ПРОВЕРКА ПОДРЕЗКИ ===
 
-const checkCropOverlay = document.createElement('div');
-checkCropOverlay.style.cssText = `
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
-  padding: 30px;
-  border-radius: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  z-index: 999999;
-  pointer-events: none;
-  text-align: center;
-  border: 4px solid white;
-  font-family: sans-serif;
-  line-height: 1.4;
-`;
-
-document.body.appendChild(checkCropOverlay);
-
-function checkIfCropped() {
-  // Получаем Safe Area Bottom (высота панели браузера / Home Indicator)
-  const safeBottomRaw = getComputedStyle(document.documentElement)
-    .getPropertyValue('safe-area-inset-bottom');
-  
-  // Если браузер не умеет читать safe-area, считаем что 0
-  let safeBottom = parseFloat(safeBottomRaw);
-  if (isNaN(safeBottom)) safeBottom = 0;
-
-  let statusText = "";
-  let statusColor = "";
-  let borderWidth = "0px";
-
-  // ЛОГИКА ПРОВЕРКИ
-  // Если safeBottom > 0, значит браузер говорит: "тут есть панель".
-  // Если в браузере работает padding-bottom (env...), то текст приподнят.
-  // Но если браузер НЕ поддерживает env(), то safeBottom будет равен 0 даже при наличии панели (на старых Android).
-  // Поэтому мы проверяем визуальную высоту окна.
-  
-  const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  const totalHeight = window.innerHeight;
-
-  if (safeBottom > 0) {
-    // Случай 1: iOS или Современный Android
-    // Браузер поддерживает env. Мы применили padding-bottom.
-    // ВЕРДИКТ: Подрезки нет (если CSS подключился).
-    statusText = "ПОДРЕЗКИ НЕТ<br>(iOS / New Android)";
-    statusColor = "#00ff00"; // Зеленый
-    borderWidth = "4px solid #00ff00";
-  } else if (visualHeight < totalHeight) {
-    // Случай 2: Старый Android (адресная строка съедает высоту)
-    // Safe Area = 0, но высота окна меньше физической.
-    // ВЕРДИКТ: Текст внизу, он перекрыт панелью при скролле.
-    statusText = "ПОДРЕЗКА ЕСТЬ<br>(Old Android)";
-    statusColor = "red"; // Красный
-    borderWidth = "4px solid red";
-  } else {
-    // Случай 3: Десктоп или полный экран на мобильном
-    statusText = "СТАНДАРТНЫЙ РЕЖИМ<br>(Desktop)";
-    statusColor = "#cccccc"; // Серый
-    borderWidth = "4px solid #cccccc";
-  }
-
-  checkCropOverlay.innerHTML = `
-    <div style="color: ${statusColor}; margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 10px;">
-      СТАТУС:
-      <br>${statusText}
-    </div>
-    
-    <div style="font-size: 18px; color: #ccc; text-align: left; margin-top: 15px;">
-      Safe Area Bottom: <strong>${safeBottom}px</strong>
-      <br><br>
-      Visible Height: ${visualHeight}px
-      <br>
-      Total Height: ${totalHeight}px
-    </div>
-  `;
-  
-  checkCropOverlay.style.borderColor = statusColor;
-}
-
-// Запускаем проверку при загрузке и ресайзе
-window.visualViewport.addEventListener('resize', checkIfCropped);
-checkIfCropped();
-
-// ================= КОНЕЦ ДЕБАГА =================
 
 // === ФИКС ДЛЯ 100vh НА MOBILE ===
 
@@ -645,11 +556,106 @@ window.addEventListener('orientationchange', () => {
   setVH();
 });
 
+
+
+// === ДЕБАГ: ЯСНАЯ ПРОВЕРКА ОТСТУПОВ ===
+
+const checkCropOverlay = document.createElement('div');
+checkCropOverlay.id = 'debug-overlay';
+checkCropOverlay.style.cssText = `
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 999999;
+  pointer-events: none;
+  text-align: center;
+  border: 4px solid white;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  font-family: sans-serif;
+  line-height: 1.4;
+`;
+
+document.body.appendChild(checkCropOverlay);
+
+function checkIfCropped() {
+  const ua = navigator.userAgent;
+  // Определяем, мобильный ли это браузер
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+
+  // Получаем Safe Area Bottom (высота панели браузера / Home Indicator)
+  const safeAreaRaw = getComputedStyle(document.documentElement)
+    .getPropertyValue('safe-area-inset-bottom');
+  
+  let safeAreaVal = parseFloat(safeAreaRaw);
+  if (isNaN(safeAreaVal)) safeAreaVal = 0;
+
+  let statusTitle = "";
+  let statusDesc = "";
+  let statusColor = "";
+
+  // ЛОГИКА:
+  // Если Safe Area > 0 -> Значит браузер поддерживает env и мы применили padding-bottom. (Зеленый)
+  // Если Safe Area == 0 -> Значит браузер НЕ поддерживает env. Защита НЕТ. (Красный)
+  
+  if (isMobile) {
+    if (safeAreaVal > 0) {
+      // Современный iPhone / Android
+      statusTitle = "ОТСТУП РАБОТАЕТ";
+      statusDesc = "Safe Area > 0px<br>Браузер поддерживает защиту.<br>Текст приподнят.";
+      statusColor = "#00ff00"; // Зеленый
+    } else {
+      // Старый Android / Chrome / Яндекс (когда env не работает)
+      statusTitle = "ОТСУТСТВУЕТ ОТСТУП";
+      statusDesc = "Safe Area = 0px<br>Браузер НЕ дает данных о панели.<br>Текст перекрыт панелью.";
+      statusColor = "red"; // Красный
+    }
+  } else {
+    // Десктоп
+    statusTitle = "ДЕСКТОП";
+    statusDesc = "Режим просмотра на ПК.<br>Панелей браузера нет.";
+    statusColor = "#cccccc"; // Серый
+  }
+
+  checkCropOverlay.innerHTML = `
+    <div style="margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+      СТАТУС БРАУЗЕРА
+    </div>
+    
+    <div style="color: ${statusColor}; margin-bottom: 15px; font-size: 32px;">
+      ${statusTitle}
+    </div>
+    
+    <div style="font-size: 18px; color: #fff; line-height: 1.5;">
+      ${statusDesc}
+    </div>
+
+    <div style="margin-top: 30px; font-size: 16px; color: #999; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+      <div>Raw CSS Value: <strong>${safeAreaRaw}</strong></div>
+      <div>Calculated Value: <strong>${safeAreaVal} px</strong></div>
+    </div>
+  `;
+  
+  checkCropOverlay.style.borderColor = statusColor;
+}
+
+// Запускаем проверку
+checkIfCropped();
+
+// ================= КОНЕЦ ДЕБАГА =================
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
 
 
 
