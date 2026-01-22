@@ -8,148 +8,11 @@ let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
 // =============================================================================
-// ОПРЕДЕЛЕНИЕ БРАУЗЕРА И SAFE AREA
+// МИНИМАЛЬНАЯ ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА (ТОЛЬКО ДЛЯ МОБИЛЬНЫХ)
 // =============================================================================
 
 function isYandexBrowser() {
     return /YaBrowser/i.test(navigator.userAgent);
-}
-
-function detectBrowser() {
-    const ua = navigator.userAgent;
-    const vendor = navigator.vendor || '';
-    
-    if (/YaBrowser/i.test(ua)) {
-        return { name: 'Яндекс.Браузер', engine: 'Blink', flags: { isYandex: true, isMobile: /Mobile/.test(ua) }};
-    } else if (/CriOS/i.test(ua)) {
-        return { name: 'Chrome (iOS)', engine: 'WebKit', flags: { isChrome: true, isIOS: true, isMobile: true }};
-    } else if(/Chrome|Chromium/i.test(ua)) {
-        return { name: 'Chrome', engine: 'Blink', flags: { isChrome: true, isMobile: /Mobile/.test(ua), isAndroid: /Android/.test(ua) }};
-    } else if (/FxiOS/i.test(ua)) {
-        return { name: 'Firefox (iOS)', engine: 'WebKit', flags: { isFirefox: true, isIOS: true, isMobile: true }};
-    } else if (/Firefox|FxiOS/i.test(ua)) {
-        return { name: 'Firefox', engine: 'Gecko', flags: { isFirefox: true, isMobile: /Mobile/.test(ua) }};
-    } else if (/Safari/i.test(ua) && vendor.includes('Apple') && !/Chrome|Chromium|CriOS/.test(ua)) {
-        return { name: 'Safari', engine: 'WebKit', flags: { isSafari: true, isIOS: /iPhone|iPad|iPod/.test(ua), isMobile: /Mobile|iPhone|iPad|iPod/.test(ua) }};
-    } else if (/SamsungBrowser/i.test(ua)) {
-        return { name: 'Samsung Internet', engine: 'Blink', flags: { isSamsung: true, isAndroid: true, isMobile: true }};
-    } else if (/Edg|EdgA|EdgiOS/i.test(ua)) {
-        return { name: 'Microsoft Edge', engine: 'Blink', flags: { isEdge: true, isMobile: /Mobile/.test(ua) }};
-    } else if (/Opera|OPR/i.test(ua)) {
-        return { name: 'Opera', engine: 'Blink', flags: { isOpera: true, isMobile: /Mobile/.test(ua) }};
-    } else {
-        return { name: 'Неизвестный', engine: 'Неизвестно', flags: { isUnknown: true, isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(ua) }};
-    }
-}
-
-function estimateBrowserUIHeight() {
-    let safeAreaBottom = 0, visualViewportHeight = null, estimatedUIHeight = 0, details = '';
-    
-    try {
-        const testEl = document.createElement('div');
-        testEl.style.position = 'fixed';
-        testEl.style.bottom = 'env(safe-area-inset-bottom, 0px)';
-        testEl.style.visibility = 'hidden';
-        document.body.appendChild(testEl);
-        const computedValue = getComputedStyle(testEl).bottom;
-        document.body.removeChild(testEl);
-        safeAreaBottom = parseFloat(computedValue) || 0;
-        if(safeAreaBottom > 0) details = `env(safe-area-inset-bottom): ${safeAreaBottom}px`;
-    } catch(e) { console.warn('Ошибка env():', e); }
-    
-    if(window.visualViewport) {
-        visualViewportHeight = window.visualViewport.height;
-        const layoutHeight = window.innerHeight;
-        estimatedUIHeight = Math.max(0, layoutHeight - visualViewportHeight);
-        if(estimatedUIHeight > 0) details += (details ? ' | ' : '') + `Visual Viewport: -${estimatedUIHeight}px`;
-    }
-    
-    return { safeAreaBottom, visualViewportHeight, estimatedUIHeight, details: details || 'Нет данных' };
-}
-
-// =============================================================================
-// УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ
-// =============================================================================
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        enterFullscreen();
-    } else {
-        exitFullscreen();
-    }
-}
-
-function enterFullscreen() {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-    }
-}
-
-function exitFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    }
-}
-
-function handleFullscreenChange() {
-    const btn = document.getElementById('fullscreenBtn');
-    if (!btn) return;
-    
-    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-    
-    if (isFullscreen) {
-        btn.classList.remove('fullscreen-icon');
-        btn.classList.add('fullscreen-exit-icon');
-    } else {
-        btn.classList.remove('fullscreen-exit-icon');
-        btn.classList.add('fullscreen-icon');
-    }
-}
-
-function updateFullscreenButtonVisibility() {
-    const btn = document.getElementById('fullscreenBtn');
-    if (!btn) return;
-    
-    const isMobile = window.innerWidth <= 1080;
-    const isIntroMode = mode === 'intro';
-    
-    btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
-}
-
-function initializeFullscreenButton() {
-    const btn = document.getElementById('fullscreenBtn');
-    if (!btn) return;
-    
-    btn.addEventListener('click', toggleFullscreen);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-}
-
-function setupGlobalFullscreenTrigger() {
-    const frame = document.getElementById('frame');
-    if (!frame) return;
-
-    frame.addEventListener('click', (e) => {
-        if (document.fullscreenElement || document.webkitFullscreenElement) return;
-        if (mode !== 'intro') return;
-        
-        const isMobile = window.innerWidth <= 1080;
-        if (!isMobile) return;
-
-        const isInteractive = e.target.closest(
-            'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
-        );
-
-        if (isInteractive) return;
-
-        enterFullscreen();
-        console.log('📱 Клик по экрану (Mobile): Вход в полноэкранный режим');
-    });
 }
 
 // =============================================================================
@@ -165,17 +28,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
     
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
-    const videoPoster = document.getElementById('videoPoster');
     const scrollZone = document.getElementById('scrollZone');
-    const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
-    
-    updateFullscreenButtonVisibility();
-    
-    if (videoPoster) {
-        videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
-        videoPoster.style.display = (newMode === 'details') ? 'block' : 'none';
-    }
     
     if (bgVideo) {
         bgVideo.style.filter = (newMode === 'details') ? 'blur(5px)' : 'none';
@@ -212,8 +66,7 @@ function setMode(newMode, { expandUseful = false } = {}) {
             bgVideo.play();
         }
         
-        smoothScrollTo(0, 700);
-        if (addressDrop) addressDrop.classList.remove("open");
+        scrollZone.scrollTop = 0;
         if (usefulDrop) usefulDrop.classList.remove("open");
         sessionStorage.removeItem('usefulDropdownState');
         
@@ -230,28 +83,9 @@ function setMode(newMode, { expandUseful = false } = {}) {
     }, 50);
 }
 
-function smoothScrollTo(targetY, duration = 700) {
-    const scrollZone = document.getElementById('scrollZone');
-    if (!scrollZone) return;
-    
-    const startY = scrollZone.scrollTop;
-    const distance = targetY - startY;
-    const startTime = performance.now();
-    
-    function easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-    
-    function step(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(1, elapsed / duration);
-        const eased = easeInOut(t);
-        scrollZone.scrollTop = startY + distance * eased;
-        if (t < 1) requestAnimationFrame(step);
-    }
-    
-    requestAnimationFrame(step);
-}
+// =============================================================================
+// ОБРАБОТКА СВАЙПОВ
+// =============================================================================
 
 function setupSwipeHandlers() {
     const scrollZone = document.getElementById('scrollZone');
@@ -345,47 +179,62 @@ function setupSwipeHandlers() {
         isHorizontalSwipe = false;
         isSwipeInProgress = false;
     }, { passive: false });
-
-    scrollZone.addEventListener("wheel", (e) => {
-        if (isAnimating) {
-            if (e.cancelable) e.preventDefault();
-            return;
-        }
-        
-        if (mode === "intro" && e.deltaY > 10) {
-            if (e.cancelable) e.preventDefault();
-            setMode("details");
-        } else if (mode === "details" && scrollZone.scrollTop <= 0 && e.deltaY < -10) {
-            if (e.cancelable) e.preventDefault();
-            setMode("intro");
-        }
-    }, { passive: false });
 }
 
-function setupKeyboardHandlers() {
-    document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            return;
+// =============================================================================
+// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('place_menu.js: DOMContentLoaded');
+    
+    const frame = document.getElementById('frame');
+    const bgVideo = document.getElementById('bgVideo');
+    
+    // === ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА ТОЛЬКО ДЛЯ МОБИЛЬНЫХ ===
+    if (isYandexBrowser() && window.innerWidth <= 767) {
+        document.body.classList.add('yandex-browser');
+        console.log('🔧 Обнаружен Яндекс.Браузер на мобильном, применен подъем элементов');
+    }
+    
+    // Восстановление состояния
+    const savedMenuState = sessionStorage.getItem('menuState');
+    const shouldOpenMenu = savedMenuState === 'open';
+    
+    if (frame) {
+        if (shouldOpenMenu) {
+            frame.classList.add('mode-details');
+        } else {
+            frame.classList.add('mode-intro');
         }
+    }
+    
+    if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.setAttribute('muted', '');
+        bgVideo.setAttribute('playsinline', '');
         
-        switch(e.key) {
-            case 'ArrowLeft':
-                e.preventDefault();
-                navigateToPrevPlace();
-                break;
-            case 'ArrowRight':
-                e.preventDefault();
-                navigateToNextPlace();
-                break;
-            case 'Escape':
-                if (mode === "details") {
-                    e.preventDefault();
-                    setMode("intro");
-                }
-                break;
+        if (shouldOpenMenu) {
+            bgVideo.pause();
+        } else {
+            setTimeout(() => bgVideo.play().catch(() => {}), 100);
         }
-    });
-}
+    }
+    
+    // Очистка sessionStorage
+    sessionStorage.removeItem('menuState');
+    sessionStorage.removeItem('usefulDropdownState');
+    
+    // Инициализация функционала
+    initializeDropdownsAndButtons();
+    setupSwipeHandlers();
+    
+    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
+});
+
+// =============================================================================
+// ИНИЦИАЛИЗАЦИЯ ДРОПДАУНОВ И КНОПОК
+// =============================================================================
 
 function initializeDropdownsAndButtons() {
     console.log('📋 Инициализация дропдаунов и кнопок...');
@@ -403,7 +252,6 @@ function initializeDropdownsAndButtons() {
             
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (isAnimating) return;
                 addressDrop.classList.toggle("open");
                 console.log('Дропдаун Адрес:', addressDrop.classList.contains('open') ? 'открыт' : 'закрыт');
             });
@@ -418,7 +266,6 @@ function initializeDropdownsAndButtons() {
             
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (isAnimating) return;
                 usefulDrop.classList.toggle("open");
                 console.log('Дропдаун Полезное:', usefulDrop.classList.contains('open') ? 'открыт' : 'закрыт');
             });
@@ -453,131 +300,17 @@ function initializeDropdownsAndButtons() {
 }
 
 // =============================================================================
-// ИНИЦИАЛИЗАЦИЯ МЕНЮ
+// ПУСТЫЕ ЗАГЛУШКИ ДЛЯ СОВМЕСТИМОСТИ
 // =============================================================================
 
-window.initializeMenu = function() {
-    console.log('🔄 Инициализация меню...');
-    
-    // === ОПРЕДЕЛЕНИЕ ЯНДЕКС.БРАУЗЕРА (только для мобильных) ===
-    if (isYandexBrowser() && window.innerWidth <= 767) {
-        document.body.classList.add('yandex-browser');
-        console.log('🔧 Обнаружен Яндекс.Браузер на мобильном, применен подъем элементов');
-    }
-    
-    const savedMenuState = sessionStorage.getItem('menuState');
-    const shouldOpenMenu = savedMenuState === 'open';
-    
-    mode = shouldOpenMenu ? "details" : "intro";
-    isAnimating = false;
-    
-    const frame = document.getElementById('frame');
-    const bgVideo = document.getElementById('bgVideo');
-    const scrollZone = document.getElementById('scrollZone');
-    const usefulDrop = document.getElementById('usefulDrop');
-    const videoPoster = document.getElementById('videoPoster');
-    
-    if (shouldOpenMenu) {
-        document.body.classList.add('no-transition');
-        
-        const elementsToDisable = [
-            frame, bgVideo, scrollZone,
-            document.querySelector('.title-block'),
-            document.querySelector('.hero-details'),
-            document.getElementById('dropdownsContainer'),
-            document.querySelector('.entry-note'),
-            document.getElementById('paidBtn')
-        ].filter(el => el);
-        
-        elementsToDisable.forEach(el => {
-            el.style.transition = 'none !important';
-            el.style.animation = 'none !important';
-        });
-        
-        setTimeout(() => {
-            elementsToDisable.forEach(el => {
-                el.style.transition = '';
-                el.style.animation = '';
-            });
-            document.body.classList.remove('no-transition');
-        }, 10);
-    }
-    
-    if (frame) {
-        if (shouldOpenMenu) {
-            frame.classList.remove('mode-intro');
-            frame.classList.add('mode-details');
-        } else {
-            frame.classList.remove('mode-details');
-            frame.classList.add('mode-intro');
-        }
-    }
-    
-    if (bgVideo) {
-        bgVideo.muted = true;
-        bgVideo.setAttribute('muted', '');
-        bgVideo.setAttribute('playsinline', '');
-        bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
-        
-        if (shouldOpenMenu) {
-            bgVideo.pause();
-        } else {
-            setTimeout(() => bgVideo.play().catch(() => {}), 100);
-        }
-    }
-    
-    if (videoPoster) {
-        videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
-        videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
-    }
-    
-    if (scrollZone) {
-        scrollZone.scrollTop = 0;
-        scrollZone.style.pointerEvents = "auto";
-    }
-    
-    const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
-    if (savedDropdownState === 'open' && usefulDrop) {
-        usefulDrop.classList.add("open");
-    } else {
-        if (usefulDrop) usefulDrop.classList.remove("open");
-    }
-    
-    initializeDropdownsAndButtons();
-    initializeFullscreenButton();
-    setupGlobalFullscreenTrigger();
-    setupSwipeHandlers();
-    setupKeyboardHandlers();
-    
-    setTimeout(() => {
-        sessionStorage.removeItem('menuState');
-        sessionStorage.removeItem('usefulDropdownState');
-    }, 100);
-    
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
+function navigateToPrevPlace() {
+    console.log('Переход к предыдущему месту (не реализован в этом файле)');
 }
 
-// =============================================================================
-// ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-// =============================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
-    
-    setTimeout(() => {
-        window.initializeMenu();
-    }, 50);
-});
-
-// =============================================================================
-// ФИКС ДЛЯ 100VH НА MOBILE
-// =============================================================================
-
-function setVH() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', vh + 'px');
+function navigateToNextPlace() {
+    console.log('Переход к следующему месту (не реализован в этом файле)');
 }
 
-setVH();
-window.addEventListener('resize', setVH);
-window.addEventListener('orientationchange', setVH);
+function getCurrentPageOrder(category) {
+    return [];
+}
