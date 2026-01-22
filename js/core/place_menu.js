@@ -528,67 +528,94 @@ window.initializeMenu = function() {
 
 
 
+// === ДЕБАГ: ПРОВЕРКА ПОДРЕЗКИ ===
 
-// === ДЕБАГ: ВЫВОД ВЫСОТЫ НИЖНЕЙ ПАНЕЛИ БРАУЗЕРА ===
-
-// 1. Создаем элемент для отладки
-const debugOverlay = document.createElement('div');
-debugOverlay.id = 'debug-overlay';
-debugOverlay.style.cssText = `
+const checkCropOverlay = document.createElement('div');
+checkCropOverlay.style.cssText = `
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.95);
   color: white;
-  padding: 40px;
+  padding: 30px;
   border-radius: 20px;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  z-index: 999999; /* Поверх всего */
-  pointer-events: none; /* Чтобы не мешал кликам */
+  z-index: 999999;
+  pointer-events: none;
   text-align: center;
-  border: 3px solid yellow;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  border: 4px solid white;
   font-family: sans-serif;
+  line-height: 1.4;
 `;
 
-document.body.appendChild(debugOverlay);
+document.body.appendChild(checkCropOverlay);
 
-// 2. Функция для получения и отображения информации
-function updateDebugInfo() {
-  // Получаем Safe Area Bottom (это физический нижний отступ на iPhone/Android)
-  // Обычно это высота Home Indicator или кнопок навигации, если они наезжают на контент
-  const safeAreaBottomRaw = getComputedStyle(document.documentElement)
+function checkIfCropped() {
+  // Получаем Safe Area Bottom (высота панели браузера / Home Indicator)
+  const safeBottomRaw = getComputedStyle(document.documentElement)
     .getPropertyValue('safe-area-inset-bottom');
   
-  // Превращаем строку "34px" в число 34
-  let safeAreaBottom = parseFloat(safeAreaBottomRaw);
-  if (isNaN(safeAreaBottom)) safeAreaBottom = 0;
-  
-  // Высота видимой части окна
-  const viewportHeight = Math.round(window.innerHeight);
+  // Если браузер не умеет читать safe-area, считаем что 0
+  let safeBottom = parseFloat(safeBottomRaw);
+  if (isNaN(safeBottom)) safeBottom = 0;
 
-  debugOverlay.innerHTML = `
-    <div style="color: #ffff00; margin-bottom: 10px;">ОТЛАДКА НИЖНЕЙ ПАНЕЛИ</div>
-    
-    <div>Высота Safe Area (Панель):</div>
-    <div style="font-size: 50px; color: #00ff00; margin: 10px 0;">
-      ${safeAreaBottom} px
+  let statusText = "";
+  let statusColor = "";
+  let borderWidth = "0px";
+
+  // ЛОГИКА ПРОВЕРКИ
+  // Если safeBottom > 0, значит браузер говорит: "тут есть панель".
+  // Если в браузере работает padding-bottom (env...), то текст приподнят.
+  // Но если браузер НЕ поддерживает env(), то safeBottom будет равен 0 даже при наличии панели (на старых Android).
+  // Поэтому мы проверяем визуальную высоту окна.
+  
+  const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const totalHeight = window.innerHeight;
+
+  if (safeBottom > 0) {
+    // Случай 1: iOS или Современный Android
+    // Браузер поддерживает env. Мы применили padding-bottom.
+    // ВЕРДИКТ: Подрезки нет (если CSS подключился).
+    statusText = "ПОДРЕЗКИ НЕТ<br>(iOS / New Android)";
+    statusColor = "#00ff00"; // Зеленый
+    borderWidth = "4px solid #00ff00";
+  } else if (visualHeight < totalHeight) {
+    // Случай 2: Старый Android (адресная строка съедает высоту)
+    // Safe Area = 0, но высота окна меньше физической.
+    // ВЕРДИКТ: Текст внизу, он перекрыт панелью при скролле.
+    statusText = "ПОДРЕЗКА ЕСТЬ<br>(Old Android)";
+    statusColor = "red"; // Красный
+    borderWidth = "4px solid red";
+  } else {
+    // Случай 3: Десктоп или полный экран на мобильном
+    statusText = "СТАНДАРТНЫЙ РЕЖИМ<br>(Desktop)";
+    statusColor = "#cccccc"; // Серый
+    borderWidth = "4px solid #cccccc";
+  }
+
+  checkCropOverlay.innerHTML = `
+    <div style="color: ${statusColor}; margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+      СТАТУС:
+      <br>${statusText}
     </div>
     
-    <div style="font-size: 16px; color: #ccc; margin-top: 10px;">
-      (Это значение используется для отступа текста)<br><br>
-      Viewport Height: ${viewportHeight}px
+    <div style="font-size: 18px; color: #ccc; text-align: left; margin-top: 15px;">
+      Safe Area Bottom: <strong>${safeBottom}px</strong>
+      <br><br>
+      Visible Height: ${visualHeight}px
+      <br>
+      Total Height: ${totalHeight}px
     </div>
   `;
+  
+  checkCropOverlay.style.borderColor = statusColor;
 }
 
-// 3. Слушаем изменения (на случай, если браузер меняет панель)
-window.visualViewport.addEventListener('resize', updateDebugInfo);
-
-// Запускаем сразу
-updateDebugInfo();
+// Запускаем проверку при загрузке и ресайзе
+window.visualViewport.addEventListener('resize', checkIfCropped);
+checkIfCropped();
 
 // ================= КОНЕЦ ДЕБАГА =================
 
@@ -623,6 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
 
 
 
