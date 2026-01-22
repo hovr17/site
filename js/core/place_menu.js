@@ -8,11 +8,65 @@ let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
 // =============================================================================
-// МИНИМАЛЬНАЯ ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА (ТОЛЬКО ДЛЯ МОБИЛЬНЫХ)
+// МИНИМАЛЬНАЯ ПРОВЕРКА БРАУЗЕРА (ТОЛЬКО ДЛЯ ЯНДЕКСА)
 // =============================================================================
 
 function isYandexBrowser() {
     return /YaBrowser/i.test(navigator.userAgent);
+}
+
+// =============================================================================
+// АВТОМАТИЧЕСКАЯ КОРРЕКЦИЯ ОБРЕЗАНИЙ ДЛЯ ВСЕХ МОБИЛЬНЫХ БРАУЗЕРОВ
+// =============================================================================
+
+function correctMobileUI() {
+    // Работаем только на мобильных устройствах (ширина ≤ 1080px)
+    if (window.innerWidth > 1080) return false;
+    
+    const screen = document.querySelector('.screen');
+    if (!screen) return false;
+    
+    // Для iOS Safari используем env(safe-area-inset-bottom)
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS) {
+        screen.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)';
+        console.log('📱 iOS: применен env() для коррекции Safe Area');
+        return true;
+    }
+    
+    // Для Android используем Visual Viewport API
+    if (window.visualViewport) {
+        function updatePadding() {
+            const viewportHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const uiHeight = Math.max(0, windowHeight - viewportHeight);
+            
+            if (uiHeight > 0) {
+                screen.style.paddingBottom = (uiHeight + 20) + 'px';
+                console.log(`📱 Android: применен padding-bottom = ${uiHeight + 20}px`);
+            } else {
+                // Если UI скрыта, убираем паддинг
+                screen.style.paddingBottom = '0px';
+            }
+        }
+        
+        // Первоначальный вызов
+        updatePadding();
+        
+        // Обновляем при изменении размеров окна
+        window.visualViewport.addEventListener('resize', updatePadding);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updatePadding, 100);
+        });
+        
+        console.log('📱 Android: активен динамический фолбек');
+        return true;
+    }
+    
+    // Запасной вариант: фиксированный отступ для старых браузеров
+    screen.style.paddingBottom = '60px';
+    console.log('📱 Применен фиксированный padding-bottom = 60px');
+    return true;
 }
 
 // =============================================================================
@@ -28,8 +82,15 @@ function setMode(newMode, { expandUseful = false } = {}) {
     
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
+    const videoPoster = document.getElementById('videoPoster');
     const scrollZone = document.getElementById('scrollZone');
+    const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
+    
+    if (videoPoster) {
+        videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
+        videoPoster.style.display = (newMode === 'details') ? 'block' : 'none';
+    }
     
     if (bgVideo) {
         bgVideo.style.filter = (newMode === 'details') ? 'blur(5px)' : 'none';
@@ -66,7 +127,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
             bgVideo.play();
         }
         
-        scrollZone.scrollTop = 0;
+        smoothScrollTo(0, 700);
+        if (addressDrop) addressDrop.classList.remove("open");
         if (usefulDrop) usefulDrop.classList.remove("open");
         sessionStorage.removeItem('usefulDropdownState');
         
@@ -83,9 +145,28 @@ function setMode(newMode, { expandUseful = false } = {}) {
     }, 50);
 }
 
-// =============================================================================
-// ОБРАБОТКА СВАЙПОВ
-// =============================================================================
+function smoothScrollTo(targetY, duration = 700) {
+    const scrollZone = document.getElementById('scrollZone');
+    if (!scrollZone) return;
+    
+    const startY = scrollZone.scrollTop;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    
+    function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    
+    function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const eased = easeInOut(t);
+        scrollZone.scrollTop = startY + distance * eased;
+        if (t < 1) requestAnimationFrame(step);
+    }
+    
+    requestAnimationFrame(step);
+}
 
 function setupSwipeHandlers() {
     const scrollZone = document.getElementById('scrollZone');
@@ -181,60 +262,30 @@ function setupSwipeHandlers() {
     }, { passive: false });
 }
 
-// =============================================================================
-// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
-// =============================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded');
-    
-    const frame = document.getElementById('frame');
-    const bgVideo = document.getElementById('bgVideo');
-    
-    // === ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА ТОЛЬКО ДЛЯ МОБИЛЬНЫХ ===
-    if (isYandexBrowser() && window.innerWidth <= 767) {
-        document.body.classList.add('yandex-browser');
-        console.log('🔧 Обнаружен Яндекс.Браузер на мобильном, применен подъем элементов');
-    }
-    
-    // Восстановление состояния
-    const savedMenuState = sessionStorage.getItem('menuState');
-    const shouldOpenMenu = savedMenuState === 'open';
-    
-    if (frame) {
-        if (shouldOpenMenu) {
-            frame.classList.add('mode-details');
-        } else {
-            frame.classList.add('mode-intro');
+function setupKeyboardHandlers() {
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
         }
-    }
-    
-    if (bgVideo) {
-        bgVideo.muted = true;
-        bgVideo.setAttribute('muted', '');
-        bgVideo.setAttribute('playsinline', '');
         
-        if (shouldOpenMenu) {
-            bgVideo.pause();
-        } else {
-            setTimeout(() => bgVideo.play().catch(() => {}), 100);
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                navigateToPrevPlace();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                navigateToNextPlace();
+                break;
+            case 'Escape':
+                if (mode === "details") {
+                    e.preventDefault();
+                    setMode("intro");
+                }
+                break;
         }
-    }
-    
-    // Очистка sessionStorage
-    sessionStorage.removeItem('menuState');
-    sessionStorage.removeItem('usefulDropdownState');
-    
-    // Инициализация функционала
-    initializeDropdownsAndButtons();
-    setupSwipeHandlers();
-    
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
-});
-
-// =============================================================================
-// ИНИЦИАЛИЗАЦИЯ ДРОПДАУНОВ И КНОПОК
-// =============================================================================
+    });
+}
 
 function initializeDropdownsAndButtons() {
     console.log('📋 Инициализация дропдаунов и кнопок...');
@@ -252,6 +303,7 @@ function initializeDropdownsAndButtons() {
             
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
+                if (isAnimating) return;
                 addressDrop.classList.toggle("open");
                 console.log('Дропдаун Адрес:', addressDrop.classList.contains('open') ? 'открыт' : 'закрыт');
             });
@@ -266,6 +318,7 @@ function initializeDropdownsAndButtons() {
             
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
+                if (isAnimating) return;
                 usefulDrop.classList.toggle("open");
                 console.log('Дропдаун Полезное:', usefulDrop.classList.contains('open') ? 'открыт' : 'закрыт');
             });
@@ -300,17 +353,120 @@ function initializeDropdownsAndButtons() {
 }
 
 // =============================================================================
-// ПУСТЫЕ ЗАГЛУШКИ ДЛЯ СОВМЕСТИМОСТИ
+// ИНИЦИАЛИЗАЦИЯ МЕНЮ
 // =============================================================================
 
-function navigateToPrevPlace() {
-    console.log('Переход к предыдущему месту (не реализован в этом файле)');
+window.initializeMenu = function() {
+    console.log('🔄 Инициализация меню...');
+    
+    // === ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА (для подъема элементов) ===
+    if (isYandexBrowser()) {
+        document.body.classList.add('yandex-browser');
+        console.log('🔧 Обнаружен Яндекс.Браузер, применен подъем элементов');
+    }
+    
+    // === АВТОМАТИЧЕСКАЯ КОРРЕКЦИЯ ОБРЕЗАНИЙ ===
+    correctMobileUI();
+    
+    const savedMenuState = sessionStorage.getItem('menuState');
+    const shouldOpenMenu = savedMenuState === 'open';
+    
+    mode = shouldOpenMenu ? "details" : "intro";
+    isAnimating = false;
+    
+    const frame = document.getElementById('frame');
+    const bgVideo = document.getElementById('bgVideo');
+    const scrollZone = document.getElementById('scrollZone');
+    const usefulDrop = document.getElementById('usefulDrop');
+    const videoPoster = document.getElementById('videoPoster');
+    
+    if (shouldOpenMenu) {
+        document.body.classList.add('no-transition');
+        
+        const elementsToDisable = [
+            frame, bgVideo, scrollZone,
+            document.querySelector('.title-block'),
+            document.querySelector('.hero-details'),
+            document.getElementById('dropdownsContainer'),
+            document.querySelector('.entry-note'),
+            document.getElementById('paidBtn')
+        ].filter(el => el);
+        
+        elementsToDisable.forEach(el => {
+            el.style.transition = 'none !important';
+            el.style.animation = 'none !important';
+        });
+        
+        setTimeout(() => {
+            elementsToDisable.forEach(el => {
+                el.style.transition = '';
+                el.style.animation = '';
+            });
+            document.body.classList.remove('no-transition');
+        }, 10);
+    }
+    
+    if (frame) {
+        if (shouldOpenMenu) {
+            frame.classList.remove('mode-intro');
+            frame.classList.add('mode-details');
+        } else {
+            frame.classList.remove('mode-details');
+            frame.classList.add('mode-intro');
+        }
+    }
+    
+    if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.setAttribute('muted', '');
+        bgVideo.setAttribute('playsinline', '');
+        bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
+        
+        if (shouldOpenMenu) {
+            bgVideo.pause();
+        } else {
+            setTimeout(() => bgVideo.play().catch(() => {}), 100);
+        }
+    }
+    
+    if (videoPoster) {
+        videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
+        videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
+    }
+    
+    if (scrollZone) {
+        scrollZone.scrollTop = 0;
+        scrollZone.style.pointerEvents = "auto";
+    }
+    
+    const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
+    if (savedDropdownState === 'open' && usefulDrop) {
+        usefulDrop.classList.add("open");
+    } else {
+        if (usefulDrop) usefulDrop.classList.remove("open");
+    }
+    
+    initializeDropdownsAndButtons();
+    setupSwipeHandlers();
+    
+    // Убраны: initializeFullscreenButton(), setupGlobalFullscreenTrigger(), setupKeyboardHandlers()
+    
+    setTimeout(() => {
+        sessionStorage.removeItem('menuState');
+        sessionStorage.removeItem('usefulDropdownState');
+    }, 100);
+    
+    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
 }
 
-function navigateToNextPlace() {
-    console.log('Переход к следующему месту (не реализован в этом файле)');
-}
+// =============================================================================
+// ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// =============================================================================
 
-function getCurrentPageOrder(category) {
-    return [];
-}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
+    
+    setTimeout(() => {
+        window.initializeMenu();
+    }, 50);
+});
