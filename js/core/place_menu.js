@@ -303,3 +303,16 @@ function initializeDropdownsAndButtons() {
 // ПУСТЫЕ ЗАГЛУШКИ ДЛЯ СОВМЕСТИМОСТИ
 // =============================================================================
 
+
+function navigateToPrevPlace() {
+    console.log('Переход к предыдущему месту (не реализован в этом файле)');
+}
+
+function navigateToNextPlace() {
+    console.log('Переход к следующему месту (не реализован в этом файле)');
+}
+
+function getCurrentPageOrder(category) {
+    return [];
+}
+
