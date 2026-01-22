@@ -109,6 +109,7 @@
   margin: auto;
 }
 
+/* Поворот иконок для навигации */
 .arrow-prev {
   background: url('./ui/back_button.svg') center/contain no-repeat;
 }
@@ -118,7 +119,10 @@
   transform: rotate(180deg);
 }
 
-/* Навигация */
+/* =============================================================================
+   НАВИГАЦИЯ (ПОЛНОСТЬЮ ЗАМЕНЕНО НА СТИЛИ STORIES)
+   ========================================================================= */
+
 .temple-nav-arrows {
   position: fixed;
   top: 0;
@@ -130,13 +134,12 @@
   display: block;
 }
 
-/* Общий стиль кнопки */
 .temple-nav-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px; 
-  height: 50px; 
+  width: 50px;
+  height: 50px;
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
@@ -145,29 +148,28 @@
   justify-content: center;
   pointer-events: auto;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-  transition: none; 
+  transition: none;
   display: none;
   z-index: 1001;
 }
 
-/* Эффект при наведении */
+/* Ховер эффект */
 .temple-nav-arrow:hover {
-  opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%) scale(1.1); 
+  transform: translateY(-50%) scale(1.1);
 }
 
-/* === ИСПРАВЛЕНИЕ: Размер для DIV-иконки (вместо img) === */
+/* Стили для иконки (div) внутри стрелки */
 .temple-nav-arrow .arrow-icon {
-  width: 60%;  /* Было 100%, теперь 60% как в сторис */
-  height: 60%; /* Было 100%, теперь 60% как в сторис */
-  margin: auto; /* Центрирование внутри flex-контейнера */
-  background-size: contain !important; /* Гарантируем, что фон вписывается */
+  width: 60% !important;
+  height: 60% !important;
+  /* Гарантируем, чтобы фон div вел себя как img из сторис */
+  background-size: contain !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
+  margin: auto;
 }
 
-/* Позиционирование стрелок */
 .temple-prev-arrow {
   left: 10px;
 }
@@ -176,13 +178,6 @@
   right: 10px;
 }
 
-/* Вращение стрелки вправо (сохраняем этот стиль) */
-.arrow-next {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
-}
-
-/* Скрытое состояние */
 .temple-nav-arrow.hidden {
   opacity: 0.3;
   pointer-events: none;
@@ -190,7 +185,7 @@
   display: flex !important;
 }
 
-/* Отображение по режимам */
+/* Управление видимостью через режимы */
 .mode-intro .temple-nav-arrow {
   display: flex;
 }
@@ -679,48 +674,37 @@
     height: min(30px, 3vmin);
   }
 
- .back-button {
-    top: min(40px, 5vh);
-    left: min(20px, 3vw);
-    width: min(60px, 6vmin);
-    height: min(30px, 3vmin);
-  }
-
+  /* СТРЕЛКИ НАВИГАЦИИ - СТИЛИ ИЗ STORIES */
   .temple-nav-arrows {
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: calc(100% + 50px) !important;
+    width: calc(100% + 100px) !important;
     max-width: 750px !important;
-    height: 60vh !important;
+    height: 90vh !important;
     max-height: 1100px !important;
+    pointer-events: none;
+    z-index: 1010 !important;
   }
 
   .temple-nav-arrow {
     position: absolute !important;
     top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: 50px !important;
-    height: 50px !important;
     opacity: 0.7;
     display: flex !important;
     pointer-events: auto !important;
-    z-index: 1011;
+    /* Сброс базовых стилей, чтобы Stories стили сработали четко */
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    left: auto !important;
+    right: auto !important;
   }
 
-  /* Ховер эффект для ПК */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
     transform: translateY(-50%) scale(1.1) !important;
-  }
-
-  /* Иконка на ПК */
-  .temple-nav-arrow .arrow-icon {
-    width: 60% !important;
-    height: 60% !important;
-    margin: auto;
   }
 
   .temple-prev-arrow {
@@ -735,13 +719,23 @@
     margin-right: -30px !important;
   }
 
+  .temple-nav-arrow .arrow-icon {
+    width: 60% !important;
+    height: 60% !important;
+    margin: auto;
+    /* Для div-иконок */
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+  /* КОНЕЦ СТРЕЛОК НАВИГАЦИИ */
+
   .temple-nav-arrow.hidden {
     opacity: 0.3;
     pointer-events: none;
     cursor: default;
     display: none !important;
   }
-  
 
   .screen {
     padding: 0 24px;
@@ -1055,7 +1049,3 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
-
-
-
-
