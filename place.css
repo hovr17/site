@@ -2136,3 +2136,39 @@
   
 }
 
+/* Было: */
+.container, #frame {
+  height: 100vh !important;
+}
+
+/* Стало: */
+.container, #frame {
+  /* Используем динамическую переменную */
+  height: calc(var(--vh, 1vh) * 100) !important;
+}
+
+/* Было: */
+.video-background {
+  min-height: 100vh;
+  z-index: -1;
+}
+
+/* Стало: */
+.video-background {
+  min-height: calc(var(--vh, 1vh) * 100);
+  z-index: -1;
+}
+
+/* Было: */
+.temple-nav-arrows {
+  height: 100vh;
+  ...
+}
+
+/* Стало: */
+.temple-nav-arrows {
+  height: calc(var(--vh, 1vh) * 100);
+
+}
+
+
