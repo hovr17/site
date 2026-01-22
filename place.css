@@ -1096,3 +1096,8 @@
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
 
+@media (min-width: 1081px) {
+  #templeNextArrow .arrow-icon {
+    transform: translate(-50%, -50%) rotate(180deg) !important;
+  }
+}
