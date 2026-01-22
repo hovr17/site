@@ -592,12 +592,38 @@ updateDebugInfo();
 
 // ================= КОНЕЦ ДЕБАГА =================
 
+// === ФИКС ДЛЯ 100vh НА MOBILE ===
+
+// 1. Функция обновления значения VH
+function setVH() {
+  // Получаем текущую видимую высоту окна
+  let vh = window.innerHeight * 0.01;
+  
+  // Записываем значение в CSS-переменную --vh на теге html
+  document.documentElement.style.setProperty('--vh', vh + 'px');
+  
+  // Для отладки (убрать потом)
+  // console.log('VH обновлен:', vh * 100, 'px');
+}
+
+// 2. Запускаем при загрузке
+setVH();
+
+// 3. Слушаем события изменения размера окна и поворота экрана
+window.addEventListener('resize', () => {
+  setVH();
+});
+
+window.addEventListener('orientationchange', () => {
+  setVH();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
 
 
 
