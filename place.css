@@ -120,7 +120,7 @@
 }
 
 /* =============================================================================
-   НАВИГАЦИЯ (ПОЛНОСТЬЮ ЗАМЕНЕНО НА СТИЛИ STORIES)
+   НАВИГАЦИЯ (БЕЗ ДВИЖЕНИЯ ПРИ НАВЕДЕНИИ)
    ========================================================================= */
 
 .temple-nav-arrows {
@@ -153,17 +153,17 @@
   z-index: 1001;
 }
 
-/* Ховер эффект */
+/* Ховер эффект (УБРАНО TRANSFORM, ЧТОБЫ НЕ ДЕРГАЛОСЬ) */
 .temple-nav-arrow:hover {
+  opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%) scale(1.1);
+  /* transform: translateY(-50%) scale(1.1); УДАЛЕНО */
 }
 
 /* Стили для иконки (div) внутри стрелки */
 .temple-nav-arrow .arrow-icon {
   width: 60% !important;
   height: 60% !important;
-  /* Гарантируем, чтобы фон div вел себя как img из сторис */
   background-size: contain !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -694,17 +694,17 @@
     opacity: 0.7;
     display: flex !important;
     pointer-events: auto !important;
-    /* Сброс базовых стилей, чтобы Stories стили сработали четко */
     transform: translateY(-50%) !important;
     margin: 0 !important;
     left: auto !important;
     right: auto !important;
   }
 
+  /* Ховер эффект (БЕЗ ИЗМЕНЕНИЯ ПОЛОЖЕНИЯ) */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%) scale(1.1) !important;
+    /* transform: translateY(-50%) scale(1.1) !important; УДАЛЕНО */
   }
 
   .temple-prev-arrow {
@@ -723,7 +723,6 @@
     width: 60% !important;
     height: 60% !important;
     margin: auto;
-    /* Для div-иконок */
     background-size: contain !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
