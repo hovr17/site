@@ -749,7 +749,7 @@
     top: 50%;
     left: 50%;
     /* Центрируем и поворачиваем */
-    transform: translate(-50%, -50%) rotate(180deg) !important;
+    transform: translate(-50%, -50%);
     margin: auto;
     background-size: contain !important;
     background-position: center !important;
@@ -1095,3 +1095,4 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
+
