@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -525,6 +526,14 @@
 }
 
 
+.no-transition,
+.no-transition * {
+    transition: none !important;
+    animation: none !important;
+}
+
+
+
 /* НОУТБУКИ/ПЛАНШЕТЫ (1081px и выше) */
 @media (min-width: 1081px) {
 
@@ -646,7 +655,6 @@
   .photo-label {
     font-size: clamp(20px, 2.5vmin, 32px);
     bottom: 1.2vh;
-    right:4vw;
   }
   
  .dropdown {
@@ -798,7 +806,7 @@
   .photo-label {
     font-size: clamp(20px, 5vmin, 55px);
     left: 4vw ;
-     right:4vw;
+    right:4vw;
     bottom: 1vh ;
   }
 
@@ -986,7 +994,6 @@
 
 .photo-label {
   font-size: 50px;
-  right:4vw;
 }
 
   .dropdown-body p {
@@ -1443,6 +1450,12 @@
     width: 6.5vw;
     height: 6.5vw;
   }
+
+  .mode-details .video-background {
+        background: white !important;
+        transition: none !important;
+    }
+    
 }
 
 .open-icon {
@@ -1476,4 +1489,687 @@
 .mode-details .title-break {
   display: none;
 }
+
+
+.photo-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки для кнопок */
+    gap: 15px; /* отступ между кнопками */
+    max-width: 600px; /* ограничьте ширину по необходимости */
+    margin: 0 auto; /* центрируйте весь контейнер */
+}
+
+.photo-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1; /* растягивается на всю ширину сетки */
+    justify-self: center; /* центрирует саму кнопку */
+    max-width: 50%; /* чтобы кнопка не была слишком широкой */
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Добавьте в place.css */
+#frame {
+  perspective: 1000px;
+  overflow: hidden;
+}
+
+@keyframes parallaxOutBack {
+  to {
+    transform: translateZ(-300px) scale(1.5) rotateY(5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutContent {
+  to {
+    transform: translateX(-100%) translateZ(0) rotateY(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutUI {
+  to {
+    transform: translateX(-50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInBack {
+  from {
+    transform: translateZ(-300px) scale(1.5) rotateY(-5deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInContent {
+  from {
+    transform: translateX(100%) translateZ(0) rotateY(10deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+}
+
+.page-exit-parallax .temple-video,
+.page-exit-parallax .video-background {
+  animation: parallaxOutBack 0.6s ease-out forwards;
+}
+
+.page-exit-parallax .screen {
+  animation: parallaxOutContent 0.5s ease-out forwards;
+}
+
+.page-exit-parallax .back-button,
+.page-exit-parallax .temple-nav-arrows {
+  animation: parallaxOutUI 0.4s ease-out forwards;
+}
+
+.page-enter-parallax .temple-video,
+.page-enter-parallax .video-background {
+  animation: parallaxInBack 0.6s ease-out forwards;
+}
+
+.page-enter-parallax .screen {
+  animation: parallaxInContent 0.5s ease-out forwards;
+}
+
+
+
+
+/* UI движение ВЛЕВО (при свайпе влево / next) */
+@keyframes parallaxOutUILeft {
+  to {
+    transform: translateX(-50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+/* UI движение ВПРАВО (при свайпе вправо / prev) */
+@keyframes parallaxOutUIRight {
+  to {
+    transform: translateX(50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+/* UI вход СЛЕВА (при свайпе вправо / prev) */
+@keyframes parallaxInUILeft {
+  from {
+    transform: translateX(-50px) translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* UI вход СПРАВА (при свайпе влево / next) */
+@keyframes parallaxInUIRight {
+  from {
+    transform: translateX(50px) translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Классы для свайпа влево (next) */
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows {
+  animation: parallaxOutUILeft 0.4s ease-out forwards;
+}
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows {
+  animation: parallaxInUIRight 0.4s ease-out forwards;
+}
+
+/* Классы для свайпа вправо (prev) */
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows {
+  animation: parallaxOutUIRight 0.4s ease-out forwards;
+}
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows {
+  animation: parallaxInUILeft 0.4s ease-out forwards;
+}
+
+
+
+
+
+
+
+
+
+/* === ПАРАЛЛАКС-ЭФФЕКТЫ ДЛЯ ПЕРЕХОДОВ === */
+
+/* Анимации фона и видео */
+@keyframes parallaxOutBackLeft {
+  0% {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(-300px) scale(1.5) rotateY(5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutBackRight {
+  0% {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(-300px) scale(1.5) rotateY(-5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInBackLeft {
+  0% {
+    transform: translateZ(-300px) scale(1.5) rotateY(-5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInBackRight {
+  0% {
+    transform: translateZ(-300px) scale(1.5) rotateY(5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+}
+
+/* Анимации контента */
+@keyframes parallaxOutContentLeft {
+  0% {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%) translateZ(0) rotateY(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutContentRight {
+  0% {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) translateZ(0) rotateY(10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInContentLeft {
+  0% {
+    transform: translateX(100%) translateZ(0) rotateY(10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInContentRight {
+  0% {
+    transform: translateX(-100%) translateZ(0) rotateY(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+}
+
+/* Анимации UI-элементов */
+@keyframes parallaxOutUILeft {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutUIRight {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInUILeft {
+  0% {
+    transform: translateX(-50px) translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInUIRight {
+  0% {
+    transform: translateX(50px) translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* === СВАЙП ВЛЕВО (NEXT) === */
+.page-exit-parallax-left .temple-video,
+.page-exit-parallax-left .video-background {
+  animation: parallaxOutBackLeft 0.6s ease-out forwards;
+}
+
+.page-exit-parallax-left .screen {
+  animation: parallaxOutContentLeft 0.5s ease-out forwards;
+}
+
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows,
+.page-exit-parallax-left .entry-note,
+.page-exit-parallax-left #paidBtn {
+  animation: parallaxOutUILeft 0.4s ease-out forwards;
+}
+
+.page-enter-parallax-left .temple-video,
+.page-enter-parallax-left .video-background {
+  animation: parallaxInBackLeft 0.6s ease-out forwards;
+}
+
+.page-enter-parallax-left .screen {
+  animation: parallaxInContentLeft 0.5s ease-out forwards;
+}
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows,
+.page-enter-parallax-left .entry-note,
+.page-enter-parallax-left #paidBtn {
+  animation: parallaxInUIRight 0.4s ease-out forwards;
+}
+
+/* === СВАЙП ВПРАВО (PREV) === */
+.page-exit-parallax-right .temple-video,
+.page-exit-parallax-right .video-background {
+  animation: parallaxOutBackRight 0.6s ease-out forwards;
+}
+
+.page-exit-parallax-right .screen {
+  animation: parallaxOutContentRight 0.5s ease-out forwards;
+}
+
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows,
+.page-exit-parallax-right .entry-note,
+.page-exit-parallax-right #paidBtn {
+  animation: parallaxOutUIRight 0.4s ease-out forwards;
+}
+
+.page-enter-parallax-right .temple-video,
+.page-enter-parallax-right .video-background {
+  animation: parallaxInBackRight 0.6s ease-out forwards;
+}
+
+.page-enter-parallax-right .screen {
+  animation: parallaxInContentRight 0.5s ease-out forwards;
+}
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows,
+.page-enter-parallax-right .entry-note,
+.page-enter-parallax-right #paidBtn {
+  animation: parallaxInUILeft 0.4s ease-out forwards;
+}
+
+
+/* ===== СТРЕЛКИ НАВИГАЦИИ (ФИНАЛЬНОЕ РАСПОЛОЖЕНИЕ) ===== */
+.temple-nav-arrows {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.temple-nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 1);
+  border-radius: 50%;
+  display: none;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1001;
+}
+
+.temple-nav-arrow:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.temple-prev-arrow {
+  left: 10px;
+}
+
+.temple-next-arrow {
+  right: 10px;
+}
+
+/* === ПОЗИЦИОНИРОВАНИЕ ДЛЯ ПК (1081px и выше) === */
+@media (min-width: 1081px) {
+  .temple-nav-arrows {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: calc(100% + 100px) !important;
+    max-width: 750px !important;
+    height: 90vh !important;
+    max-height: 1100px !important;
+  }
+
+  .temple-nav-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .temple-prev-arrow {
+    left: 0 !important;
+    transform: translateX(-100%) translateY(-50%) !important;
+    margin-left: -30px !important;
+  }
+  
+  .temple-next-arrow {
+    right: 0 !important;
+    transform: translateX(100%) translateY(-50%) !important;
+    margin-right: -30px !important;
+  }
+}
+
+/* ВИДНО: Только на ПК в режиме intro */
+@media (min-width: 1081px) {
+  .mode-intro .temple-nav-arrow {
+    display: flex !important;
+  }
+}
+
+/* СКРЫТО: В режиме details */
+.mode-details .temple-nav-arrow {
+  display: none !important;
+}
+
+/* СКРЫТО: На мобильных */
+@media (max-width: 1080px) {
+  .temple-nav-arrow {
+    display: none !important;
+  }
+}
+
+/* НЕАКТИВНАЯ стрелка (нет куда переходить) */
+.temple-nav-arrow.hidden {
+  opacity: 0.3;
+  pointer-events: none !important; /* ТОЛЬКО здесь отключаем события */
+}
+
+
+
+
+
+ @media (max-width: 767px) {
+  
+  /* === ИСПРАВЛЕНИЕ: Полноэкранное видео и читаемый текст === */
+  
+  /* 1. Растягиваем контейнер на весь физический экран (под панели браузера) */
+  .container, #frame {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  /* 2. Добавляем отступы в контейнер текста, чтобы "оттолкнуть" его от краев */
+  .screen {
+    height: 100%;
+    padding-top: env(safe-area-inset-top) !important;    /* Отступ от верхней панели (адресная строка) */
+    padding-bottom: env(safe-area-inset-bottom) !important; /* Отступ от нижней панели (home indicator) */
+  }
+
+  /* === КОНЕЦ ИСПРАВЛЕНИЯ === */
+
+  /*.back-button {
+    top: min(50px, 6.75vh);
+    left: min(20px, 2.25vw);
+    width: min(120px, 10.8vmin);
+    height: min(60px, 5.4vmin);
+  }*/
+  
+  .title-block h1 {
+   font-size: clamp(36px, 11vw, 100px);
+    padding-top: 150px;
+  }
+
+/* === АДАПТИВНЫЙ ТЕКСТ "подробнее" === */
+  .details-header {
+    font-size: clamp(16px, 6vw, 72px);  /* min: 16px, adaptive: 4.5vw, max: 24px */
+    line-height: 1.2;                     /* Оптимальный интерлиньяж */
+  }
+
+  .entry-note {
+    font-size: clamp(14px, 3.3vmin, 65px);
+     gap: 0.4vh;      
+  }
+  
+  .small-btn {
+    height: 13px;
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(55vh);
+  }
+
+  .mode-intro .title-block {
+    transform: translateY(50vh);
+  }
+
+  /* === КАРТОЧКИ === */
+  .photo-wrapper {
+    display: grid ;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4vw ;
+    justify-items: center;
+    padding-left: 0 ;
+  }
+
+  .photo-card {
+    width: 42vw ;
+    height: auto ;
+    aspect-ratio: 166 / 225 ;
+    max-width: 42vw ;
+    border-radius: 7vw ;
+    border-width: 0.8vw ;
+  }
+
+  .photo-label {
+    font-size: clamp(20px, 5vmin, 55px);
+    left: 4vw ;
+    right:4vw;
+    bottom: 1vh ;
+  }
+
+  /* === ДРОПДАУНЫ — ЦЕНТРИРОВАНИЕ ЧЕРЕЗ GRID === */
+  .dropdown {
+    border-radius: 27px;
+    max-height: 55px;
+
+    margin-inline: 3vw;
+    padding-top: 0.3vh;
+     margin-top: 3.5vh;
+  }
+
+  /* ОБНОВЛЕННЫЙ HEADER С ПРИНУДИТЕЛЬНЫМ ЦЕНТРИРОВАНИЕМ */
+  .dropdown-header {
+    display: grid ;
+    grid-template-columns: auto 1fr auto; /* иконка | текст | стрелка */
+    align-items: center ;       /* ВЕРТИКАЛЬНО ПО ЦЕНТРУ */
+    justify-items: center;                /* ГОРИЗОНТАЛЬНО ПО ЦЕНТРУ */
+    padding: 0 5vw ;
+    min-height: 50px ;          /* МИНИМАЛЬНАЯ ВЫСОТА ВМЕСТО ФИКСИРОВАННОЙ */
+    height: auto ;              /* СБРАСЫВАЕМ height: 60px */
+    margin: 0 ;
+  }
+
+  /* ПРИНУДИТЕЛЬНОЕ ЦЕНТРИРОВАНИЕ ЭЛЕМЕНТОВ */
+  .dropdown-icon,
+  .dropdown-arrow {
+    margin: 0 ;
+    padding: 0 ;
+    align-self: center ;
+    justify-self: center ;
+  }
+
+  .dropdown-title {
+    font-size: clamp(18px, 5vmin, 44px);
+    margin: 0 ;
+    padding: 0 ;
+    text-align: center ;
+  }
+
+  .dropdown-icon {
+    width: 8vw ;
+    height: 8vw ;
+  }
+
+  .dropdown-arrow {
+    width: 6.5vw ;
+    height: 6.5vw ;
+  }
+
+  .dropdown-body p {
+    font-size: clamp(16px, 4vmin, 50px);
+  }
+
+
+  /* СКРЫТИЕ СТРЕЛОК */
+  .temple-nav-arrows,
+  .temple-nav-arrow {
+    display: none ;
+    pointer-events: none;
+  }
+
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
+  }
+
+   .mode-details .video-background::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;              /* Высота полосы, можно изменить */
+    background: white;
+    z-index: 3;                /* Над overlay-gradient */
+  }
+
+  .video-background {
+    position: absolute ;
+    inset: 0 ;
+    width: 100% ;
+    height: 100% ;
+    min-height: 100vh ;
+    z-index: -1 ;
+  }
+
+  /* Мгновенный белый фон при размытии (без transition) */
+  .mode-details .video-background {
+    background: white ;
+    transition: none ; /* Убирает плавный переход */
+  }
+  
+}
+
+/* Было: */
+.container, #frame {
+  height: 100vh !important;
+}
+
+/* Стало: */
+.container, #frame {
+  /* Используем динамическую переменную */
+  height: calc(var(--vh, 1vh) * 100) !important;
+}
+
+/* Было: */
+.video-background {
+  min-height: 100vh;
+  z-index: -1;
+}
+
+/* Стало: */
+.video-background {
+  min-height: calc(var(--vh, 1vh) * 100);
+  z-index: -1;
+}
+
+/* Было: */
+.temple-nav-arrows {
+  height: 100vh;
+  ...
+}
+
+/* Стало: */
+.temple-nav-arrows {
+  height: calc(var(--vh, 1vh) * 100);
+
+}
+
+
 
