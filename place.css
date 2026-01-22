@@ -668,7 +668,7 @@
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: calc(100% + 100px) !important;
+    width: calc(100% + 50px) !important;
     max-width: 750px !important;
     height: 90vh !important;
     max-height: 1100px !important;
@@ -1022,3 +1022,4 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
+
