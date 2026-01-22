@@ -130,12 +130,13 @@
   display: block;
 }
 
+/* Общий стиль стрелок */
 .temple-nav-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 50px; /* ИЗМЕНЕНО: Было 40px */
+  height: 50px; /* ИЗМЕНЕНО: Было 40px */
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
@@ -144,30 +145,36 @@
   justify-content: center;
   pointer-events: auto;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-  transition: none;
+  transition: none; /* Сохраняем отсутствие стандартного transition, как в Stories */
   display: none;
   z-index: 1001;
 }
 
+/* Стиль при наведении (как в Stories) */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
+  transform: translateY(-50%) scale(1.1); /* ИЗМЕНЕНО: Добавлен scale(1.1) */
 }
 
+/* Иконка внутри стрелки */
 .temple-nav-arrow img {
   width: 60%;
   height: 60%;
   object-fit: contain;
 }
 
+/* Позиционирование левой стрелки */
 .temple-prev-arrow {
   left: 10px;
 }
 
+/* Позиционирование правой стрелки */
 .temple-next-arrow {
   right: 10px;
 }
 
+/* Скрытое состояние стрелок */
 .temple-nav-arrow.hidden {
   opacity: 0.3;
   pointer-events: none;
@@ -175,6 +182,7 @@
   display: flex !important;
 }
 
+/* Логика отображения в режимах */
 .mode-intro .temple-nav-arrow {
   display: flex;
 }
@@ -689,6 +697,7 @@
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
+    transform: translateY(-50%) scale(1.1) !important;
   }
 
   .temple-prev-arrow {
@@ -709,6 +718,7 @@
     cursor: default;
     display: none !important;
   }
+  
 
   .screen {
     padding: 0 24px;
@@ -1022,5 +1032,6 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
+
 
 
