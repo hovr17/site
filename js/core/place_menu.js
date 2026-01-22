@@ -528,7 +528,8 @@ window.initializeMenu = function() {
 
 
 
-// === ДЕБАГ: ВЫВОД ВЫСОТЫ ПАНЕЛИ БРАУЗЕРА ===
+
+// === ДЕБАГ: ВЫВОД ВЫСОТЫ НИЖНЕЙ ПАНЕЛИ БРАУЗЕРА ===
 
 // 1. Создаем элемент для отладки
 const debugOverlay = document.createElement('div');
@@ -540,9 +541,9 @@ debugOverlay.style.cssText = `
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.95);
   color: white;
-  padding: 30px;
+  padding: 40px;
   border-radius: 20px;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   z-index: 999999; /* Поверх всего */
   pointer-events: none; /* Чтобы не мешал кликам */
@@ -556,48 +557,48 @@ document.body.appendChild(debugOverlay);
 
 // 2. Функция для получения и отображения информации
 function updateDebugInfo() {
-  if (!window.visualViewport) {
-    debugOverlay.textContent = "VisualViewport API не поддерживается";
-    return;
-  }
-
-  // Visual Top - это то, на сколько браузер "поднял" контент сверху.
-  // Это примерно равно высоте адресной строки (если она видна).
-  const visualTop = Math.round(window.visualViewport.offsetTop);
+  // Получаем Safe Area Bottom (это физический нижний отступ на iPhone/Android)
+  // Обычно это высота Home Indicator или кнопок навигации, если они наезжают на контент
+  const safeAreaBottomRaw = getComputedStyle(document.documentElement)
+    .getPropertyValue('safe-area-inset-bottom');
   
-  // Safe Area Inset Top - это "безопасная зона" сверху.
-  // Включает адресную строку браузера + статус-бар (время/батарея).
-  const safeAreaTop = getComputedStyle(document.documentElement)
-    .getPropertyValue('safe-area-inset-top').trim();
-
+  // Превращаем строку "34px" в число 34
+  let safeAreaBottom = parseFloat(safeAreaBottomRaw);
+  if (isNaN(safeAreaBottom)) safeAreaBottom = 0;
+  
   // Высота видимой части окна
-  const viewportHeight = Math.round(window.visualViewport.height);
+  const viewportHeight = Math.round(window.innerHeight);
 
   debugOverlay.innerHTML = `
-    <div style="color: #ffff00; margin-bottom: 10px;">ОТЛАДКА БРАУЗЕРА</div>
-    <div>Высота верхней панели (ScrollTop):</div>
-    <div style="font-size: 40px; color: #00ff00;">${visualTop} px</div>
-    <div style="margin-top: 20px; font-size: 16px; color: #ccc;">
-      Safe Area Top: ${safeAreaTop}<br>
+    <div style="color: #ffff00; margin-bottom: 10px;">ОТЛАДКА НИЖНЕЙ ПАНЕЛИ</div>
+    
+    <div>Высота Safe Area (Панель):</div>
+    <div style="font-size: 50px; color: #00ff00; margin: 10px 0;">
+      ${safeAreaBottom} px
+    </div>
+    
+    <div style="font-size: 16px; color: #ccc; margin-top: 10px;">
+      (Это значение используется для отступа текста)<br><br>
       Viewport Height: ${viewportHeight}px
     </div>
   `;
 }
 
-// 3. Слушаем изменения размера вьюпорта (при скролле или повороте экрана)
+// 3. Слушаем изменения (на случай, если браузер меняет панель)
 window.visualViewport.addEventListener('resize', updateDebugInfo);
-window.visualViewport.addEventListener('scroll', updateDebugInfo);
 
-// Запускаем сразу при загрузке
+// Запускаем сразу
 updateDebugInfo();
 
 // ================= КОНЕЦ ДЕБАГА =================
+
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
     initializeDropdownsAndButtons();
     window.initializeMenu();
 });
+
 
 
 
