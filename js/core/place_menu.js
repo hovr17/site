@@ -70,39 +70,6 @@ function correctMobileUI() {
 }
 
 // =============================================================================
-// УПРАВЛЕНИЕ ВИДИМОСТЬЮ КНОПОК НАВИГАЦИИ (ПК)
-// =============================================================================
-
-/**
- * Скрывает или показывает кнопки перелистывания на ПК в зависимости от режима меню
- */
-function updateNavigationVisibility() {
-    // Работаем только на ПК (ширина > 1080px)
-    if (window.innerWidth <= 1080) return;
-
-    // Ищем кнопки навигации. 
-    // .temple-nav-arrow взят из вашего первого скрипта как основной класс стрелок.
-    const navArrows = document.querySelectorAll('.temple-nav-arrow, .nav-arrow, .arrow, .nav-btn');
-    
-    const isMenuOpen = (mode === "details");
-
-    navArrows.forEach(btn => {
-        // Добавляем плавность, если её нет
-        btn.style.transition = 'opacity 0.3s ease, visibility 0.3s';
-        
-        if (isMenuOpen) {
-            // Меню открыто -> скрываем кнопки
-            btn.style.opacity = '0';
-            btn.style.pointerEvents = 'none';
-        } else {
-            // Меню закрыто -> показываем кнопки
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-        }
-    });
-}
-
-// =============================================================================
 // ОСНОВНАЯ ЛОГИКА МЕНЮ
 // =============================================================================
 
@@ -170,9 +137,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
             isAnimating = false;
         }, 500);
     }
-
-    // ===== ОБНОВЛЯЕМ ВИДИМОСТЬ СТРЕЛОК НА ПК =====
-    updateNavigationVisibility();
     
     setTimeout(() => {
         if (window.updateNavArrows) {
@@ -297,7 +261,7 @@ function setupSwipeHandlers() {
         isSwipeInProgress = false;
     }, { passive: false });
 
-    // ===== ЛОГИКА ДЛЯ ПК (СКРОЛЛ КОЛЕСИКОМ) =====
+    // ===== ДОБАВЛЕННАЯ ЛОГИКА ДЛЯ ПК (СКРОЛЛ) =====
     scrollZone.addEventListener("wheel", (e) => {
         if (isAnimating) {
             if (e.cancelable) e.preventDefault();
@@ -474,10 +438,9 @@ window.initializeMenu = function() {
     }
     
     initializeDropdownsAndButtons();
-    setupSwipeHandlers();
+    setupSwipeHandlers(); // Теперь содержит логику для скролла на ПК
     
-    // ПРОВЕРЯЕМ ВИДИМОСТЬ КНОПОК ПРИ ЗАГРУЗКЕ
-    updateNavigationVisibility();
+    // Убраны: initializeFullscreenButton(), setupGlobalFullscreenTrigger(), setupKeyboardHandlers()
     
     setTimeout(() => {
         sessionStorage.removeItem('menuState');
