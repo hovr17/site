@@ -526,11 +526,6 @@ window.initializeMenu = function() {
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
-    initializeDropdownsAndButtons();
-    window.initializeMenu();
-});
 
 
 // === ДЕБАГ: ВЫВОД ВЫСОТЫ ПАНЕЛИ БРАУЗЕРА ===
@@ -597,3 +592,12 @@ window.visualViewport.addEventListener('scroll', updateDebugInfo);
 updateDebugInfo();
 
 // ================= КОНЕЦ ДЕБАГА =================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
+    initializeDropdownsAndButtons();
+    window.initializeMenu();
+});
+
+
+
