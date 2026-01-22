@@ -2,333 +2,266 @@ console.log('place_menu.js загружен');
 
 let mode = "intro";
 let isAnimating = false;
-
-// Переменные для обработки свайпов
 let touchStartX = null;
 let touchStartY = null;
 let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
 // =============================================================================
-// СИСТЕМА ПРОВЕРКИ SAFE AREA И ПОДДЕРЖКИ env()
+// СИСТЕМА ПРОВЕРКИ БРАУЗЕРА И SAFE AREA
 // =============================================================================
 
-/**
- * Комплексная проверка поддержки env(safe-area-inset-bottom)
- * Возвращает объект с полной информацией о статусе и рекомендациях
- */
+function detectBrowser() {
+    const ua = navigator.userAgent;
+    const vendor = navigator.vendor || '';
+    
+    if (/YaBrowser/i.test(ua)) {
+        return { name: 'Яндекс.Браузер', engine: 'Blink', flags: { isYandex: true, isMobile: /Mobile/.test(ua) }};
+    } else if (/CriOS/i.test(ua)) {
+        return { name: 'Chrome (iOS)', engine: 'WebKit', flags: { isChrome: true, isIOS: true, isMobile: true }};
+    } else if(/Chrome|Chromium/i.test(ua)) {
+        return { name: 'Chrome', engine: 'Blink', flags: { isChrome: true, isMobile: /Mobile/.test(ua), isAndroid: /Android/.test(ua) }};
+    } else if (/FxiOS/i.test(ua)) {
+        return { name: 'Firefox (iOS)', engine: 'WebKit', flags: { isFirefox: true, isIOS: true, isMobile: true }};
+    } else if (/Firefox|FxiOS/i.test(ua)) {
+        return { name: 'Firefox', engine: 'Gecko', flags: { isFirefox: true, isMobile: /Mobile/.test(ua) }};
+    } else if (/Safari/i.test(ua) && vendor.includes('Apple') && !/Chrome|Chromium|CriOS/.test(ua)) {
+        return { name: 'Safari', engine: 'WebKit', flags: { isSafari: true, isIOS: /iPhone|iPad|iPod/.test(ua), isMobile: /Mobile|iPhone|iPad|iPod/.test(ua) }};
+    } else if (/SamsungBrowser/i.test(ua)) {
+        return { name: 'Samsung Internet', engine: 'Blink', flags: { isSamsung: true, isAndroid: true, isMobile: true }};
+    } else if (/Edg|EdgA|EdgiOS/i.test(ua)) {
+        return { name: 'Microsoft Edge', engine: 'Blink', flags: { isEdge: true, isMobile: /Mobile/.test(ua) }};
+    } else if (/Opera|OPR/i.test(ua)) {
+        return { name: 'Opera', engine: 'Blink', flags: { isOpera: true, isMobile: /Mobile/.test(ua) }};
+    } else {
+        return { name: 'Неизвестный', engine: 'Неизвестно', flags: { isUnknown: true, isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(ua) }};
+    }
+}
+
+function estimateBrowserUIHeight() {
+    let safeAreaBottom = 0, visualViewportHeight = null, estimatedUIHeight = 0, details = '';
+    
+    try {
+        const testEl = document.createElement('div');
+        testEl.style.position = 'fixed';
+        testEl.style.bottom = 'env(safe-area-inset-bottom, 0px)';
+        testEl.style.visibility = 'hidden';
+        document.body.appendChild(testEl);
+        const computedValue = getComputedStyle(testEl).bottom;
+        document.body.removeChild(testEl);
+        safeAreaBottom = parseFloat(computedValue) || 0;
+        if(safeAreaBottom > 0) details = `env(safe-area-inset-bottom): ${safeAreaBottom}px`;
+    } catch(e) { console.warn('Ошибка env():', e); }
+    
+    if(window.visualViewport) {
+        visualViewportHeight = window.visualViewport.height;
+        const layoutHeight = window.innerHeight;
+        estimatedUIHeight = Math.max(0, layoutHeight - visualViewportHeight);
+        if(estimatedUIHeight > 0) details += (details ? ' | ' : '') + `Visual Viewport: -${estimatedUIHeight}px`;
+    }
+    
+    return { safeAreaBottom, visualViewportHeight, estimatedUIHeight, details: details || 'Нет данных' };
+}
+
 function checkSafeAreaSupport() {
-  // === УРОВЕНЬ 1: Проверка CSS.supports() ===
-  const supportsEnv = CSS.supports('padding-bottom', 'env(safe-area-inset-bottom, 0px)');
-  
-  // === УРОВЕНЬ 2: Реальный тест env() ===
-  // Создаем элемент с fallback-значением, которое никогда не будет реальным
-  const testEl = document.createElement('div');
-  testEl.style.position = 'fixed';
-  testEl.style.bottom = 'env(safe-area-inset-bottom, -9999px)';
-  testEl.style.visibility = 'hidden';
-  document.body.appendChild(testEl);
-  const computedValue = getComputedStyle(testEl).bottom;
-  document.body.removeChild(testEl);
-  
-  // Если env() не поддерживается, вернется -9999px
-  const envReallyWorks = computedValue !== '-9999px';
-  const safeAreaBottom = parseFloat(computedValue) || 0;
-  
-  // === УРОВЕНЬ 3: Специфичные браузеры ===
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isAndroidChrome = /Android.*Chrome/i.test(navigator.userAgent);
-  const isSamsungInternet = /SamsungBrowser/i.test(navigator.userAgent);
-  const isFirefoxMobile = /Android.*Firefox/i.test(navigator.userAgent);
-  const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  
-  // === УРОВЕНЬ 4: Visual Viewport API (фолбек для Android) ===
-  let visualViewportHeight = null;
-  if (window.visualViewport) {
-    visualViewportHeight = window.visualViewport.height;
-  }
-  
-  // === ИТОГОВЫЙ СТАТУС ===
-  let status, description, color, recommendation;
-  
-  if (!supportsEnv || !envReallyWorks) {
-    // Браузер НЕ поддерживает env()
-    if (isIOS) {
-      status = "⚠️ ОГРАНИЧЕННАЯ ПОДДЕРЖКА";
-      description = "iOS, но env() не работает (редкий случай)";
-      color = "#ff9500";
-      recommendation = "Проверьте мета-тег viewport и CSS";
-    } else if (isAndroidChrome || isSamsungInternet || isFirefoxMobile) {
-      status = "🔧 НУЖЕН ФОЛБЕК";
-      description = "Android-браузер без поддержки env()";
-      color = "#ff3b30";
-      recommendation = "Включается JS-фолбек";
+    const browser = detectBrowser();
+    const uiInfo = estimateBrowserUIHeight();
+    let status, description, color, recommendation;
+    
+    if(browser.flags.isSafari || browser.flags.isIOS) {
+        if(uiInfo.safeAreaBottom > 0) {
+            status = "✅ Safari Safe Area";
+            description = `Нижняя панель: ${uiInfo.safeAreaBottom}px`;
+            color = "#34c759";
+            recommendation = "Используется env()";
+        } else {
+            status = "ℹ️ Safari без Safe Area";
+            description = "Десктоп или старый iOS";
+            color = "#007aff";
+            recommendation = "Отступ не требуется";
+        }
+    } else if(browser.flags.isChrome || browser.flags.isYandex || browser.flags.isSamsung || browser.flags.isAndroid) {
+        if(uiInfo.estimatedUIHeight > 0) {
+            status = "🔧 Android UI обнаружена";
+            description = `Общая высота UI: ${uiInfo.estimatedUIHeight}px`;
+            color = "#ff9500";
+            recommendation = "Используется JS-фолбек";
+        } else {
+            status = "ℹ️ Без панелей";
+            description = "Весь экран доступен";
+            color = "#007aff";
+            recommendation = "Фолбек не нужен";
+        }
     } else {
-      status = "❌ НЕТ ПОДДЕРЖКИ";
-      description = "env() не поддерживается";
-      color = "#ff3b30";
-      recommendation = "Добавьте кнопку 'В полный экран'";
+        status = "ℹ️ Другой браузер";
+        description = browser.name;
+        color = "#cccccc";
+        recommendation = "Стандартное поведение";
     }
-  } else {
-    // env() поддерживается
-    if (safeAreaBottom > 0) {
-      status = "✅ ОТСТУП РАБОТАЕТ";
-      description = `Safe Area = ${safeAreaBottom}px`;
-      color = "#34c759";
-      recommendation = "Все отлично!";
-    } else {
-      status = "ℹ️ ПОДДЕРЖКА ЕСТЬ, НО ОТСТУП = 0";
-      description = "Устройство без панели или десктоп";
-      color = "#007aff";
-      recommendation = "Нормально для этого устройства";
-    }
-  }
-  
-  return {
-    supportsEnv,
-    envReallyWorks,
-    safeAreaBottom,
-    isIOS,
-    isAndroidChrome,
-    isSamsungInternet,
-    isMobile,
-    visualViewportHeight,
-    status,
-    description,
-    color,
-    recommendation
-  };
+    
+    return {
+        browser: browser.name,
+        engine: browser.engine,
+        isMobile: browser.flags.isMobile,
+        ...uiInfo,
+        status,
+        description,
+        color,
+        recommendation
+    };
 }
 
-/**
- * Отображает отладочный оверлей с полной информацией
- * Автоматически скрывается через 5 секунд
- */
 function showDebugOverlay() {
-  const check = checkSafeAreaSupport();
-  let overlay = document.getElementById('debug-overlay');
-  
-  // Создаем оверлей, если его еще нет
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'debug-overlay';
-    overlay.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      color: white;
-      padding: 30px;
-      border-radius: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      z-index: 999999;
-      pointer-events: none;
-      text-align: center;
-      border: 4px solid white;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
-      font-family: sans-serif;
-      line-height: 1.4;
-      max-width: 90vw;
-      word-wrap: break-word;
+    const check = checkSafeAreaSupport();
+    let overlay = document.getElementById('debug-overlay');
+    
+    if(!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'debug-overlay';
+        overlay.style.cssText = `
+            position: fixed; top: 10px; left: 10px; right: 10px;
+            background: rgba(0,0,0,0.95); color: white; padding: 15px;
+            border-radius: 12px; font-family: sans-serif; font-size: 14px;
+            z-index: 999999; pointer-events: none; border: 2px solid ${check.color};
+            max-height: 90vh; overflow-y: auto;
+        `;
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = `
+        <div style="display:flex;align-items:center;margin-bottom:10px">
+            <div style="width:12px;height:12px;background:${check.color};border-radius:50%;margin-right:8px;"></div>
+            <strong style="font-size:16px">${check.status}</strong>
+        </div>
+        <div style="margin-bottom:12px">
+            <strong>Браузер:</strong> ${check.browser}<br>
+            <strong>Движок:</strong> ${check.engine}<br>
+            <strong>Устройство:</strong> ${check.isMobile ? 'Мобильное' : 'Десктоп'}
+        </div>
+        <div style="background:rgba(255,255,255,0.1);padding:10px;border-radius:8px;margin-bottom:10px">
+            <strong>Высота панелей:</strong><br>${check.details}
+        </div>
+        <div style="background:rgba(255,255,255,0.1);padding:10px;border-radius:8px;font-size:12px;color:#ccc">${check.description}</div>
+        <div style="margin-top:10px;font-size:13px;color:${check.color}">💡 ${check.recommendation}</div>
     `;
-    document.body.appendChild(overlay);
-  }
-  
-  overlay.innerHTML = `
-    <div style="margin-bottom: 15px; border-bottom: 2px solid ${check.color}; padding-bottom: 10px; color: ${check.color};">
-      <strong>${check.status}</strong>
-    </div>
     
-    <div style="font-size: 18px; color: #fff; line-height: 1.5; margin-bottom: 15px;">
-      ${check.description}
-    </div>
-    
-    <div style="font-size: 16px; color: #999; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; line-height: 1.4;">
-      <div><strong>Поддержка env():</strong> ${check.supportsEnv ? 'Да' : 'Нет'}</div>
-      <div><strong>Работает env():</strong> ${check.envReallyWorks ? 'Да' : 'Нет'}</div>
-      <div><strong>Safe Area:</strong> ${check.safeAreaBottom}px</div>
-      <div><strong>iOS:</strong> ${check.isIOS ? 'Да' : 'Нет'}</div>
-      <div><strong>Android Chrome:</strong> ${check.isAndroidChrome ? 'Да' : 'Нет'}</div>
-      <div><strong>Mobile:</strong> ${check.isMobile ? 'Да' : 'Нет'}</div>
-      <div><strong>Visual Viewport:</strong> ${check.visualViewportHeight ? check.visualViewportHeight + 'px' : 'Не поддерживается'}</div>
-    </div>
-    
-    <div style="margin-top: 15px; font-size: 16px; color: #fff; background: ${check.color}22; padding: 10px; border-radius: 8px;">
-      💡 ${check.recommendation}
-    </div>
-  `;
-  
-  overlay.style.borderColor = check.color;
-  
-  // Автоматически скрываем оверлей через 5 секунд
-  setTimeout(() => {
-    overlay.style.display = 'none';
-  }, 5000);
+    setTimeout(() => overlay.style.display = 'none', 5000);
 }
 
-/**
- * Автоматический фолбек для Android-браузеров без env() поддержки
- */
-function applyAndroidFallback() {
-  const check = checkSafeAreaSupport();
-  const screen = document.querySelector('.screen');
-  const frame = document.getElementById('frame');
-  
-  if (!screen || !frame) return false;
-  
-  // Если env() не работает и это Android
-  if (!check.envReallyWorks && (check.isAndroidChrome || check.isSamsungInternet)) {
-    console.log('🔧 Применяется Android fallback');
+function applyBrowserFallback() {
+    const check = checkSafeAreaSupport();
+    const screen = document.querySelector('.screen');
+    if(!screen || !check.isMobile || check.safeAreaBottom > 0) return false;
+    
     screen.classList.add('no-env-support');
     
-    // Динамический расчет через Visual Viewport API
-    if (window.visualViewport) {
-      function updatePadding() {
-        const viewportHeight = window.visualViewport.height;
-        const windowHeight = window.innerHeight;
-        const browserBarHeight = windowHeight - viewportHeight;
-        
-        if (browserBarHeight > 0) {
-          const paddingValue = Math.max(60, browserBarHeight + 20); // Минимум 60px
-          screen.style.paddingBottom = paddingValue + 'px';
-          console.log(`🔧 Android fallback: padding-bottom = ${paddingValue}px`);
-        } else {
-          // Если не можем точно расчитать, ставим стандартный отступ
-          screen.style.paddingBottom = '80px';
+    if(window.visualViewport) {
+        function updatePadding() {
+            const viewportHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const uiHeight = Math.max(0, windowHeight - viewportHeight);
+            
+            if(uiHeight > 0) {
+                screen.style.paddingBottom = (uiHeight + 20) + 'px';
+                console.log(`🔧 Динамический фолбек: padding-bottom = ${uiHeight + 20}px`);
+            }
         }
-      }
-      
-      window.visualViewport.addEventListener('resize', updatePadding);
-      window.addEventListener('orientationchange', () => {
-        setTimeout(updatePadding, 100); // Задержка для пересчета
-      });
-      
-      updatePadding(); // Первоначальный вызов
-    } else {
-      // Если Visual Viewport не поддерживается, ставим фиксированный отступ
-      screen.style.paddingBottom = '80px';
+        
+        window.visualViewport.addEventListener('resize', updatePadding);
+        updatePadding();
+        return true;
     }
-    
-    return true;
-  }
-  
-  return false;
+    return false;
 }
 
 // =============================================================================
-// СУЩЕСТВУЮЩИЙ КОД ИЗ ОРИГИНАЛЬНОГО ФАЙЛА (БЕЗ ИЗМЕНЕНИЙ)
+// УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ
 // =============================================================================
 
-/**
- * Переключение полноэкранного режима
- */
 function toggleFullscreen() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    enterFullscreen();
-  } else {
-    exitFullscreen();
-  }
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        enterFullscreen();
+    } else {
+        exitFullscreen();
+    }
 }
 
-/**
- * Вход в полноэкранный режим
- */
 function enterFullscreen() {
-  const elem = document.documentElement;
-  
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) {
-    elem.webkitRequestFullscreen();
-  }
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    }
 }
 
-/**
- * Выход из полноэкранного режима
- */
 function exitFullscreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen();
-  }
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    }
 }
 
-/**
- * Обработчик изменения состояния полноэкранного режима
- */
 function handleFullscreenChange() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-  
-  if (isFullscreen) {
-    btn.classList.remove('fullscreen-icon');
-    btn.classList.add('fullscreen-exit-icon');
-  } else {
-    btn.classList.remove('fullscreen-exit-icon');
-    btn.classList.add('fullscreen-icon');
-  }
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+    
+    if (isFullscreen) {
+        btn.classList.remove('fullscreen-icon');
+        btn.classList.add('fullscreen-exit-icon');
+    } else {
+        btn.classList.remove('fullscreen-exit-icon');
+        btn.classList.add('fullscreen-icon');
+    }
 }
 
-/**
- * МГНОВЕННОЕ обновление видимости кнопки полноэкранного режима
- */
 function updateFullscreenButtonVisibility() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  const isMobile = window.innerWidth <= 1080;
-  const isIntroMode = mode === 'intro';
-  
-  btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
-}
-
-/**
- * Инициализация кнопки полноэкранного режима
- */
-function initializeFullscreenButton() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  btn.addEventListener('click', toggleFullscreen);
-  document.addEventListener('fullscreenchange', handleFullscreenChange);
-  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-}
-
-/**
- * Настраивает переход в полноэкранный режим при любом клике на экране (в режиме intro)
- */
-function setupGlobalFullscreenTrigger() {
-  const frame = document.getElementById('frame');
-  if (!frame) return;
-
-  frame.addEventListener('click', (e) => {
-    // 1. Если мы уже в полноэкранном режиме — ничего не делаем
-    if (document.fullscreenElement || document.webkitFullscreenElement) return;
-
-    // 2. Работаем только в режиме intro
-    if (mode !== 'intro') return;
-
-    // 3. Работаем только на мобильных устройствах (ширина <= 1080px)
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    
     const isMobile = window.innerWidth <= 1080;
-    if (!isMobile) return;
-
-    // 4. Исключаем клики по интерактивным элементам, чтобы не ломать навигацию и кнопки
-    const isInteractive = e.target.closest(
-      'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
-    );
-
-    if (isInteractive) return;
-
-    // 5. Если клик пришелся на фон или видео -> открываем полноэкранный режим
-    enterFullscreen();
-    console.log('📱 Клик по экрану (Mobile): Вход в полноэкранный режим');
-  });
+    const isIntroMode = mode === 'intro';
+    
+    btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
 }
+
+function initializeFullscreenButton() {
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    
+    btn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+}
+
+function setupGlobalFullscreenTrigger() {
+    const frame = document.getElementById('frame');
+    if (!frame) return;
+
+    frame.addEventListener('click', (e) => {
+        if (document.fullscreenElement || document.webkitFullscreenElement) return;
+        if (mode !== 'intro') return;
+        
+        const isMobile = window.innerWidth <= 1080;
+        if (!isMobile) return;
+
+        const isInteractive = e.target.closest(
+            'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
+        );
+
+        if (isInteractive) return;
+
+        enterFullscreen();
+        console.log('📱 Клик по экрану (Mobile): Вход в полноэкранный режим');
+    });
+}
+
+// =============================================================================
+// ОСНОВНАЯ ЛОГИКА МЕНЮ
+// =============================================================================
 
 function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === newMode || isAnimating) return;
@@ -362,7 +295,7 @@ function setMode(newMode, { expandUseful = false } = {}) {
         scrollZone.classList.add('animating');
         
         if (bgVideo) {
-            bgVideo.pause(); // ✅ СТАВИМ НА ПАУЗУ при открытии меню
+            bgVideo.pause();
         }
         
         if (expandUseful && usefulDrop) {
@@ -383,7 +316,7 @@ function setMode(newMode, { expandUseful = false } = {}) {
         scrollZone.classList.add('animating');
         
         if (bgVideo) {
-            bgVideo.play(); // ✅ ВОЗОБНОВЛЯЕМ при закрытии меню
+            bgVideo.play();
         }
         
         smoothScrollTo(0, 700);
@@ -626,14 +559,13 @@ function initializeDropdownsAndButtons() {
     }
 }
 
-// Сохраняем оригинальную initializeMenu
-const originalInitializeMenu = window.initializeMenu || function() {};
+// =============================================================================
+// ИНИЦИАЛИЗАЦИЯ МЕНЮ С ПРОВЕРКОЙ SAFE AREA
+// =============================================================================
 
-// Переопределяем с добавлением проверок Safe Area
 window.initializeMenu = function() {
     console.log('🔄 Инициализация меню с проверкой Safe Area...');
     
-    // Вызываем оригинальную функцию
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
     
@@ -646,14 +578,11 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
-    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ для мгновенного отображения
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         
         const elementsToDisable = [
-            frame,
-            bgVideo,
-            scrollZone,
+            frame, bgVideo, scrollZone,
             document.querySelector('.title-block'),
             document.querySelector('.hero-details'),
             document.getElementById('dropdownsContainer'),
@@ -728,37 +657,36 @@ window.initializeMenu = function() {
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
     
-    // Добавляем наши проверки
+    // Проверка Safe Area
     setTimeout(() => {
-        const fallbackApplied = applyAndroidFallback();
+        const fallbackApplied = applyBrowserFallback();
         showDebugOverlay();
         
         const check = checkSafeAreaSupport();
         console.log('📊 Результат проверки Safe Area:', check);
-        console.log(`🔧 Android fallback применен: ${fallbackApplied ? 'Да' : 'Нет'}`);
+        console.log(`🔧 Фолбек применен: ${fallbackApplied ? 'Да' : 'Нет'}`);
     }, 100);
 }
 
 // =============================================================================
-// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
     
-    // Запускаем инициализацию
     setTimeout(() => {
         window.initializeMenu();
     }, 50);
 });
 
 // =============================================================================
-// ФИКС ДЛЯ 100VH НА MOBILE (ВАШ СУЩЕСТВУЮЩИЙ КОД)
+// ФИКС ДЛЯ 100VH НА MOBILE
 // =============================================================================
 
 function setVH() {
-  let vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', vh + 'px');
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
 }
 
 setVH();
