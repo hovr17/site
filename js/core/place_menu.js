@@ -106,7 +106,7 @@ function setupGlobalFullscreenTrigger() {
     // 2. Работаем только в режиме intro
     if (mode !== 'intro') return;
 
-    // 3. Работаем только на мобильных устройствах (ширина <= 1080px)
+    // 3. ✅ НОВАЯ ПРОВЕРКА: Работаем только на мобильных устройствах (ширина <= 1080px)
     const isMobile = window.innerWidth <= 1080;
     if (!isMobile) return;
 
@@ -526,139 +526,39 @@ window.initializeMenu = function() {
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
 }
 
+// ===== АДАПТАЦИЯ ПОД ПАНЕЛИ БРАУЗЕРОВ (решение для Яндекс Браузера) =====
 
+/**
+ * Динамическое обновление CSS-переменных для высоты нижней панели браузера
+ */
+function updateSafeAreaInsets() {
+  const isMobile = window.innerWidth <= 1080;
+  if (!isMobile) return;
 
-
-
-// === ФИКС ДЛЯ 100vh НА MOBILE ===
-
-// 1. Функция обновления значения VH
-function setVH() {
-  // Получаем текущую видимую высоту окна
-  let vh = window.innerHeight * 0.01;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  const browserBarHeight = window.innerHeight - viewportHeight;
   
-  // Записываем значение в CSS-переменную --vh на теге html
-  document.documentElement.style.setProperty('--vh', vh + 'px');
-  
-  // Для отладки (убрать потом)
-  // console.log('VH обновлен:', vh * 100, 'px');
-}
-
-// 2. Запускаем при загрузке
-setVH();
-
-// 3. Слушаем события изменения размера окна и поворота экрана
-window.addEventListener('resize', () => {
-  setVH();
-});
-
-window.addEventListener('orientationchange', () => {
-  setVH();
-});
-
-
-
-// === ДЕБАГ: ЯСНАЯ ПРОВЕРКА ОТСТУПОВ ===
-
-const checkCropOverlay = document.createElement('div');
-checkCropOverlay.id = 'debug-overlay';
-checkCropOverlay.style.cssText = `
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
-  padding: 30px;
-  border-radius: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  z-index: 999999;
-  pointer-events: none;
-  text-align: center;
-  border: 4px solid white;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  font-family: sans-serif;
-  line-height: 1.4;
-`;
-
-document.body.appendChild(checkCropOverlay);
-
-function checkIfCropped() {
-  const ua = navigator.userAgent;
-  // Определяем, мобильный ли это браузер
-  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-
-  // Получаем Safe Area Bottom (высота панели браузера / Home Indicator)
-  const safeAreaRaw = getComputedStyle(document.documentElement)
-    .getPropertyValue('safe-area-inset-bottom');
-  
-  let safeAreaVal = parseFloat(safeAreaRaw);
-  if (isNaN(safeAreaVal)) safeAreaVal = 0;
-
-  let statusTitle = "";
-  let statusDesc = "";
-  let statusColor = "";
-
-  // ЛОГИКА:
-  // Если Safe Area > 0 -> Значит браузер поддерживает env и мы применили padding-bottom. (Зеленый)
-  // Если Safe Area == 0 -> Значит браузер НЕ поддерживает env. Защита НЕТ. (Красный)
-  
-  if (isMobile) {
-    if (safeAreaVal > 0) {
-      // Современный iPhone / Android
-      statusTitle = "ОТСТУП РАБОТАЕТ";
-      statusDesc = "Safe Area > 0px<br>Браузер поддерживает защиту.<br>Текст приподнят.";
-      statusColor = "#00ff00"; // Зеленый
-    } else {
-      // Старый Android / Chrome / Яндекс (когда env не работает)
-      statusTitle = "ОТСУТСТВУЕТ ОТСТУП";
-      statusDesc = "Safe Area = 0px<br>Браузер НЕ дает данных о панели.<br>Текст перекрыт панелью.";
-      statusColor = "red"; // Красный
-    }
-  } else {
-    // Десктоп
-    statusTitle = "ДЕСКТОП";
-    statusDesc = "Режим просмотра на ПК.<br>Панелей браузера нет.";
-    statusColor = "#cccccc"; // Серый
+  if (browserBarHeight > 10) {
+    document.documentElement.style.setProperty('--safe-area-inset-bottom', `${browserBarHeight}px`);
+    console.log(`📱 Панель браузера: ${browserBarHeight}px`);
   }
-
-  checkCropOverlay.innerHTML = `
-    <div style="margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 10px;">
-      СТАТУС БРАУЗЕРА
-    </div>
-    
-    <div style="color: ${statusColor}; margin-bottom: 15px; font-size: 32px;">
-      ${statusTitle}
-    </div>
-    
-    <div style="font-size: 18px; color: #fff; line-height: 1.5;">
-      ${statusDesc}
-    </div>
-
-    <div style="margin-top: 30px; font-size: 16px; color: #999; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
-      <div>Raw CSS Value: <strong>${safeAreaRaw}</strong></div>
-      <div>Calculated Value: <strong>${safeAreaVal} px</strong></div>
-    </div>
-  `;
-  
-  checkCropOverlay.style.borderColor = statusColor;
 }
 
-// Запускаем проверку
-checkIfCropped();
-
-// ================= КОНЕЦ ДЕБАГА =================
-
+// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
+    
+    // Существующая инициализация
     initializeDropdownsAndButtons();
     window.initializeMenu();
+    
+    // Новая инициализация safe area
+    updateSafeAreaInsets();
+    setTimeout(updateSafeAreaInsets, 300); // Повтор после полной загрузки
 });
 
-
-
-
-
-
-
+// Отслеживание изменений размера окна и viewport
+window.addEventListener('resize', updateSafeAreaInsets);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateSafeAreaInsets);
+}
