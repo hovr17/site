@@ -8,8 +8,12 @@ let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
 // =============================================================================
-// СИСТЕМА ПРОВЕРКИ БРАУЗЕРА И SAFE AREA
+// ОПРЕДЕЛЕНИЕ БРАУЗЕРА И SAFE AREA
 // =============================================================================
+
+function isYandexBrowser() {
+    return /YaBrowser/i.test(navigator.userAgent);
+}
 
 function detectBrowser() {
     const ua = navigator.userAgent;
@@ -68,7 +72,12 @@ function checkSafeAreaSupport() {
     const uiInfo = estimateBrowserUIHeight();
     let status, description, color, recommendation;
     
-    if(browser.flags.isSafari || browser.flags.isIOS) {
+    if(browser.flags.isYandex) {
+        status = "🔧 Яндекс.Браузер";
+        description = uiInfo.estimatedUIHeight > 0 ? `UI высота: ${uiInfo.estimatedUIHeight}px` : 'Без UI панелей';
+        color = "#ff0000";
+        recommendation = "Применен подъем на 55px";
+    } else if(browser.flags.isSafari || browser.flags.isIOS) {
         if(uiInfo.safeAreaBottom > 0) {
             status = "✅ Safari Safe Area";
             description = `Нижняя панель: ${uiInfo.safeAreaBottom}px`;
@@ -80,7 +89,7 @@ function checkSafeAreaSupport() {
             color = "#007aff";
             recommendation = "Отступ не требуется";
         }
-    } else if(browser.flags.isChrome || browser.flags.isYandex || browser.flags.isSamsung || browser.flags.isAndroid) {
+    } else if(browser.flags.isChrome || browser.flags.isSamsung || browser.flags.isAndroid) {
         if(uiInfo.estimatedUIHeight > 0) {
             status = "🔧 Android UI обнаружена";
             description = `Общая высота UI: ${uiInfo.estimatedUIHeight}px`;
@@ -103,6 +112,7 @@ function checkSafeAreaSupport() {
         browser: browser.name,
         engine: browser.engine,
         isMobile: browser.flags.isMobile,
+        isYandex: browser.flags.isYandex,
         ...uiInfo,
         status,
         description,
@@ -153,23 +163,25 @@ function applyBrowserFallback() {
     const screen = document.querySelector('.screen');
     if(!screen || !check.isMobile || check.safeAreaBottom > 0) return false;
     
-    screen.classList.add('no-env-support');
-    
-    if(window.visualViewport) {
-        function updatePadding() {
-            const viewportHeight = window.visualViewport.height;
-            const windowHeight = window.innerHeight;
-            const uiHeight = Math.max(0, windowHeight - viewportHeight);
-            
-            if(uiHeight > 0) {
-                screen.style.paddingBottom = (uiHeight + 20) + 'px';
-                console.log(`🔧 Динамический фолбек: padding-bottom = ${uiHeight + 20}px`);
-            }
-        }
+    if(!check.isYandex && (check.isMobile && check.estimatedUIHeight === 0)) {
+        screen.classList.add('no-env-support');
         
-        window.visualViewport.addEventListener('resize', updatePadding);
-        updatePadding();
-        return true;
+        if(window.visualViewport) {
+            function updatePadding() {
+                const viewportHeight = window.visualViewport.height;
+                const windowHeight = window.innerHeight;
+                const uiHeight = Math.max(0, windowHeight - viewportHeight);
+                
+                if(uiHeight > 0) {
+                    screen.style.paddingBottom = (uiHeight + 20) + 'px';
+                    console.log(`🔧 Динамический фолбек: padding-bottom = ${uiHeight + 20}px`);
+                }
+            }
+            
+            window.visualViewport.addEventListener('resize', updatePadding);
+            updatePadding();
+            return true;
+        }
     }
     return false;
 }
@@ -560,11 +572,17 @@ function initializeDropdownsAndButtons() {
 }
 
 // =============================================================================
-// ИНИЦИАЛИЗАЦИЯ МЕНЮ С ПРОВЕРКОЙ SAFE AREA
+// ИНИЦИАЛИЗАЦИЯ МЕНЮ
 // =============================================================================
 
 window.initializeMenu = function() {
-    console.log('🔄 Инициализация меню с проверкой Safe Area...');
+    console.log('🔄 Инициализация меню...');
+    
+    // === ОПРЕДЕЛЕНИЕ ЯНДЕКС.БРАУЗЕРА ===
+    if (isYandexBrowser()) {
+        document.body.classList.add('yandex-browser');
+        console.log('🔧 Обнаружен Яндекс.Браузер, применен подъем элементов на 55px');
+    }
     
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
@@ -657,7 +675,7 @@ window.initializeMenu = function() {
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
     
-    // Проверка Safe Area
+    // === ПРОВЕРКА SAFE AREA ===
     setTimeout(() => {
         const fallbackApplied = applyBrowserFallback();
         showDebugOverlay();
