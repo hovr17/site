@@ -1,6 +1,6 @@
-/* =========================================================================
-   БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
-   ========================================================================= */
+/* ==========================================
+   БАЗОВЫЕ СТИЛИ И RESET
+   ========================================== */
 
 * {
   box-sizing: border-box;
@@ -8,18 +8,13 @@
   padding: 0;
 }
 
-:root {
-  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-  --content-padding-bottom: max(30px, var(--safe-area-inset-bottom));
-}
-
-/* =========================================================================
-   ИНДИКАТОР ЗАГРУЗКИ
-   ========================================================================= */
-
+/* Индикатор загрузки */
 .page-loading-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: #000;
   z-index: 9999;
   opacity: 1;
@@ -31,9 +26,9 @@
   opacity: 0;
 }
 
-/* =========================================================================
-   ВИДЕО И ФОН
-   ========================================================================= */
+/* ==========================================
+   VIDEO BACKGROUND & OVERLAYS
+   ========================================== */
 
 .temple-video {
   position: absolute;
@@ -41,15 +36,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: filter 0s ease;
   z-index: 1;
 }
 
 .video-background {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   z-index: 0;
 }
 
@@ -67,16 +59,37 @@
   z-index: 2;
 }
 
-/* =========================================================================
+/* ==========================================
+   КНОПКА "НАЗАД"
+   ========================================== */
+
+.back-button {
+  position: absolute;
+  top: 3vh;
+  left: 3vw;
+  width: min(60px, 9vmin);
+  height: min(30px, 5vmin);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  z-index: 10;
+  text-decoration: none;
+}
+
+.back-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ==========================================
    НАВИГАЦИОННЫЕ СТРЕЛКИ
-   ========================================================================= */
+   ========================================== */
 
 .temple-nav-arrows {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 1000;
 }
@@ -90,19 +103,20 @@
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
-  cursor: pointer;
   display: none;
-  align-items: center;
-  justify-content: center;
   pointer-events: auto;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-  transition: none;
+  cursor: pointer;
   z-index: 1001;
 }
 
 .temple-nav-arrow:hover {
-  opacity: 1;
   background: rgba(0, 0, 0, 0.5);
+}
+
+.temple-nav-arrow img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
 }
 
 .temple-prev-arrow {
@@ -115,36 +129,22 @@
 
 .temple-nav-arrow.hidden {
   opacity: 0.3;
-  pointer-events: none !important;
-  cursor: default;
+  pointer-events: none;
+  display: flex !important;
 }
 
-/* =========================================================================
-   КНОПКА "НАЗАД"
-   ========================================================================= */
-
-.back-button {
-  position: absolute;
-  top: 3vh;
-  left: 3vw;
-  width: min(60px, 9vmin);
-  height: min(30px, 5vmin);
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
-  z-index: 10;
-  text-decoration: none;
+.mode-intro .temple-nav-arrow {
+  display: flex;
 }
 
-.back-button,
-.back-button img,
-.back-icon {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.mode-details .temple-nav-arrows,
+.mode-details .temple-nav-arrow {
+  display: none;
 }
 
-/* =========================================================================
-   КОНТЕЙНЕР И ПРОКРУТКА
-   ========================================================================= */
+/* ==========================================
+   ОСНОВНОЙ КОНТЕЙНЕР И СКРОЛЛ
+   ========================================== */
 
 .screen {
   position: relative;
@@ -172,7 +172,7 @@
 
 .mode-details .scroll-zone {
   overflow-y: auto;
-  padding-bottom: var(--content-padding-bottom);
+  padding-bottom: 80px;
 }
 
 .scroll-zone.animating {
@@ -184,13 +184,12 @@
   flex-shrink: 0;
 }
 
-/* =========================================================================
-   БЛОКИ КОНТЕНТА (ОБЩИЕ СТИЛИ)
-   ========================================================================= */
+/* ==========================================
+   ЗАГОЛОВОК И ТЕКСТ "ПОДРОБНЕЕ"
+   ========================================== */
 
 .title-block,
-.hero-details,
-#dropdownsContainer {
+.hero-details {
   transition: transform 0.5s ease;
 }
 
@@ -198,7 +197,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
 }
 
 .title-block h1 {
@@ -210,32 +208,15 @@
   color: white;
 }
 
-/* =========================================================================
-   ОТОБРАЖЕНИЕ В РАЗНЫХ РЕЖИМАХ
-   ========================================================================= */
-
-.mode-intro .back-button {
-  display: block;
+.details-header {
+  font-family: 'Crooker', sans-serif;
+  font-size: clamp(24px, 4.5vmin, 30px);
+  position: relative;
+  top: -10px;
+  text-shadow: 0 4px 5px rgba(0, 0, 0, 0.55);
+  text-align: left;
+  color: white;
 }
-
-.mode-details .back-button,
-.mode-details .temple-nav-arrows {
-  display: none;
-}
-
-.mode-intro .temple-nav-arrow {
-  display: flex;
-}
-
-.mode-details .temple-nav-arrow {
-  display: none;
-  pointer-events: none;
-  opacity: 0;
-}
-
-/* =========================================================================
-   ТЕКСТ "ВХОД ПЛАТНЫЙ"
-   ========================================================================= */
 
 .entry-note {
   font-family: 'Crooker', sans-serif;
@@ -264,10 +245,6 @@
   margin-top: 0;
 }
 
-/* =========================================================================
-   КНОПКА РАЗВОРОТА МЕНЮ
-   ========================================================================= */
-
 .small-btn {
   height: 1.5vh;
   aspect-ratio: 1;
@@ -279,9 +256,7 @@
   transform: rotate(360deg);
 }
 
-.small-btn,
-.small-btn img,
-.open-icon {
+.small-btn img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -297,28 +272,9 @@
   transform: scale(0.95);
 }
 
-.open-icon {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
-}
-
-/* =========================================================================
-   ЗАГОЛОВОК "ПОДРОБНЕЕ:"
-   ========================================================================= */
-
-.details-header {
-  font-family: 'Crooker', sans-serif;
-  font-size: clamp(24px, 4.5vmin, 30px);
-  position: relative;
-  top: -10px;
-  text-shadow: 0 4px 5px rgba(0, 0, 0, 0.55);
-  text-align: left;
-  color: white;
-}
-
-/* =========================================================================
-   ФОТО-КНОПКИ
-   ========================================================================= */
+/* ==========================================
+   КАРТОЧКИ "ФОТО"
+   ========================================== */
 
 .photo-wrapper {
   display: flex;
@@ -344,18 +300,8 @@
   transition: transform 0.4s linear;
 }
 
-.photo-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  justify-self: center;
-  max-width: 50%;
-}
-
 #photoCard2 {
   background: url("stories_button_images/second_button.png") center/cover no-repeat;
-}
-
-.mode-intro .photo-card {
-  transform: none;
 }
 
 .mode-details .photo-card {
@@ -379,9 +325,9 @@
   opacity: 1;
 }
 
-/* =========================================================================
+/* ==========================================
    ДРОПДАУНЫ
-   ========================================================================= */
+   ========================================== */
 
 .dropdown {
   margin-top: 45px;
@@ -395,6 +341,27 @@
   transition: max-height 0.2s ease, padding-bottom 0.3s ease;
   max-height: 80px;
   padding-bottom: 30px;
+}
+
+.address-link {
+  color: white;
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.dropdown-icon {
+  width: 75px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
 }
 
 .dropdown.open {
@@ -418,28 +385,22 @@
   text-shadow: 0 0 9px rgba(0, 0, 0, 0.45);
 }
 
-.dropdown-icon {
-  width: 75px;
-  height: 75px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dropdown-icon,
 .dropdown-arrow {
   width: 60px;
   height: 60px;
-  margin: 0;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  font-size: 0;
 }
 
-.dropdown-icon img,
 .dropdown-arrow img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
   transition: transform 0.25s ease;
 }
 
@@ -468,203 +429,9 @@
   padding-left: 15px;
 }
 
-/* =========================================================================
-   НИЖНЯЯ ТЕНЬ
-   ========================================================================= */
-
-.bottom-shadow {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 150px;
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.7),
-    rgba(255, 255, 255, 0)
-  );
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-  z-index: 3;
-}
-
-.mode-details .bottom-shadow {
-  opacity: 0;
-}
-
-/* =========================================================================
-   ПАРАЛЛАКС АНИМАЦИИ
-   ========================================================================= */
-
-.page-exit-parallax-left,
-.page-exit-parallax-right,
-.page-enter-parallax-left,
-.page-enter-parallax-right {
-  animation-duration: 0.5s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  animation-fill-mode: forwards;
-}
-
-.page-exit-parallax-left,
-.page-exit-parallax-right {
-  z-index: 1000;
-}
-
-.page-enter-parallax-left,
-.page-enter-parallax-right {
-  z-index: 1001;
-}
-
-/* Базовые keyframes (запасные) */
-@keyframes pageSlideOutLeft {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-100%); opacity: 1; }
-}
-
-@keyframes pageSlideOutRight {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(100%); opacity: 1; }
-}
-
-@keyframes pageSlideInLeft {
-  from { transform: translateX(-100%); opacity: 1; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes pageSlideInRight {
-  from { transform: translateX(100%); opacity: 1; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* Детальные keyframes для параллакса */
-@keyframes parallaxOutBackLeft {
-  from { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-  to { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
-}
-
-@keyframes parallaxOutBackRight {
-  from { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-  to { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
-}
-
-@keyframes parallaxInBackLeft {
-  from { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; }
-  to { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInBackRight {
-  from { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; }
-  to { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxOutContentLeft {
-  from { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-  to { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
-}
-
-@keyframes parallaxOutContentRight {
-  from { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-  to { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
-}
-
-@keyframes parallaxInContentLeft {
-  from { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; }
-  to { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInContentRight {
-  from { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; }
-  to { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; }
-}
-
-@keyframes parallaxOutUILeft {
-  from { transform: translateX(0) translateY(0); opacity: 1; }
-  to { transform: translateX(-50px) translateY(50px); opacity: 0; }
-}
-
-@keyframes parallaxOutUIRight {
-  from { transform: translateX(0) translateY(0); opacity: 1; }
-  to { transform: translateX(50px) translateY(50px); opacity: 0; }
-}
-
-@keyframes parallaxInUILeft {
-  from { transform: translateX(-50px) translateY(-50px); opacity: 0; }
-  to { transform: translateX(0) translateY(0); opacity: 1; }
-}
-
-@keyframes parallaxInUIRight {
-  from { transform: translateX(50px) translateY(-50px); opacity: 0; }
-  to { transform: translateX(0) translateY(0); opacity: 1; }
-}
-
-/* Применение анимаций */
-.page-exit-parallax-left .temple-video,
-.page-exit-parallax-left .video-background {
-  animation: parallaxOutBackLeft 0.6s ease-out forwards;
-}
-
-.page-exit-parallax-right .temple-video,
-.page-exit-parallax-right .video-background {
-  animation: parallaxOutBackRight 0.6s ease-out forwards;
-}
-
-.page-enter-parallax-left .temple-video,
-.page-enter-parallax-left .video-background {
-  animation: parallaxInBackLeft 0.6s ease-out forwards;
-}
-
-.page-enter-parallax-right .temple-video,
-.page-enter-parallax-right .video-background {
-  animation: parallaxInBackRight 0.6s ease-out forwards;
-}
-
-.page-exit-parallax-left .screen {
-  animation: parallaxOutContentLeft 0.5s ease-out forwards;
-}
-
-.page-exit-parallax-right .screen {
-  animation: parallaxOutContentRight 0.5s ease-out forwards;
-}
-
-.page-enter-parallax-left .screen {
-  animation: parallaxInContentLeft 0.5s ease-out forwards;
-}
-
-.page-enter-parallax-right .screen {
-  animation: parallaxInContentRight 0.5s ease-out forwards;
-}
-
-.page-exit-parallax-left .back-button,
-.page-exit-parallax-left .temple-nav-arrows,
-.page-exit-parallax-left .entry-note,
-.page-exit-parallax-left #paidBtn {
-  animation: parallaxOutUILeft 0.4s ease-out forwards;
-}
-
-.page-exit-parallax-right .back-button,
-.page-exit-parallax-right .temple-nav-arrows,
-.page-exit-parallax-right .entry-note,
-.page-exit-parallax-right #paidBtn {
-  animation: parallaxOutUIRight 0.4s ease-out forwards;
-}
-
-.page-enter-parallax-left .back-button,
-.page-enter-parallax-left .temple-nav-arrows,
-.page-enter-parallax-left .entry-note,
-.page-enter-parallax-left #paidBtn {
-  animation: parallaxInUIRight 0.4s ease-out forwards;
-}
-
-.page-enter-parallax-right .back-button,
-.page-enter-parallax-right .temple-nav-arrows,
-.page-enter-parallax-right .entry-note,
-.page-enter-parallax-right #paidBtn {
-  animation: parallaxInUILeft 0.4s ease-out forwards;
-}
-
-/* =========================================================================
-   ОТКЛЮЧЕНИЕ АНИМАЦИЙ
-   ========================================================================= */
+/* ==========================================
+   ЭФФЕКТЫ И ПЕРЕХОДЫ
+   ========================================== */
 
 .no-transition,
 .no-transition * {
@@ -672,330 +439,64 @@
   animation: none !important;
 }
 
-/* =========================================================================
-   ИКОНКИ
-   ========================================================================= */
-
-.back-icon {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
+/* ===== ПОДНЯТИЕ РАЗВЕРНУТОГО МЕНЮ НА 50px ВВЕРХ ===== */
+.mode-details .title-block {
+  transform: translateY(-100px);
 }
 
-.open-icon {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
+.mode-details .hero-details {
+  transform: translateY(-50px);
 }
 
-.geo-icon {
-  background: url('./ui/geo_tag.svg') center/contain no-repeat;
+.mode-details #dropdownsContainer {
+  transform: translateY(-50px);
 }
 
-.bulb-icon {
-  background: url('./ui/bulb.svg') center/contain no-repeat;
-}
-
-.arrow-down-icon {
-  background: url('./ui/open_menu_button.svg') center/contain no-repeat;
-}
-
-.arrow-icon {
-  width: 60%;
-  height: 60%;
-  margin: auto;
-}
-
-.arrow-prev {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-}
-
-.arrow-next {
-  background: url('./ui/back_button.svg') center/contain no-repeat;
-  transform: rotate(180deg);
-}
-
-/* =========================================================================
-   АДАПТИВНЫЕ СТИЛИ - МОБИЛЬНЫЕ (до 767px)
-   ========================================================================= */
-
-@media (max-width: 767px) {
-  .screen {
-    margin-top: 10px;
-  }
-
-  .title-block h1 {
-    font-size: clamp(36px, 11vw, 100px);
-    padding-top: 150px;
-  }
-
-  .details-header {
-    font-size: clamp(16px, 6vw, 72px);
-    line-height: 1.2;
-  }
-
-  .entry-note {
-    font-size: clamp(14px, 3.3vmin, 65px);
-    gap: 0.4vh;
-  }
-
-  .small-btn {
-    height: 13px;
-  }
-
-  /* === ПОДЪЕМ ЭЛЕМЕНТОВ В РЕЖИМЕ INTRO (ОСНОВНАЯ ЛОГИКА) === */
-  .mode-intro .title-block {
-    transform: translateY(calc(50vh - 200px));
-  }
-
-  .mode-intro .hero-details {
-    transform: translateY(calc(55vh - 200px));
-  }
-
-  .mode-intro #dropdownsContainer {
-    transform: translateY(calc(50vh - 200px));
-  }
-
-  /* === КОРОТКИЕ ЭКРАНЫ (iPhone SE) === */
-  @media (max-height: 700px) {
-    .mode-intro .title-block,
-    .mode-intro .hero-details,
-    .mode-intro #dropdownsContainer {
-      transform: translateY(calc(50vh - 200px - 60px));
-    }
-  }
-
-  /* === ОЧЕНЬ НИЗКИЕ ЭКРАНЫ (< 500px) === */
-  @media (max-height: 500px) {
-    .mode-intro .title-block {
-      transform: translateY(calc(-25vh - 60px));
-    }
-
-    .mode-intro .hero-details {
-      transform: translateY(calc(-10vh - 60px));
-    }
-  }
-
-  /* === КАРТОЧКИ === */
-  .photo-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4vw;
-    justify-items: center;
-    padding-left: 0;
-  }
-
-  .photo-card {
-    width: 42vw;
-    height: auto;
-    aspect-ratio: 166 / 225;
-    max-width: 42vw;
-    border-radius: 7vw;
-    border-width: 0.8vw;
-  }
-
-  .photo-label {
-    font-size: clamp(20px, 5vmin, 55px);
-    left: 4vw;
-    right: 4vw;
-    bottom: 1vh;
-  }
-
-  /* === ДРОПДАУНЫ === */
-  .dropdown {
-    border-radius: 27px;
-    max-height: 55px;
-    margin-inline: 3vw;
-    padding-top: 0.3vh;
-    margin-top: 3.5vh;
-  }
-
-  .dropdown-header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    justify-items: center;
-    padding: 0 5vw;
-    min-height: 50px;
-    height: auto;
-  }
-
-  .dropdown-title {
-    font-size: clamp(18px, 5vmin, 44px);
-  }
-
-  .dropdown-icon {
-    width: 8vw;
-    height: 8vw;
-  }
-
-  .dropdown-arrow {
-    width: 6.5vw;
-    height: 6.5vw;
-  }
-
-  .dropdown-body {
-    padding: 0vh 4vw;
-  }
-
-  .dropdown-body p {
-    font-size: clamp(16px, 4vmin, 50px);
-  }
-
-  /* === СКРЫТИЕ СТРЕЛОК === */
-  .temple-nav-arrows,
-  .temple-nav-arrow {
-    display: none;
-    pointer-events: none;
-  }
-
-  /* === БЕЛАЯ ПОЛОСА ПРИ РАЗВОРОТЕ МЕНЮ === */
-  .mode-details .video-background {
-    background: white;
-    transition: none;
-  }
-
-  .mode-details .video-background::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;
-    background: white;
-    z-index: 3;
-  }
-}
-
-/* =========================================================================
-   АДАПТИВНЫЕ СТИЛИ - ПЛАНШЕТЫ (768-1080px)
-   ========================================================================= */
-
-@media (min-width: 768px) and (max-width: 1080px) {
-  .mode-details .title-block {
-    transform: translateY(-100px);
-  }
-
-  .dropdown {
-    max-height: 130px;
-    margin-inline: 10px;
-    margin-top: 40px;
-    border-radius: 65px;
-  }
-
-  .title-block h1 {
-    font-size: clamp(36px, 11vw, 100px);
-    padding-top: 150px;
-  }
-
-  .details-header {
-    font-size: clamp(16px, 6vw, 72px);
-    line-height: 1.2;
-  }
-
-  .entry-note {
-    font-size: clamp(14px, 3.3vmin, 65px);
-    gap: 6.5px;
-  }
-
-  .dropdown-icon {
-    width: 60px;
-    height: 60px;
-  }
-
-  .dropdown-title {
-    font-size: clamp(16px, 6vmin, 50px);
-  }
-
-  .dropdown-arrow {
-    width: 50px;
-    height: 50px;
-  }
-
-  .dropdown-body p {
-    font-size: clamp(16px, 4vmin, 50px);
-  }
-
-  .dropdown-body {
-    padding: 0 7.5vw 25px 7.5vw;
-  }
-
-  .photo-label {
-    font-size: 50px;
-  }
-
-  /* === ПОДЪЕМ ЭЛЕМЕНТОВ В РЕЖИМЕ INTRO === */
-  .mode-intro .title-block {
-    transform: translateY(40vh);
-  }
-
-  .mode-intro .hero-details {
-    transform: translateY(45vh);
-  }
-
-  .mode-intro #dropdownsContainer {
-    transform: translateY(50vh);
-  }
-
-  /* === БЕЛАЯ ПОЛОСА === */
-  .mode-details .video-background {
-    background: white;
-    transition: none;
-  }
-
-  .mode-details .video-background::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    background: white;
-    z-index: 3;
-  }
-}
-
-/* =========================================================================
-   АДАПТИВНЫЕ СТИЛИ - ДЕСКТОП (1081px+)
-   ========================================================================= */
+/* ==========================================
+   МЕДИА-ЗАПРОСЫ: ДЕСКТОП (1081px+)
+   ========================================== */
 
 @media (min-width: 1081px) {
   .back-button {
     top: min(40px, 5vh);
     left: min(20px, 3vw);
-    width: min(60px, 6vmin);
-    height: min(30px, 3vmin);
   }
 
   .temple-nav-arrows {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: calc(100% + 100px) !important;
-    max-width: 750px !important;
-    height: 90vh !important;
-    max-height: 1100px !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% + 100px);
+    max-width: 750px;
+    height: 90vh;
+    max-height: 1100px;
+    z-index: 1010;
   }
 
   .temple-nav-arrow {
-    position: absolute !important;
-    top: 50% !important;
-    width: 50px !important;
-    height: 50px !important;
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 50px;
     opacity: 0.7;
-    display: flex !important;
-    pointer-events: auto !important;
-    z-index: 1011;
+    transform: translateY(-50%);
   }
 
   .temple-prev-arrow {
-    left: 0 !important;
-    transform: translateX(-100%) translateY(-50%) !important;
-    margin-left: -30px !important;
+    left: 0;
+    transform: translateX(-100%) translateY(-50%);
+    margin-left: -30px;
   }
 
   .temple-next-arrow {
-    right: 0 !important;
-    transform: translateX(100%) translateY(-50%) !important;
-    margin-right: -30px !important;
+    right: 0;
+    transform: translateX(100%) translateY(-50%);
+    margin-right: -30px;
+  }
+
+  .temple-nav-arrow.hidden {
+    display: none;
   }
 
   .screen {
@@ -1010,11 +511,6 @@
 
   .mode-intro .title-block {
     transform: translateY(43vh);
-  }
-
-  .entry-note {
-    font-size: clamp(14px, 1.5vmin, 18px);
-    gap: 0.5vh;
   }
 
   .mode-intro .hero-details {
@@ -1036,7 +532,6 @@
 
   .photo-wrapper {
     justify-content: flex-start;
-    padding-left: 0;
     gap: 1.9vh;
   }
 
@@ -1076,7 +571,7 @@
   }
 
   .dropdown-body {
-    padding: 0 2vh 25px 2vh;
+    padding: 0 2vh;
   }
 
   .dropdown-body p {
@@ -1088,21 +583,12 @@
     width: auto;
   }
 
-  .mode-details .title-block {
-    transform: translateY(-100px);
-  }
-
-  .mode-details .hero-details {
-    transform: translateY(-50px);
-  }
-
-  .mode-details #dropdownsContainer {
-    transform: translateY(-50px);
-  }
-
   #frame {
     position: absolute !important;
-    inset: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
     margin: auto !important;
     width: auto !important;
     height: 90vh !important;
@@ -1114,5 +600,640 @@
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     border-radius: 30px;
     overflow: hidden;
+  }
+}
+
+/* ==========================================
+   МЕДИА-ЗАПРОСЫ: ПЛАНШЕТЫ (768px-1080px)
+   ========================================== */
+
+@media (min-width: 768px) and (max-width: 1080px) {
+  .mode-details .title-block {
+    transform: translateY(-100px);
+  }
+
+  .dropdown {
+    max-height: 130px;
+    margin-inline: 10px;
+    margin-top: 40px;
+    border-radius: 65px;
+  }
+
+  .title-block h1 {
+    font-size: clamp(36px, 11vw, 100px);
+    padding-top: 150px;
+  }
+
+  .details-header {
+    font-size: clamp(16px, 6vw, 72px);
+    line-height: 1.2;
+  }
+
+  .entry-note {
+    font-size: clamp(14px, 3.3vmin, 65px);
+    gap: 6.5px;
+  }
+
+  .small-btn {
+    height: 13px;
+  }
+
+  .dropdown-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .dropdown-title {
+    font-size: clamp(16px, 6vmin, 50px);
+  }
+
+  .dropdown-arrow {
+    width: 50px;
+    height: 50px;
+  }
+
+  .photo-label {
+    font-size: 50px;
+  }
+
+  .dropdown-body p {
+    font-size: clamp(16px, 4vmin, 50px);
+  }
+
+  .dropdown-body {
+    padding: 0 7.5vw 25px 7.5vw;
+  }
+
+  .mode-intro .title-block {
+    transform: translateY(40vh);
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(45vh);
+  }
+
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
+  }
+
+  .mode-details .video-background {
+    background: white;
+    transition: none;
+  }
+
+  .mode-details .video-background::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: white;
+    z-index: 3;
+  }
+}
+
+/* ==========================================
+   МЕДИА-ЗАПРОСЫ: МОБИЛЬНЫЕ (0-767px)
+   ========================================== */
+
+@media (max-width: 767px) {
+  .screen {
+    margin-top: 10px;
+  }
+
+  .title-block h1 {
+    font-size: clamp(36px, 11vw, 100px);
+    padding-top: 150px;
+  }
+
+  .details-header {
+    font-size: clamp(16px, 6vw, 72px);
+    line-height: 1.2;
+  }
+
+  .entry-note {
+    font-size: clamp(14px, 3.3vmin, 65px);
+    gap: 0.4vh;
+  }
+
+  .small-btn {
+    height: 13px;
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(55vh);
+  }
+
+  .mode-intro .title-block {
+    transform: translateY(50vh);
+  }
+
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
+  }
+
+  /* КАРТОЧКИ */
+  .photo-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4vw;
+    justify-items: center;
+    padding-left: 0;
+  }
+
+  .photo-card {
+    width: 42vw;
+    height: auto;
+    aspect-ratio: 166 / 225;
+    max-width: 42vw;
+    border-radius: 7vw;
+    border-width: 0.8vw;
+  }
+
+  .photo-label {
+    font-size: clamp(20px, 5vmin, 55px);
+    left: 4vw;
+    right: 4vw;
+    bottom: 1vh;
+  }
+
+  /* ДРОПДАУНЫ */
+  .dropdown {
+    border-radius: 27px;
+    max-height: 55px;
+    margin-inline: 3vw;
+    padding-top: 0.3vh;
+    margin-top: 3.5vh;
+  }
+
+  .dropdown-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    justify-items: center;
+    padding: 0 5vw;
+    min-height: 50px;
+    height: auto;
+    margin: 0;
+  }
+
+  .dropdown-icon,
+  .dropdown-arrow {
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .dropdown-title {
+    font-size: clamp(18px, 5vmin, 44px);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .dropdown-icon {
+    width: 8vw;
+    height: 8vw;
+  }
+
+  .dropdown-arrow {
+    width: 6.5vw;
+    height: 6.5vw;
+  }
+
+  .dropdown-body {
+    padding: 0vh 4vw;
+  }
+
+  .dropdown-body p {
+    font-size: clamp(16px, 4vmin, 50px);
+  }
+
+  /* СКРЫТИЕ СТРЕЛОК НА МОБИЛЬНЫХ */
+  .temple-nav-arrows,
+  .temple-nav-arrow {
+    display: none;
+    pointer-events: none;
+  }
+
+  .video-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    z-index: -1;
+  }
+
+  .mode-details .video-background {
+    background: white;
+    transition: none;
+  }
+
+  .mode-details .video-background::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: white;
+    z-index: 3;
+  }
+}
+
+/* ==========================================
+   СПЕЦИАЛЬНЫЕ СЦЕНАРИИ: КОРОТКИЕ ЭКРАНЫ
+   ========================================== */
+
+@media (max-width: 767px) and (max-height: 700px) {
+  .mode-intro .title-block,
+  .mode-intro .hero-details,
+  .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 60px));
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(calc(55vh - 60px));
+  }
+}
+
+@media (max-height: 500px) {
+  .title-block h1 {
+    font-size: clamp(36px, 8vw, 400px);
+    padding-top: 150px;
+  }
+
+  .details-header {
+    font-size: clamp(16px, 4vw, 72px);
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(-10vh);
+  }
+
+  .mode-intro .title-block {
+    transform: translateY(-25vh);
+  }
+}
+
+/* ==========================================
+   АНИМАЦИИ ПЕРЕХОДОВ (ОДИН РАЗ, БЕЗ ДУБЛИКАТОВ)
+   ========================================== */
+
+/* Выезд страницы */
+@keyframes pageSlideOutLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100%); opacity: 1; }
+}
+
+@keyframes pageSlideOutRight {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 1; }
+}
+
+/* Заезд страницы */
+@keyframes pageSlideInLeft {
+  0% { transform: translateX(100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pageSlideInRight {
+  0% { transform: translateX(-100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Параллакс-эффекты для переходов */
+@keyframes parallaxOutBack {
+  to {
+    transform: translateZ(-300px) scale(1.5) rotateY(5deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutContent {
+  to {
+    transform: translateX(-100%) translateZ(0) rotateY(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxOutUI {
+  to {
+    transform: translateX(-50px) translateY(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes parallaxInBack {
+  from {
+    transform: translateZ(-300px) scale(1.5) rotateY(-5deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateZ(0) scale(1) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxInContent {
+  from {
+    transform: translateX(100%) translateZ(0) rotateY(10deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes parallaxOutUILeft {
+  to { transform: translateX(-50px) translateY(50px); opacity: 0; }
+}
+
+@keyframes parallaxOutUIRight {
+  to { transform: translateX(50px) translateY(50px); opacity: 0; }
+}
+
+@keyframes parallaxInUILeft {
+  from { transform: translateX(-50px) translateY(-50px); opacity: 0; }
+  to { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+@keyframes parallaxInUIRight {
+  from { transform: translateX(50px) translateY(-50px); opacity: 0; }
+  to { transform: translateX(0) translateY(0); opacity: 1; }
+}
+
+/* Применение анимаций */
+.page-exit-left { animation: pageSlideOutLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1000; }
+.page-exit-right { animation: pageSlideOutRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1000; }
+.page-enter-left { animation: pageSlideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1001; }
+.page-enter-right { animation: pageSlideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; z-index: 1001; }
+
+.page-exit-parallax .temple-video,
+.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
+
+.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
+
+.page-exit-parallax .back-button,
+.page-exit-parallax .temple-nav-arrows { animation: parallaxOutUI 0.4s ease-out forwards; }
+
+.page-enter-parallax .temple-video,
+.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
+
+.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
+
+/* Классы для свайпа */
+.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .temple-nav-arrows { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+
+.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .temple-nav-arrows { animation: parallaxInUIRight 0.4s ease-out forwards; }
+
+.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .temple-nav-arrows { animation: parallaxOutUIRight 0.4s ease-out forwards; }
+
+.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .temple-nav-arrows { animation: parallaxInUILeft 0.4s ease-out forwards; }
+
+.page-transition-active {
+  overflow: hidden !important;
+}
+
+#frame {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+#spa-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ==========================================
+   UI ИКОНКИ
+   ========================================== */
+
+.back-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+}
+
+.open-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+  transform: rotate(180deg);
+}
+
+.geo-icon {
+  background: url('./ui/geo_tag.svg') center/contain no-repeat;
+}
+
+.bulb-icon {
+  background: url('./ui/bulb.svg') center/contain no-repeat;
+}
+
+.arrow-down-icon {
+  width: 100%;
+  height: 100%;
+  background: url('./ui/open_menu_button.svg') center/contain no-repeat;
+  transition: transform 0.25s ease;
+}
+
+.dropdown.open .arrow-down-icon {
+  transform: rotate(180deg);
+}
+
+.arrow-prev {
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+}
+
+.arrow-next {
+  background: url('./ui/back_button.svg') center/contain no-repeat;
+  transform: rotate(180deg);
+}
+
+/* ==========================================
+   СПЕЦИАЛЬНАЯ СЕТКА ДЛЯ ФОТО
+   ========================================== */
+
+.photo-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.photo-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 50%;
+}
+
+/* ==========================================
+   100VH FIX ДЛЯ МОБИЛЬНЫХ
+   ========================================== */
+
+.container, #frame {
+  height: calc(var(--vh, 1vh) * 100) !important;
+}
+
+.video-background,
+.temple-nav-arrows {
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* ==========================================
+   ПОДЪЕМ ЭЛЕМЕНТОВ В ЯНДЕКС.БРАУЗЕРЕ
+   ========================================== */
+
+/*
+   КОД, ОТВЕЧАЮЩИЙ ЗА ПОДЪЕМ ЭЛЕМЕНТОВ:
+   
+   1. ЯНДЕКС.БРАУЗЕР:
+      - Для мобильных: .yandex-browser .mode-intro .title-block, .hero-details, #dropdownsContainer, .photo-wrapper
+      - Для планшетов: аналогичные правила в @media (768px-1080px)
+      - Для десктопов: аналогичные правила в @media (1081px+)
+   
+   2. ДРУГИЕ МОБИЛЬНЫЕ БРАУЗЕРЫ:
+      - Управляется через transform: translateY() в основных медиа-запросах
+      - Дополнительные поправки в @media (max-width: 767px) and (max-height: 700px)
+*/
+
+/* Для мобильных устройств (там где чаще всего нужен подъем) */
+@media (max-width: 767px) {
+  .yandex-browser .mode-intro .title-block {
+    transform: translateY(calc(50vh - 200px - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .hero-details {
+    transform: translateY(calc(55vh - 200px - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 200px - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .photo-wrapper {
+    transform: translateY(-55px) !important;
+  }
+}
+
+/* Для планшетов (768px-1080px) */
+@media (min-width: 768px) and (max-width: 1080px) {
+  .yandex-browser .mode-intro .title-block {
+    transform: translateY(calc(40vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .hero-details {
+    transform: translateY(calc(45vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .photo-wrapper {
+    transform: translateY(-55px) !important;
+  }
+}
+
+/* Для десктопов (1081px и выше) */
+@media (min-width: 1081px) {
+  .yandex-browser .mode-intro .title-block {
+    transform: translateY(calc(43vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .hero-details {
+    transform: translateY(calc(47vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro #dropdownsContainer {
+    transform: translateY(calc(47vh - 55px)) !important;
+  }
+
+  .yandex-browser .mode-intro .photo-wrapper {
+    transform: translateY(-55px) !important;
+  }
+}
+
+/* Для очень коротких экранов (iPhone SE) */
+@media (max-width: 767px) and (max-height: 700px) {
+  .yandex-browser .mode-intro .title-block,
+  .yandex-browser .mode-intro .hero-details,
+  .yandex-browser .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 60px - 55px)) !important;
+  }
+}
+
+/* Дополнительный подъем заголовка */
+.yandex-browser .mode-intro .title-block h1 {
+  position: relative;
+  top: -55px !important;
+}
+
+/* Подъем текста "подробнее:" */
+.yandex-browser .mode-intro .details-header {
+  position: relative;
+  top: -65px !important;
+}
+
+/* Запасной вариант для entry-note */
+.yandex-browser .mode-intro .entry-note {
+  transform: translateY(-55px) !important;
+}
+
+/* ==========================================
+   ПОДЪЕМ ДЛЯ ДРУГИХ МОБИЛЬНЫХ БРАУЗЕРОВ
+   ========================================== */
+
+/* Базовый подъем для всех мобильных в режиме intro */
+@media (max-width: 767px) {
+  .mode-intro .title-block,
+  .mode-intro .hero-details,
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(55vh);
+  }
+}
+
+/* Поправки для коротких экранов */
+@media (max-width: 767px) and (max-height: 700px) {
+  .mode-intro .title-block,
+  .mode-intro .hero-details,
+  .mode-intro #dropdownsContainer {
+    transform: translateY(calc(50vh - 60px));
+  }
+  
+  .mode-intro .hero-details {
+    transform: translateY(calc(55vh - 60px));
+  }
+}
+
+/* Поправки для планшетов */
+@media (min-width: 768px) and (max-width: 1080px) {
+  .mode-intro .title-block {
+    transform: translateY(40vh);
+  }
+
+  .mode-intro .hero-details {
+    transform: translateY(45vh);
+  }
+
+  .mode-intro #dropdownsContainer {
+    transform: translateY(50vh);
   }
 }
