@@ -109,7 +109,6 @@
   margin: auto;
 }
 
-/* Поворот иконок для навигации (Базовый, будет перезаписан ниже) */
 .arrow-prev {
   background: url('./ui/back_button.svg') center/contain no-repeat;
 }
@@ -119,10 +118,7 @@
   transform: rotate(180deg);
 }
 
-/* =============================================================================
-   НАВИГАЦИЯ (С ПОВОРОТОМ ПРАВОЙ СТРЕЛКИ)
-   ========================================================================= */
-
+/* Навигация */
 .temple-nav-arrows {
   position: fixed;
   top: 0;
@@ -138,8 +134,8 @@
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
@@ -153,41 +149,15 @@
   z-index: 1001;
 }
 
-/* Ховер эффект */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%);
 }
 
-/* Базовая иконка (Центрирование) */
-.temple-nav-arrow .arrow-icon {
-  width: 60% !important;
-  height: 60% !important;
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  margin: auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Только центрирование */
-  transform: translate(-50%, -50%);
-}
-
-/* ИСПРАВЛЕНИЕ: Правая стрелка с поворотом */
-.temple-next-arrow .arrow-icon {
-  width: 60% !important;
-  height: 60% !important;
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  margin: auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Центрирование + Поворот на 180 */
-  transform: translate(-50%, -50%) rotate(180deg);
+.temple-nav-arrow img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
 }
 
 .temple-prev-arrow {
@@ -205,7 +175,6 @@
   display: flex !important;
 }
 
-/* Управление видимостью через режимы */
 .mode-intro .temple-nav-arrow {
   display: flex;
 }
@@ -694,7 +663,6 @@
     height: min(30px, 3vmin);
   }
 
-  /* СТРЕЛКИ НАВИГАЦИИ */
   .temple-nav-arrows {
     position: fixed !important;
     top: 50% !important;
@@ -704,58 +672,23 @@
     max-width: 750px !important;
     height: 90vh !important;
     max-height: 1100px !important;
-    pointer-events: none;
-    z-index: 1010 !important;
   }
 
   .temple-nav-arrow {
     position: absolute !important;
     top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 50px !important;
+    height: 50px !important;
     opacity: 0.7;
     display: flex !important;
     pointer-events: auto !important;
-    transform: translateY(-50%) !important;
-    margin: 0 !important;
-    left: auto !important;
-    right: auto !important;
+    z-index: 1011;
   }
-  
 
-  /* Ховер эффект */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%) !important;
-  }
-
-  .temple-nav-arrow .arrow-icon {
-  width: 60% !important;
-  height: 60% !important;
-  margin: auto; /* Flexbox + margin = идеальный центр */
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  /* position и transform УБРАНЫ */
-}
-
-/* Поворот правой стрелки (как в Stories) */
-.temple-next-arrow .arrow-icon {
-  transform: rotate(180deg);
-}
-  
-  /* ИСПРАВЛЕНИЕ: Правая иконка с поворотом */
-  .temple-next-arrow .arrow-icon {
-    width: 60% !important;
-    height: 60% !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    /* Центрируем и поворачиваем */
-    transform: translate(-50%, -50%);
-    margin: auto;
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
   }
 
   .temple-prev-arrow {
@@ -764,18 +697,10 @@
     margin-left: -30px !important;
   }
 
-  .temple-prev-arrow:hover {
-    transform: translateX(-100%) translateY(-50%) !important;
-  }
-
   .temple-next-arrow {
     right: 0 !important;
     transform: translateX(100%) translateY(-50%) !important;
     margin-right: -30px !important;
-  }
-
-  .temple-next-arrow:hover {
-    transform: translateX(100%) translateY(-50%) !important;
   }
 
   .temple-nav-arrow.hidden {
@@ -1097,10 +1022,3 @@
 .yandex-browser .mode-intro .title-block h1 { position: relative; top: -55px !important; }
 .yandex-browser .mode-intro .details-header { position: relative; top: -65px !important; }
 .yandex-browser .mode-intro .entry-note { transform: translateY(-55px) !important; }
-
-@media (min-width: 1081px) {
-  #templeNextArrow .arrow-icon {
-    transform: translate(-50%, -50%) rotate(180deg) !important;
-  }
-}
-
