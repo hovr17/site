@@ -67,125 +67,6 @@ function estimateBrowserUIHeight() {
     return { safeAreaBottom, visualViewportHeight, estimatedUIHeight, details: details || 'Нет данных' };
 }
 
-function checkSafeAreaSupport() {
-    const browser = detectBrowser();
-    const uiInfo = estimateBrowserUIHeight();
-    let status, description, color, recommendation;
-    
-    if(browser.flags.isYandex) {
-        status = "🔧 Яндекс.Браузер";
-        description = uiInfo.estimatedUIHeight > 0 ? `UI высота: ${uiInfo.estimatedUIHeight}px` : 'Без UI панелей';
-        color = "#ff0000";
-        recommendation = "Применен подъем на 55px";
-    } else if(browser.flags.isSafari || browser.flags.isIOS) {
-        if(uiInfo.safeAreaBottom > 0) {
-            status = "✅ Safari Safe Area";
-            description = `Нижняя панель: ${uiInfo.safeAreaBottom}px`;
-            color = "#34c759";
-            recommendation = "Используется env()";
-        } else {
-            status = "ℹ️ Safari без Safe Area";
-            description = "Десктоп или старый iOS";
-            color = "#007aff";
-            recommendation = "Отступ не требуется";
-        }
-    } else if(browser.flags.isChrome || browser.flags.isSamsung || browser.flags.isAndroid) {
-        if(uiInfo.estimatedUIHeight > 0) {
-            status = "🔧 Android UI обнаружена";
-            description = `Общая высота UI: ${uiInfo.estimatedUIHeight}px`;
-            color = "#ff9500";
-            recommendation = "Используется JS-фолбек";
-        } else {
-            status = "ℹ️ Без панелей";
-            description = "Весь экран доступен";
-            color = "#007aff";
-            recommendation = "Фолбек не нужен";
-        }
-    } else {
-        status = "ℹ️ Другой браузер";
-        description = browser.name;
-        color = "#cccccc";
-        recommendation = "Стандартное поведение";
-    }
-    
-    return {
-        browser: browser.name,
-        engine: browser.engine,
-        isMobile: browser.flags.isMobile,
-        isYandex: browser.flags.isYandex,
-        ...uiInfo,
-        status,
-        description,
-        color,
-        recommendation
-    };
-}
-
-function showDebugOverlay() {
-    const check = checkSafeAreaSupport();
-    let overlay = document.getElementById('debug-overlay');
-    
-    if(!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'debug-overlay';
-        overlay.style.cssText = `
-            position: fixed; top: 10px; left: 10px; right: 10px;
-            background: rgba(0,0,0,0.95); color: white; padding: 15px;
-            border-radius: 12px; font-family: sans-serif; font-size: 14px;
-            z-index: 999999; pointer-events: none; border: 2px solid ${check.color};
-            max-height: 90vh; overflow-y: auto;
-        `;
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="display:flex;align-items:center;margin-bottom:10px">
-            <div style="width:12px;height:12px;background:${check.color};border-radius:50%;margin-right:8px;"></div>
-            <strong style="font-size:16px">${check.status}</strong>
-        </div>
-        <div style="margin-bottom:12px">
-            <strong>Браузер:</strong> ${check.browser}<br>
-            <strong>Движок:</strong> ${check.engine}<br>
-            <strong>Устройство:</strong> ${check.isMobile ? 'Мобильное' : 'Десктоп'}
-        </div>
-        <div style="background:rgba(255,255,255,0.1);padding:10px;border-radius:8px;margin-bottom:10px">
-            <strong>Высота панелей:</strong><br>${check.details}
-        </div>
-        <div style="background:rgba(255,255,255,0.1);padding:10px;border-radius:8px;font-size:12px;color:#ccc">${check.description}</div>
-        <div style="margin-top:10px;font-size:13px;color:${check.color}">💡 ${check.recommendation}</div>
-    `;
-    
-    setTimeout(() => overlay.style.display = 'none', 5000);
-}
-
-function applyBrowserFallback() {
-    const check = checkSafeAreaSupport();
-    const screen = document.querySelector('.screen');
-    if(!screen || !check.isMobile || check.safeAreaBottom > 0) return false;
-    
-    if(!check.isYandex && (check.isMobile && check.estimatedUIHeight === 0)) {
-        screen.classList.add('no-env-support');
-        
-        if(window.visualViewport) {
-            function updatePadding() {
-                const viewportHeight = window.visualViewport.height;
-                const windowHeight = window.innerHeight;
-                const uiHeight = Math.max(0, windowHeight - viewportHeight);
-                
-                if(uiHeight > 0) {
-                    screen.style.paddingBottom = (uiHeight + 20) + 'px';
-                    console.log(`🔧 Динамический фолбек: padding-bottom = ${uiHeight + 20}px`);
-                }
-            }
-            
-            window.visualViewport.addEventListener('resize', updatePadding);
-            updatePadding();
-            return true;
-        }
-    }
-    return false;
-}
-
 // =============================================================================
 // УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ
 // =============================================================================
@@ -578,10 +459,10 @@ function initializeDropdownsAndButtons() {
 window.initializeMenu = function() {
     console.log('🔄 Инициализация меню...');
     
-    // === ОПРЕДЕЛЕНИЕ ЯНДЕКС.БРАУЗЕРА ===
-    if (isYandexBrowser()) {
+    // === ОПРЕДЕЛЕНИЕ ЯНДЕКС.БРАУЗЕРА (только для мобильных) ===
+    if (isYandexBrowser() && window.innerWidth <= 767) {
         document.body.classList.add('yandex-browser');
-        console.log('🔧 Обнаружен Яндекс.Браузер, применен подъем элементов на 55px');
+        console.log('🔧 Обнаружен Яндекс.Браузер на мобильном, применен подъем элементов');
     }
     
     const savedMenuState = sessionStorage.getItem('menuState');
@@ -674,16 +555,6 @@ window.initializeMenu = function() {
     }, 100);
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
-    
-    // === ПРОВЕРКА SAFE AREA ===
-    setTimeout(() => {
-        const fallbackApplied = applyBrowserFallback();
-        showDebugOverlay();
-        
-        const check = checkSafeAreaSupport();
-        console.log('📊 Результат проверки Safe Area:', check);
-        console.log(`🔧 Фолбек применен: ${fallbackApplied ? 'Да' : 'Нет'}`);
-    }, 100);
 }
 
 // =============================================================================
