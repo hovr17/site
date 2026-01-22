@@ -109,7 +109,7 @@
   margin: auto;
 }
 
-/* Поворот иконок для навигации */
+/* Поворот иконок для навигации (Базовый, будет перезаписан ниже) */
 .arrow-prev {
   background: url('./ui/back_button.svg') center/contain no-repeat;
 }
@@ -120,7 +120,7 @@
 }
 
 /* =============================================================================
-   НАВИГАЦИЯ (ЖЕСТКАЯ ФИКСАЦИЯ ПОЗИЦИИ)
+   НАВИГАЦИЯ (С ПОВОРОТОМ ПРАВОЙ СТРЕЛКИ)
    ========================================================================= */
 
 .temple-nav-arrows {
@@ -137,7 +137,6 @@
 .temple-nav-arrow {
   position: fixed;
   top: 50%;
-  /* Фиксируем позицию */
   transform: translateY(-50%);
   width: 50px;
   height: 50px;
@@ -154,14 +153,14 @@
   z-index: 1001;
 }
 
-/* Ховер эффект: Принудительно сохраняем тот же transform, чтобы не дергало */
+/* Ховер эффект */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%); /* ВАЖНО: Принудительно дублируем transform */
+  transform: translateY(-50%);
 }
 
-/* Стили для иконки (div) внутри стрелки */
+/* Базовая иконка (Центрирование) */
 .temple-nav-arrow .arrow-icon {
   width: 60% !important;
   height: 60% !important;
@@ -169,10 +168,26 @@
   background-position: center !important;
   background-repeat: no-repeat !important;
   margin: auto;
-  position: absolute; /* Доп. фиксация против сдвигов */
+  position: absolute;
   top: 50%;
   left: 50%;
+  /* Только центрирование */
   transform: translate(-50%, -50%);
+}
+
+/* ИСПРАВЛЕНИЕ: Правая стрелка с поворотом */
+.temple-next-arrow .arrow-icon {
+  width: 60% !important;
+  height: 60% !important;
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Центрирование + Поворот на 180 */
+  transform: translate(-50%, -50%) rotate(180deg);
 }
 
 .temple-prev-arrow {
@@ -705,39 +720,17 @@
     right: auto !important;
   }
 
-  /* Ховер эффект: ЖЕСТКО фиксируем позицию */
+  /* Ховер эффект */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
+    transform: translateY(-50%) !important;
   }
 
-  .temple-prev-arrow {
-    left: 0 !important;
-    transform: translateX(-100%) translateY(-50%) !important;
-    margin-left: -30px !important;
-  }
-
-  /* Ховер для левой стрелки: Фиксируем позицию */
-  .temple-prev-arrow:hover {
-    transform: translateX(-100%) translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
-  }
-
-  .temple-next-arrow {
-    right: 0 !important;
-    transform: translateX(100%) translateY(-50%) !important;
-    margin-right: -30px !important;
-  }
-
-  /* Ховер для правой стрелки: Фиксируем позицию */
-  .temple-next-arrow:hover {
-    transform: translateX(100%) translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
-  }
-
+  /* Общая иконка */
   .temple-nav-arrow .arrow-icon {
     width: 60% !important;
     height: 60% !important;
-    /* Иконка фиксирована абсолютно */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -746,6 +739,41 @@
     background-size: contain !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
+  }
+
+  /* ИСПРАВЛЕНИЕ: Правая иконка с поворотом */
+  .temple-next-arrow .arrow-icon {
+    width: 60% !important;
+    height: 60% !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Центрируем и поворачиваем */
+    transform: translate(-50%, -50%) rotate(180deg) !important;
+    margin: auto;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .temple-prev-arrow {
+    left: 0 !important;
+    transform: translateX(-100%) translateY(-50%) !important;
+    margin-left: -30px !important;
+  }
+
+  .temple-prev-arrow:hover {
+    transform: translateX(-100%) translateY(-50%) !important;
+  }
+
+  .temple-next-arrow {
+    right: 0 !important;
+    transform: translateX(100%) translateY(-50%) !important;
+    margin-right: -30px !important;
+  }
+
+  .temple-next-arrow:hover {
+    transform: translateX(100%) translateY(-50%) !important;
   }
 
   .temple-nav-arrow.hidden {
