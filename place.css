@@ -120,7 +120,7 @@
 }
 
 /* =============================================================================
-   НАВИГАЦИЯ (БЕЗ ДВИЖЕНИЯ ПРИ НАВЕДЕНИИ)
+   НАВИГАЦИЯ (ЖЕСТКАЯ ФИКСАЦИЯ ПОЗИЦИИ)
    ========================================================================= */
 
 .temple-nav-arrows {
@@ -137,6 +137,7 @@
 .temple-nav-arrow {
   position: fixed;
   top: 50%;
+  /* Фиксируем позицию */
   transform: translateY(-50%);
   width: 50px;
   height: 50px;
@@ -153,11 +154,11 @@
   z-index: 1001;
 }
 
-/* Ховер эффект (УБРАНО TRANSFORM, ЧТОБЫ НЕ ДЕРГАЛОСЬ) */
+/* Ховер эффект: Принудительно сохраняем тот же transform, чтобы не дергало */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  /* transform: translateY(-50%) scale(1.1); УДАЛЕНО */
+  transform: translateY(-50%); /* ВАЖНО: Принудительно дублируем transform */
 }
 
 /* Стили для иконки (div) внутри стрелки */
@@ -168,6 +169,10 @@
   background-position: center !important;
   background-repeat: no-repeat !important;
   margin: auto;
+  position: absolute; /* Доп. фиксация против сдвигов */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .temple-prev-arrow {
@@ -674,7 +679,7 @@
     height: min(30px, 3vmin);
   }
 
-  /* СТРЕЛКИ НАВИГАЦИИ - СТИЛИ ИЗ STORIES */
+  /* СТРЕЛКИ НАВИГАЦИИ */
   .temple-nav-arrows {
     position: fixed !important;
     top: 50% !important;
@@ -700,11 +705,11 @@
     right: auto !important;
   }
 
-  /* Ховер эффект (БЕЗ ИЗМЕНЕНИЯ ПОЛОЖЕНИЯ) */
+  /* Ховер эффект: ЖЕСТКО фиксируем позицию */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
-    /* transform: translateY(-50%) scale(1.1) !important; УДАЛЕНО */
+    transform: translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
   }
 
   .temple-prev-arrow {
@@ -713,21 +718,35 @@
     margin-left: -30px !important;
   }
 
+  /* Ховер для левой стрелки: Фиксируем позицию */
+  .temple-prev-arrow:hover {
+    transform: translateX(-100%) translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
+  }
+
   .temple-next-arrow {
     right: 0 !important;
     transform: translateX(100%) translateY(-50%) !important;
     margin-right: -30px !important;
   }
 
+  /* Ховер для правой стрелки: Фиксируем позицию */
+  .temple-next-arrow:hover {
+    transform: translateX(100%) translateY(-50%) !important; /* ПРИНУДИТЕЛЬНО ЗАКРЕПЛЯЕМ */
+  }
+
   .temple-nav-arrow .arrow-icon {
     width: 60% !important;
     height: 60% !important;
+    /* Иконка фиксирована абсолютно */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     margin: auto;
     background-size: contain !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
   }
-  /* КОНЕЦ СТРЕЛОК НАВИГАЦИИ */
 
   .temple-nav-arrow.hidden {
     opacity: 0.3;
