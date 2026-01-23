@@ -497,7 +497,7 @@
   }
 
   .story-caption-content {
-    font-size: 1.5vh;
+    font-size: 1.8vh;
     padding: 20px 25px 40px;
     max-height: 500px;
     min-height: 220px;
@@ -584,7 +584,7 @@
 
   .caption-fullscreen {
     padding: 20px 25px;
-    font-size: 1.5vh;
+    font-size: 1.8vh;
     max-height: 85%;
     border-radius: 0 0 30px 30px;
     background-color: transparent;
@@ -814,7 +814,7 @@
   }
 
   .caption-fullscreen {
-    font-size: 1.8vh;
+     font-size: 2.2vh;
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen-content {
@@ -960,9 +960,10 @@
 
    .yandex-browser .caption-overlay.mobile-overlay .caption-fullscreen{
        padding: 2vh 4vw 19vh;
-       font-size: 1.8vh;
+        font-size: 2.2vh;
    }
 }
+
 
 
 
