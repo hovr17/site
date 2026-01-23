@@ -640,6 +640,21 @@
   height: 100%;
   object-fit: contain;
   }
+
+  .yandex-browser .story-caption-container {
+    /* 1. Поднимаем контейнер с текстом еще на 70px вниз (115 + 70 = 185px) */
+    bottom: 165px !important;
+  }
+
+  .yandex-browser .caption-expand-btn {
+    /* 2. Поднимаем кнопку раскрытия на 70px вверх (база 1vh + 70px) */
+    bottom: calc(1vh + 50px) !important;
+  }
+
+  .yandex-browser .story-image {
+    /* 3. Поднимаем изображение еще на 50px вверх (-50px - 50px = -100px ) */
+    margin-top: -70px !important;
+  }
 }
 
 /* ==================== ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ==================== */
@@ -943,19 +958,4 @@
    ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ ЯНДЕКС.БРАУЗЕРА (STORIES)
    ========================================================================= */
 
-@media (max-width: 1080px) {
-  .yandex-browser .story-caption-container {
-    /* 1. Поднимаем контейнер с текстом еще на 70px вниз (115 + 70 = 185px) */
-    bottom: 185px !important;
-  }
 
-  .yandex-browser .caption-expand-btn {
-    /* 2. Поднимаем кнопку раскрытия на 70px вверх (база 1vh + 70px) */
-    bottom: calc(1vh + 70px) !important;
-  }
-
-  .yandex-browser .story-image {
-    /* 3. Поднимаем изображение еще на 50px вверх (-50px - 50px = -100px) */
-    margin-top: -100px !important;
-  }
-}
