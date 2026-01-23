@@ -1009,7 +1009,7 @@
 @media (max-width: 767px) {
     /* Заголовок: Используем мобильную базу 50vh и поднимаем на 110px */
     .yandex-browser .mode-intro .title-block {
-        transform: translateY(calc(50vh - 110px)) !important;
+        transform: translateY(calc(50vh - 100px)) !important;
     }
 
     /* Подробнее и фото внутри: Используем мобильную базу 55vh и поднимаем на 110px */
@@ -1043,6 +1043,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
