@@ -1016,9 +1016,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { 
         transform: translateY(calc(38vh - 160px)) !important; 
     }
-    .yandex-browser .mode-intro .photo-wrapper { 
-        transform: translateY(-160px) !important; 
-    }
+
 }
 
 
@@ -1039,6 +1037,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
