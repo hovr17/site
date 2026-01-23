@@ -1008,13 +1008,13 @@
    ========================================================================= */
 @media (max-width: 767px) {
     /* База: 50vh */
-    .yandex-browser .mode-intro .title-block { transform: calc(50vh + 70px) !important; }
+    .yandex-browser .mode-intro .title-block { transform: calc(50vh + 110px) !important; }
     /* База: 55vh */
-    .yandex-browser .mode-intro .hero-details { transform: calc(55vh + 70px) !important; }
+    .yandex-browser .mode-intro .hero-details { transform: calc(55vh + 110px) !important; }
     /* База: 50vh */
-    .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 70px) !important; }
+    .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 110px) !important; }
     /* База: 0 (для фото) */
-    .yandex-browser .mode-intro .photo-wrapper { transform: translateY(70px) !important; }
+    .yandex-browser .mode-intro .photo-wrapper { transform: translateY(110px) !important; }
 }
 
 
@@ -1047,5 +1047,6 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
