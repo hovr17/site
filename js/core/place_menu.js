@@ -20,13 +20,11 @@ function isYandexBrowser() {
 // =============================================================================
 
 function correctMobileUI() {
-    // Работаем только на мобильных устройствах (ширина ≤ 1080px)
     if (window.innerWidth > 1080) return false;
     
     const screen = document.querySelector('.screen');
     if (!screen) return false;
     
-    // Для iOS Safari используем env(safe-area-inset-bottom)
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isIOS) {
         screen.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)';
@@ -34,36 +32,21 @@ function correctMobileUI() {
         return true;
     }
     
-    // Для Android используем Visual Viewport API
     if (window.visualViewport) {
         function updatePadding() {
             const viewportHeight = window.visualViewport.height;
             const windowHeight = window.innerHeight;
             const uiHeight = Math.max(0, windowHeight - viewportHeight);
-            
-            if (uiHeight > 0) {
-                screen.style.paddingBottom = (uiHeight + 20) + 'px';
-                console.log(`📱 Android: применен padding-bottom = ${uiHeight + 20}px`);
-            } else {
-                // Если UI скрыта, убираем паддинг
-                screen.style.paddingBottom = '0px';
-            }
+            screen.style.paddingBottom = (uiHeight > 0 ? (uiHeight + 20) + 'px' : '0px');
         }
         
-        // Первоначальный вызов
         updatePadding();
-        
-        // Обновляем при изменении размеров окна
         window.visualViewport.addEventListener('resize', updatePadding);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(updatePadding, 100);
-        });
-        
+        window.addEventListener('orientationchange', () => setTimeout(updatePadding, 100));
         console.log('📱 Android: активен динамический фолбек');
         return true;
     }
     
-    // Запасной вариант: фиксированный отступ для старых браузеров
     screen.style.paddingBottom = '60px';
     console.log('📱 Применен фиксированный padding-bottom = 60px');
     return true;
@@ -74,27 +57,14 @@ function correctMobileUI() {
 // =============================================================================
 
 function updateNavigationVisibility() {
-    // Работаем только на ПК (ширина > 1080px)
     if (window.innerWidth <= 1080) return;
-
-    // Ищем кнопки навигации
     const navArrows = document.querySelectorAll('.temple-nav-arrow, .nav-arrow, .arrow');
-    
     const isMenuOpen = (mode === "details");
 
     navArrows.forEach(btn => {
-        // Добавляем плавность, если её нет
         btn.style.transition = 'opacity 0.3s ease, visibility 0.3s';
-        
-        if (isMenuOpen) {
-            // Меню открыто -> скрываем кнопки
-            btn.style.opacity = '0';
-            btn.style.pointerEvents = 'none';
-        } else {
-            // Меню закрыто -> показываем кнопки
-            btn.style.opacity = '';
-            btn.style.pointerEvents = 'auto';
-        }
+        btn.style.opacity = isMenuOpen ? '0' : '';
+        btn.style.pointerEvents = isMenuOpen ? 'none' : 'auto';
     });
 }
 
@@ -128,12 +98,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === "details") {
         frame.classList.remove("mode-intro");
         frame.classList.add("mode-details");
-        
         scrollZone.classList.add('animating');
-        
-        if (bgVideo) {
-            bgVideo.pause();
-        }
+        if (bgVideo) bgVideo.pause();
         
         if (expandUseful && usefulDrop) {
             setTimeout(() => {
@@ -149,11 +115,11 @@ function setMode(newMode, { expandUseful = false } = {}) {
     } else {
         frame.classList.remove("mode-details");
         frame.classList.add("mode-intro");
-        
         scrollZone.classList.add('animating');
         
         if (bgVideo) {
-            bgVideo.play();
+            // При возврате в интро пытаемся запустить видео
+            bgVideo.play().catch(e => console.log("⚠️ Play error on mode switch:", e));
         }
         
         smoothScrollTo(0, 700);
@@ -167,49 +133,35 @@ function setMode(newMode, { expandUseful = false } = {}) {
         }, 500);
     }
 
-    // ОБНОВЛЯЕМ ВИДИМОСТЬ СТРЕЛОК НА ПК
     updateNavigationVisibility();
-    
     setTimeout(() => {
-        if (window.updateNavArrows) {
-            window.updateNavArrows();
-        }
+        if (window.updateNavArrows) window.updateNavArrows();
     }, 50);
 }
 
 function smoothScrollTo(targetY, duration = 700) {
     const scrollZone = document.getElementById('scrollZone');
     if (!scrollZone) return;
-    
     const startY = scrollZone.scrollTop;
     const distance = targetY - startY;
     const startTime = performance.now();
     
-    function easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-    
     function step(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(1, elapsed / duration);
-        const eased = easeInOut(t);
-        scrollZone.scrollTop = startY + distance * eased;
+        const t = Math.min(1, (now - startTime) / duration);
+        scrollZone.scrollTop = startY + distance * (t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
         if (t < 1) requestAnimationFrame(step);
     }
-    
     requestAnimationFrame(step);
 }
 
 function setupSwipeHandlers() {
     const scrollZone = document.getElementById('scrollZone');
     if (!scrollZone) return;
-    
     let isSwipeInProgress = false;
     let initialScrollTop = 0;
     
     scrollZone.addEventListener("touchstart", (e) => {
         if (isAnimating || window.spaRouter?.isAnimating) return;
-        
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         isHorizontalSwipe = false;
@@ -219,162 +171,90 @@ function setupSwipeHandlers() {
 
     scrollZone.addEventListener("touchmove", (e) => {
         if (!touchStartX || !touchStartY || isAnimating || window.spaRouter?.isAnimating) return;
-        
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
-        const deltaX = touchX - touchStartX;
-        const deltaY = touchY - touchStartY;
+        const deltaX = e.touches[0].clientX - touchStartX;
+        const deltaY = e.touches[0].clientY - touchStartY;
         
         if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
             isHorizontalSwipe = true;
             isSwipeInProgress = true;
-            
-            if (e.cancelable) {
-                e.preventDefault();
-            }
+            if (e.cancelable) e.preventDefault();
         }
-        
         if (mode === "details" && deltaY > 0 && !isHorizontalSwipe && initialScrollTop <= 0) {
-            if (e.cancelable) {
-                e.preventDefault();
-            }
+            if (e.cancelable) e.preventDefault();
         }
     }, { passive: false });
 
     scrollZone.addEventListener("touchend", (e) => {
         if (!touchStartX || !touchStartY || isAnimating || window.spaRouter?.isAnimating) return;
-        
-        const touchX = e.changedTouches[0].clientX;
-        const touchY = e.changedTouches[0].clientY;
-        
-        const deltaX = touchX - touchStartX;
-        const deltaY = touchY - touchStartY;
-        
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
         const isVerticalSwipe = Math.abs(deltaY) > Math.abs(deltaX);
         
         if (mode === "details" && deltaY > 30 && isVerticalSwipe && !isHorizontalSwipe) {
             const scrollTop = scrollZone.scrollTop;
-            const swipeStartedAtTop = touchStartY < window.innerHeight * 0.25;
-            
-            if (scrollTop <= 0 || swipeStartedAtTop) {
+            if (scrollTop <= 0 || touchStartY < window.innerHeight * 0.25) {
                 if (e.cancelable) e.preventDefault();
                 setMode("intro");
-                console.log('⬇️ Свайп вниз - закрытие меню');
             }
         } else if (mode === "intro" && deltaY < -30 && isVerticalSwipe && !isHorizontalSwipe) {
             if (e.cancelable) e.preventDefault();
             setMode("details");
-            console.log('⬆️ Свайп вверх - открытие меню');
         } else if (isHorizontalSwipe && Math.abs(deltaX) > SWIPE_THRESHOLD && isSwipeInProgress) {
             e.preventDefault();
-            
             const order = getCurrentPageOrder(window.spaRouter?.currentCategory);
-            if (order.length <= 1) {
-                console.log('🎯 В категории только одна страница, свайп не работает');
-                touchStartX = null;
-                touchStartY = null;
-                isHorizontalSwipe = false;
-                isSwipeInProgress = false;
-                return;
-            }
-            
-            if (deltaX > 0) {
-                console.log('➡️ Свайп вправо, переход к предыдущей странице');
-                navigateToPrevPlace();
-            } else {
-                console.log('⬅️ Свайп влево, переход к следующей странице');
-                navigateToNextPlace();
+            if (order.length > 1) {
+                deltaX > 0 ? navigateToPrevPlace() : navigateToNextPlace();
             }
         }
-        
         touchStartX = null;
         touchStartY = null;
         isHorizontalSwipe = false;
         isSwipeInProgress = false;
     }, { passive: false });
 
-    // ===== ЛОГИКА ДЛЯ ПК (СКРОЛЛ КОЛЕСИКОМ) =====
     scrollZone.addEventListener("wheel", (e) => {
-        if (isAnimating) {
-            if (e.cancelable) e.preventDefault();
-            return;
-        }
-        
+        if (isAnimating) { if (e.cancelable) e.preventDefault(); return; }
         if (mode === "intro" && e.deltaY > 10) {
-            if (e.cancelable) e.preventDefault();
-            setMode("details");
+            if (e.cancelable) e.preventDefault(); setMode("details");
         } else if (mode === "details" && scrollZone.scrollTop <= 0 && e.deltaY < -10) {
-            if (e.cancelable) e.preventDefault();
-            setMode("intro");
+            if (e.cancelable) e.preventDefault(); setMode("intro");
         }
     }, { passive: false });
 }
 
 function setupKeyboardHandlers() {
     document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            return;
-        }
-        
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         switch(e.key) {
-            case 'ArrowLeft':
-                e.preventDefault();
-                navigateToPrevPlace();
-                break;
-            case 'ArrowRight':
-                e.preventDefault();
-                navigateToNextPlace();
-                break;
-            case 'Escape':
-                if (mode === "details") {
-                    e.preventDefault();
-                    setMode("intro");
-                }
-                break;
+            case 'ArrowLeft': e.preventDefault(); navigateToPrevPlace(); break;
+            case 'ArrowRight': e.preventDefault(); navigateToNextPlace(); break;
+            case 'Escape': if (mode === "details") { e.preventDefault(); setMode("intro"); } break;
         }
     });
 }
 
 function initializeDropdownsAndButtons() {
-    console.log('📋 Инициализация дропдаунов и кнопок...');
-    
     const paidBtn = document.getElementById('paidBtn');
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
     const entryNote = document.querySelector(".entry-note");
     
-    if (addressDrop) {
-        const arrow = addressDrop.querySelector(".dropdown-arrow");
+    [addressDrop, usefulDrop].forEach(drop => {
+        if (!drop) return;
+        const arrow = drop.querySelector(".dropdown-arrow");
         if (arrow) {
             const newArrow = arrow.cloneNode(true);
             arrow.parentNode.replaceChild(newArrow, arrow);
-            
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
                 if (isAnimating) return;
-                addressDrop.classList.toggle("open");
-                console.log('Дропдаун Адрес:', addressDrop.classList.contains('open') ? 'открыт' : 'закрыт');
+                drop.classList.toggle("open");
             });
         }
-    }
-    
-    if (usefulDrop) {
-        const arrow = usefulDrop.querySelector(".dropdown-arrow");
-        if (arrow) {
-            const newArrow = arrow.cloneNode(true);
-            arrow.parentNode.replaceChild(newArrow, arrow);
-            
-            newArrow.addEventListener("click", (e) => {
-                e.stopPropagation();
-                if (isAnimating) return;
-                usefulDrop.classList.toggle("open");
-                console.log('Дропдаун Полезное:', usefulDrop.classList.contains('open') ? 'открыт' : 'закрыт');
-            });
-        }
-    }
+    });
     
     if (!window.dropdownClickHandlerAdded) {
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', (e) => {
             if (!e.target.closest('.dropdown')) {
                 if (addressDrop) addressDrop.classList.remove("open");
                 if (usefulDrop) usefulDrop.classList.remove("open");
@@ -383,21 +263,10 @@ function initializeDropdownsAndButtons() {
         window.dropdownClickHandlerAdded = true;
     }
     
-    if (paidBtn) {
-        paidBtn.onclick = () => {
-            console.log('Клик на paidBtn, вызываем setMode с expandUseful: true');
-            setMode("details", { expandUseful: true });
-        };
-    }
-    
-    if (entryNote) {
-        entryNote.onclick = (e) => {
-            if (!e.target.closest("#paidBtn")) {
-                console.log('Клик на entryNote, вызываем setMode с expandUseful: true');
-                setMode("details", { expandUseful: true });
-            }
-        };
-    }
+    if (paidBtn) paidBtn.onclick = () => setMode("details", { expandUseful: true });
+    if (entryNote) entryNote.onclick = (e) => {
+        if (!e.target.closest("#paidBtn")) setMode("details", { expandUseful: true });
+    };
 }
 
 // =============================================================================
@@ -407,13 +276,7 @@ function initializeDropdownsAndButtons() {
 window.initializeMenu = function() {
     console.log('🔄 Инициализация меню...');
     
-    // === ПРОВЕРКА ЯНДЕКС.БРАУЗЕРА (для подъема элементов) ===
-    if (isYandexBrowser()) {
-        document.body.classList.add('yandex-browser');
-        console.log('🔧 Обнаружен Яндекс.Браузер, применен подъем элементов');
-    }
-    
-    // === АВТОМАТИЧЕСКАЯ КОРРЕКЦИЯ ОБРЕЗАНИЙ ===
+    if (isYandexBrowser()) document.body.classList.add('yandex-browser');
     correctMobileUI();
     
     const savedMenuState = sessionStorage.getItem('menuState');
@@ -428,90 +291,52 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
-    // Отключаем анимации для мгновенного рендеринга при возврате на страницу
+    // Убираем анимации при первом рендере для плавности
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
-        
-        const elementsToDisable = [
-            frame, bgVideo, scrollZone,
-            document.querySelector('.title-block'),
-            document.querySelector('.hero-details'),
-            document.getElementById('dropdownsContainer'),
-            document.querySelector('.entry-note'),
-            document.getElementById('paidBtn')
-        ].filter(el => el);
-        
-        elementsToDisable.forEach(el => {
-            el.style.transition = 'none !important';
-            el.style.animation = 'none !important';
-        });
-        
-        setTimeout(() => {
-            elementsToDisable.forEach(el => {
-                el.style.transition = '';
-                el.style.animation = '';
-            });
-            document.body.classList.remove('no-transition');
-        }, 10);
+        const els = [frame, bgVideo, scrollZone, document.querySelector('.title-block'), document.querySelector('.hero-details'), document.getElementById('dropdownsContainer'), document.querySelector('.entry-note'), document.getElementById('paidBtn')].filter(Boolean);
+        els.forEach(el => el.style.cssText = 'transition: none !important; animation: none !important;');
+        setTimeout(() => { els.forEach(el => el.style.cssText = ''); document.body.classList.remove('no-transition'); }, 10);
     }
     
-    // Установка классов контейнера
-    if (frame) {
-        if (shouldOpenMenu) {
-            frame.classList.remove('mode-intro');
-            frame.classList.add('mode-details');
-        } else {
-            frame.classList.remove('mode-details');
-            frame.classList.add('mode-intro');
-        }
-    }
+    if (frame) frame.className = `container mode-${mode}`;
     
-    // === ИСПРАВЛЕННАЯ ЛОГИКА ВИДЕО ===
+    // === НОВАЯ УНИВЕРСАЛЬНАЯ ЛОГИКА ВИДЕО ===
     if (bgVideo) {
-        // 1. Принудительная установка атрибутов для мобильных
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
         bgVideo.setAttribute('webkit-playsinline', '');
         bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
-        
-        // 2. Функция попытки запуска
+
+        // Функция попытки запуска (используется и при инициализации, и при смене слайдов)
         const attemptPlay = () => {
-            if (!bgVideo.currentSrc && !bgVideo.src) {
-                console.warn('⚠️ Video src is empty, waiting for data...');
+            if (mode !== "intro") {
+                // Если мы в режиме деталей (меню открыто), видео должно быть на паузе
+                bgVideo.pause();
                 return;
             }
+            if (!bgVideo.currentSrc && !bgVideo.src) return; // Нет источника
 
             const playPromise = bgVideo.play();
             if (playPromise !== undefined) {
                 playPromise
-                    .then(() => console.log('✅ Video autoplay started successfully'))
-                    .catch(err => console.warn('⚠️ Autoplay blocked or error:', err.name, err.message));
+                    .then(() => console.log('✅ Video autoplay started'))
+                    .catch(err => console.warn('⚠️ Autoplay blocked:', err.name));
             }
         };
 
-        if (shouldOpenMenu) {
-            bgVideo.pause();
-        } else {
-            // Проверяем, загружены ли уже метаданные
-            if (bgVideo.readyState >= 2) {
-                attemptPlay();
-            } else {
-                // Если данных еще нет, ждем события загрузки
-                bgVideo.addEventListener('loadeddata', () => {
-                    console.log('📦 Video data loaded, attempting play...');
-                    attemptPlay();
-                }, { once: true });
-                
-                // Fallback на случай, если loadeddata сработал до подписки
-                if (bgVideo.readyState > 0) {
-                     attemptPlay();
-                }
-            }
-        }
+        // Глобальный слушатель загрузки данных (Срабатывает ПРИ КАЖДОМ смене src)
+        // УБРАЛИ { once: true }, чтобы работало при навигации между местами
+        bgVideo.addEventListener('loadeddata', () => {
+            console.log('📦 Video data loaded, state:', mode);
+            attemptPlay();
+        });
+
+        // Попытка запустить сразу, если видео уже было в кэше браузера
+        if (bgVideo.readyState >= 2) attemptPlay();
     }
     
-    // Постер (обложка)
     if (videoPoster) {
         videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
         videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
@@ -522,18 +347,11 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
-    const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
-    if (savedDropdownState === 'open' && usefulDrop) {
-        usefulDrop.classList.add("open");
-    } else {
-        if (usefulDrop) usefulDrop.classList.remove("open");
-    }
+    if (sessionStorage.getItem('usefulDropdownState') === 'open' && usefulDrop) usefulDrop.classList.add("open");
     
     initializeDropdownsAndButtons();
     setupSwipeHandlers();
-    setupKeyboardHandlers(); // Включаем клавиатуру для ПК
-    
-    // ПРОВЕРЯЕМ ВИДИМОСТЬ КНОПОК ПРИ ЗАГРУЗКЕ
+    setupKeyboardHandlers();
     updateNavigationVisibility();
     
     setTimeout(() => {
@@ -541,13 +359,9 @@ window.initializeMenu = function() {
         sessionStorage.removeItem('usefulDropdownState');
     }, 100);
     
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
-}
+    console.log('✅ Меню инициализировано');
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
-    
-    setTimeout(() => {
-        window.initializeMenu();
-    }, 50);
+    setTimeout(() => { window.initializeMenu(); }, 50);
 });
