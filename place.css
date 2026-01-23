@@ -770,18 +770,6 @@
     border-width: 0.3vh;
   }
 
-  /* 5. Настройка контейнера карточек */
-  .photo-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    padding-left: 0;
-    gap: 1.5vh; /* Чуть уменьшим отступ, чтобы выиграть место */
-    max-width: 100%; /* Чтобы сетка не выходила за пределы экрана */
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
   /* Исправление: Grid вместо Flex, чтобы работало центрирование */
   .photo-wrapper {
     display: grid;
@@ -1056,6 +1044,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
