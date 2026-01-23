@@ -1023,21 +1023,10 @@
     }
 
     .yandex-browser #usefulDrop.open {
-        margin-bottom: 40px;
+        margin-bottom: 80px;
     }
 }
 
-
-/*@media (max-width: 767px) and (max-height: 700px) {
-    .yandex-browser .mode-intro .title-block,
-    .yandex-browser .mode-intro #dropdownsContainer {
-        transform: calc(50vh - 60px + 40px) !important; 
-    }
-    .yandex-browser .mode-intro .hero-details {
-        transform: calc(55vh - 60px + 40px) !important; 
-    }
-    .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
-}*/
 
 @media (max-height: 500px) {
     .yandex-browser .mode-intro .title-block { transform: calc(-25vh + 40px) !important; }
@@ -1045,6 +1034,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
