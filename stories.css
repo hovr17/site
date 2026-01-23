@@ -634,14 +634,7 @@
   }
 }
 
-@media (max-width: 1080px) {
-  .story-slide {
-    position: relative; /* важно для absolute позиционирования img */
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
+@media (max-width: 1080px) {  
   .story-image {
     width: 100vw;
     height: 100vh;
@@ -991,6 +984,7 @@
   }
   
 }
+
 
 
 
