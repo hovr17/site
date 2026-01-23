@@ -971,8 +971,12 @@
     font-size: 2.2vh ;
   }
 
+   .yandex-browser .story-caption-content {
+    font-size: 1.3vh !important;
+  }
   
 }
+
 
 
 
