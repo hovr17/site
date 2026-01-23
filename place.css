@@ -754,15 +754,26 @@
 
   /* === ИСПРАВЛЕННЫЕ КНОПКИ ФОТО (НЕ СЖИМАЮТСЯ, ВЛЕЗАЮТ В КОНТЕЙНЕР) === */
   .photo-card {
-    width: 21vh;
-    height: 24vh !important; /* Фиксированная высота для влезания */
+   /* width: 100%;
+    height: 24vh !important;
     max-height: 24vh !important;
-    aspect-ratio: 166 / 225 !important; /* Сохраняем форму */
-    background-size: contain !important; /* Картинка не сплющивается */
+    aspect-ratio: 166 / 225 !important;
+    background-size: contain !important;
     background-position: center !important;
     border-radius: 3.6vh;
     border-width: 0.3vh;
-    background-color: rgba(0,0,0,0.3); /* Фон для контраста */
+    background-color: rgba(0,0,0,0.3); */
+
+      width: 100% ;
+
+height: auto ;
+    aspect-ratio: 166 / 225 ;
+
+    background-size: cover ;
+    background-position: center ;
+
+    border-radius: 3.6vh;
+    border-width: 0.3vh;
   }
 
   .photo-wrapper {
@@ -1054,6 +1065,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
