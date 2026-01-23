@@ -751,14 +751,36 @@
   .mode-intro .hero-details { transform: translateY(47vh); }
   .mode-intro #dropdownsContainer { transform: translateY(47vh); }
 
+@media (min-width: 1081px) {
+  
+  /* === РЕШЕНИЕ ПРОБЛЕМЫ С КНОПКАМИ НА ПК (АДАПТИВНЫЙ РАЗМЕР) === */
+
   .photo-card {
-    width: 21vh;
-    height: auto;
-    aspect-ratio: 166 / 225;
-    max-width: 35vh;
+    width: 100% !important;
+
+    max-height: 20vh !important; 
+    height: auto !important;
+
+    aspect-ratio: none !important;
+
+    background-size: cover !important;
+    background-position: center !important;
+
     border-radius: 3.6vh;
     border-width: 0.3vh;
   }
+
+  /* 5. Настройка контейнера карточек */
+  .photo-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding-left: 0;
+    gap: 1.5vh; /* Чуть уменьшим отступ, чтобы выиграть место */
+    max-width: 100%; /* Чтобы сетка не выходила за пределы экрана */
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
 
   /* Исправление: Grid вместо Flex, чтобы работало центрирование */
   .photo-wrapper {
@@ -1034,6 +1056,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
