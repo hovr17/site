@@ -73,16 +73,12 @@ function correctMobileUI() {
 // УПРАВЛЕНИЕ ВИДИМОСТЬЮ КНОПОК НАВИГАЦИИ (ПК)
 // =============================================================================
 
-/**
- * Скрывает или показывает кнопки перелистывания на ПК в зависимости от режима меню
- */
 function updateNavigationVisibility() {
     // Работаем только на ПК (ширина > 1080px)
     if (window.innerWidth <= 1080) return;
 
-    // Ищем кнопки навигации. 
-    // .temple-nav-arrow взят из вашего первого скрипта как основной класс стрелок.
-    const navArrows = document.querySelectorAll('.temple-nav-arrow, .nav-arrow, .arrow, .nav-btn');
+    // Ищем кнопки навигации
+    const navArrows = document.querySelectorAll('.temple-nav-arrow, .nav-arrow, .arrow');
     
     const isMenuOpen = (mode === "details");
 
@@ -96,7 +92,7 @@ function updateNavigationVisibility() {
             btn.style.pointerEvents = 'none';
         } else {
             // Меню закрыто -> показываем кнопки
-            btn.style.opacity = '1';
+            btn.style.opacity = '';
             btn.style.pointerEvents = 'auto';
         }
     });
@@ -171,7 +167,7 @@ function setMode(newMode, { expandUseful = false } = {}) {
         }, 500);
     }
 
-    // ===== ОБНОВЛЯЕМ ВИДИМОСТЬ СТРЕЛОК НА ПК =====
+    // ОБНОВЛЯЕМ ВИДИМОСТЬ СТРЕЛОК НА ПК
     updateNavigationVisibility();
     
     setTimeout(() => {
@@ -312,6 +308,31 @@ function setupSwipeHandlers() {
             setMode("intro");
         }
     }, { passive: false });
+}
+
+function setupKeyboardHandlers() {
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                navigateToPrevPlace();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                navigateToNextPlace();
+                break;
+            case 'Escape':
+                if (mode === "details") {
+                    e.preventDefault();
+                    setMode("intro");
+                }
+                break;
+        }
+    });
 }
 
 function initializeDropdownsAndButtons() {
@@ -475,6 +496,7 @@ window.initializeMenu = function() {
     
     initializeDropdownsAndButtons();
     setupSwipeHandlers();
+    setupKeyboardHandlers(); // Включаем клавиатуру для ПК
     
     // ПРОВЕРЯЕМ ВИДИМОСТЬ КНОПОК ПРИ ЗАГРУЗКЕ
     updateNavigationVisibility();
@@ -486,10 +508,6 @@ window.initializeMenu = function() {
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
 }
-
-// =============================================================================
-// ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-// =============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
