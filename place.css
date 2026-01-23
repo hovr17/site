@@ -1007,16 +1007,22 @@
    СПЕЦИАЛЬНЫЕ СТИЛИ ДЛЯ ЯНДЕКС.БРАУЗЕРА (+40px СДВИГ)
    ========================================================================= */
 @media (max-width: 767px) {
-    .yandex-browser .mode-intro .title-block { 
-        transform: translateY(calc(22vh - 160px)) !important; 
-    }
-    .yandex-browser .mode-intro .hero-details { 
-        transform: translateY(calc(38vh - 160px)) !important; 
-    }
-    .yandex-browser .mode-intro #dropdownsContainer { 
-        transform: translateY(calc(38vh - 160px)) !important; 
+    /* Заголовок: Используем мобильную базу 50vh и поднимаем на 110px */
+    .yandex-browser .mode-intro .title-block {
+        transform: translateY(calc(50vh - 110px)) !important;
     }
 
+    /* Подробнее и фото внутри: Используем мобильную базу 55vh и поднимаем на 110px */
+    .yandex-browser .mode-intro .hero-details {
+        transform: translateY(calc(55vh - 110px)) !important;
+    }
+
+    /* Дропдауны: Используем мобильную базу 50vh и поднимаем на 110px */
+    .yandex-browser .mode-intro #dropdownsContainer {
+        transform: translateY(calc(50vh - 110px)) !important;
+    }
+
+    /* Photo-wrapper не трогаем, чтобы не было двойного сдвига, он едет вместе с hero-details */
 }
 
 
@@ -1037,6 +1043,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
