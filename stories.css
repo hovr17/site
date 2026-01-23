@@ -950,7 +950,7 @@
 
   .yandex-browser .caption-expand-btn {
     /* 2. Поднимаем кнопку раскрытия на 70px вверх (база 1vh + 70px) */
-    bottom: calc(1vh + 0px) !important;
+    bottom: calc(1vh + -5px) !important;
   }
 
   .yandex-browser .story-image {
@@ -959,10 +959,11 @@
   }
 
    .yandex-browser .caption-overlay.mobile-overlay .caption-fullscreen{
-       padding: 4vh 6vw 15vh;
+       padding: 4vh 6vw 19vh;
        font-size: 1.8vh;
    }
 }
+
 
 
 
