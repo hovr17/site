@@ -963,9 +963,18 @@
         font-size: 2.2vh;
    }
 
+ .yandex-browser .story-caption-content {
+    font-size: 2.2vh ;
+  }
 
+  .yandex-browser .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
+    font-size: 2.2vh ;
+  }
   
 }
+
+
+
 
 
 
