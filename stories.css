@@ -955,8 +955,14 @@
 
   .yandex-browser .story-image {
     /* 3. Поднимаем изображение еще на 50px вверх (-50px - 50px = -100px ) */
-    margin-top: -30px !important;
+    margin-top: -20px !important;
   }
+
+   .yandex-browser .caption-overlay.mobile-overlay .caption-fullscreen{
+       padding: 4vh 6vw 15vh;
+       font-size: 1.8vh;
+   }
 }
+
 
 
