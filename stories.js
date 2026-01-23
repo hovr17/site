@@ -73,6 +73,24 @@ class StoriesManager {
     this.loadImages();
     this.setupEventListeners();
     this.updateArrowVisibility();
+
+    // === ПОЛИФИЛЛ ДЛЯ ДИНАМИЧЕСКОЙ ВЫСОТЫ ВЬЮПОРТА ===
+function setDynamicVh() {
+  // window.innerHeight на iOS выдает высоту УЖЕ без браузерных панелей
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+// Устанавливаем при загрузке
+setDynamicVh();
+
+// Обновляем при ресайзе (скрытие/появление панели браузера)
+window.addEventListener('resize', setDynamicVh);
+window.addEventListener('orientationchange', setDynamicVh);
+// Также слушаем изменения размера визуального вьюпорта (для продвинутой работы)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', setDynamicVh);
+}
   }
   
   updateLabel() {
@@ -640,3 +658,4 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
