@@ -22,14 +22,13 @@ class StoriesManager {
   }
   
   init() {
-    // === ПРОВЕРКА БРАУЗЕРА (НАЧАЛО) ===
-    // Проверяем User Agent на наличие YaBrowser или Yowser (старый)
+    // === ПРОВЕРКА БРАУЗЕРА (НАДЕЖНЫЙ ВАРИАНТ) ===
+    // Добавляем класс к тегу <html>, он доступен всегда
     if (/YaBrowser|Yowser/i.test(navigator.userAgent)) {
-      // Добавляем класс к тегу body, чтобы CSS правила .yandex-browser сработали
-      document.body.classList.add('yandex-browser');
-      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
+      document.documentElement.classList.add('yandex-browser');
+      console.log('🔧 Обнаружен Яндекс.Браузер - класс добавлен в HTML');
     }
-    // ===================================
+    // =============================================
 
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
@@ -616,6 +615,7 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
