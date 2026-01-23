@@ -22,6 +22,15 @@ class StoriesManager {
   }
   
   init() {
+    // === ПРОВЕРКА БРАУЗЕРА (НАЧАЛО) ===
+    // Проверяем User Agent на наличие YaBrowser или Yowser (старый)
+    if (/YaBrowser|Yowser/i.test(navigator.userAgent)) {
+      // Добавляем класс к тегу body, чтобы CSS правила .yandex-browser сработали
+      document.body.classList.add('yandex-browser');
+      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
+    }
+    // ===================================
+
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
     
@@ -33,17 +42,10 @@ class StoriesManager {
     
     this.updateLabel();
     
-    // === НОВАЯ ПРОВЕРКА: ДОБАВЛЯЕМ КЛАСС ЯНДЕКС.БРАУЗЕРА ===
-    if (/YaBrowser/i.test(navigator.userAgent)) {
-      document.body.classList.add('yandex-browser');
-      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
-    }
-    // =================================================================
-    
     if (this.isDesktop && this.currentSlide === 0) {
       this.prevArrow.classList.add('hidden');
     }
-    
+
     this.loadImages();
     this.setupEventListeners();
     this.updateArrowVisibility();
@@ -614,5 +616,6 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
