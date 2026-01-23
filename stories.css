@@ -985,6 +985,24 @@
   
 }
 
+/* === Стили для отладочной информации === */
+.debug-browser-info {
+  position: fixed;
+  bottom: 80px; /* Расположим снизу, чтобы не мешать кнопкам наверху */
+  left: 10px;
+  background-color: rgba(255, 59, 48, 0.9); /* Красный полупрозрачный фон */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 99999 !important; /* Гарантированно поверх всего */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  pointer-events: none; /* Чтобы плашка не перекрывала клики */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
 
 
