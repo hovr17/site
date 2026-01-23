@@ -729,7 +729,7 @@
     max-width: 100%;
     color: #ffffff;
     font-family: 'Crooker', sans-serif;
-    font-size: 1.8vh;
+    font-size: 2.2vh; 
     font-weight: 100;
     line-height: 1.4;
     padding: 2vh 4vw 4vh;
@@ -797,8 +797,8 @@
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen {
-    /* ИСПРАВЛЕНИЕ: УБРАЛИ ФИКСИРОВАННЫЙ padding: 30px 350px 100px */
-    padding: 4vh 6vw 10vh; /* АДАПТИВНЫЕ ОТСТУПЫ */
+
+    padding: 2vh 4vw 4vh; /* АДАПТИВНЫЕ ОТСТУПЫ */
     line-height: 1.5;
     border-radius: 20px 20px 0 0;
     z-index: 1021;
@@ -950,7 +950,7 @@
 
   .yandex-browser .caption-expand-btn {
     /* 2. Поднимаем кнопку раскрытия на 70px вверх (база 1vh + 70px) */
-    bottom: calc(1vh + -5px) !important;
+    bottom: calc(1vh + 5px) !important;
   }
 
   .yandex-browser .story-image {
@@ -959,10 +959,11 @@
   }
 
    .yandex-browser .caption-overlay.mobile-overlay .caption-fullscreen{
-       padding: 4vh 6vw 19vh;
+       padding: 2vh 4vw 19vh;
        font-size: 1.8vh;
    }
 }
+
 
 
 
