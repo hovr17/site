@@ -21,33 +21,34 @@ class StoriesManager {
     this.init();
   }
   
-  init() {
-    // === ПРОВЕРКА БРАУЗЕРА (НАДЕЖНЫЙ ВАРИАНТ) ===
-    // Добавляем класс к тегу <html>, он доступен всегда
-    if (/YaBrowser|Yowser/i.test(navigator.userAgent)) {
-      document.documentElement.classList.add('yandex-browser');
-      console.log('🔧 Обнаружен Яндекс.Браузер - класс добавлен в HTML');
-    }
-    // =============================================
+ init() {
+const urlParams = new URLSearchParams(window.location.search);
+this.placeId = urlParams.get('place');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    this.placeId = urlParams.get('place');
-    
-    this.placeData = storiesData[this.placeId];
-    
-    if (!this.placeData) {
-      console.error(`Данные для места "${this.placeId}" не найдены`);
-    }
-    
-    this.updateLabel();
-    
-    if (this.isDesktop && this.currentSlide === 0) {
-      this.prevArrow.classList.add('hidden');
-    }
+this.placeData = storiesData[this.placeId];
 
-    this.loadImages();
-    this.setupEventListeners();
-    this.updateArrowVisibility();
+if (!this.placeData) {
+console.error(`Данные для места "${this.placeId}" не найдены`);
+}
+
+this.updateLabel();
+
+// === НОВАЯ ПРОВЕРКА: ДОБАВЛЯЕМ КЛАСС ЯНДЕКС.БРАУЗЕРА ===
+if (/YaBrowser/i.test(navigator.userAgent)) {
+document.body.classList.add('yandex-browser');
+console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
+}
+// =================================================================
+
+if (this.isDesktop && this.currentSlide === 0) {
+this.prevArrow.classList.add('hidden');
+}
+
+
+
+this.loadImages();
+this.setupEventListeners();
+this.updateArrowVisibility();
   }
   
   updateLabel() {
@@ -615,6 +616,7 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
