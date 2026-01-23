@@ -1008,39 +1008,17 @@
    ========================================================================= */
 @media (max-width: 767px) {
     /* База: 50vh */
-    .yandex-browser .mode-intro .title-block { transform: calc(50vh + 40px) !important; }
+    .yandex-browser .mode-intro .title-block { transform: calc(50vh + 70px) !important; }
     /* База: 55vh */
-    .yandex-browser .mode-intro .hero-details { transform: calc(55vh + 40px) !important; }
+    .yandex-browser .mode-intro .hero-details { transform: calc(55vh + 70px) !important; }
     /* База: 50vh */
-    .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
+    .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 70px) !important; }
     /* База: 0 (для фото) */
-    .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
+    .yandex-browser .mode-intro .photo-wrapper { transform: translateY(70px) !important; }
 }
 
-/* ============================================================================
-   ПОДЪЕМ ЭЛЕМЕНТОВ НА 45px ВВЕРХ ДЛЯ ЯНДЕКС.БРАУЗЕРА
-   ============================================================================ */
 
-@media (max-width: 767px) {
-  
-  /* Поднимаем ЗАГОЛОВОК (h1) и entry-note (кнопка) */
-  /* Было 50vh, стало 50vh - 45px (элемент смещается вверх) */
-  .yandex-browser .mode-intro .title-block {
-    transform: translateY(calc(50vh - 45px)) !important;
-  }
 
-  /* Поднимаем ТЕКСТ "подробнее:" */
-  /* Было 55vh, стало 55vh - 45px */
-  .yandex-browser .mode-intro .hero-details {
-    transform: translateY(calc(55vh - 45px)) !important;
-  }
-
-  /* Поднимаем КНОПКИ ФОТО (photo-wrapper) */
-  /* Было 0 (на месте), стало -45px (смещение вверх) */
-  .yandex-browser .mode-intro .photo-wrapper {
-    transform: translateY(-45px) !important;
-  }
-}
 @media (min-width: 1081px) {
     .yandex-browser .mode-intro .title-block { transform: calc(43vh + 40px) !important; }
     .yandex-browser .mode-intro .hero-details { transform: calc(47vh + 40px) !important; }
@@ -1069,4 +1047,5 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
