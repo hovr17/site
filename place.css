@@ -109,7 +109,7 @@
   margin: auto;
 }
 
-/* Поворот иконок для навигации (Базовый, будет перезаписан ниже) */
+/* Поворот иконок для навигации */
 .arrow-prev {
   background: url('./ui/back_button.svg') center/contain no-repeat;
 }
@@ -119,10 +119,7 @@
   transform: rotate(180deg);
 }
 
-/* =============================================================================
-   НАВИГАЦИЯ (С ПОВОРОТОМ ПРАВОЙ СТРЕЛКИ)
-   ========================================================================= */
-
+/* Навигация */
 .temple-nav-arrows {
   position: fixed;
   top: 0;
@@ -153,14 +150,12 @@
   z-index: 1001;
 }
 
-/* Ховер эффект */
 .temple-nav-arrow:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
-  transform: translateY(-50%);
+  /* Без transform, чтобы не дергало */
 }
 
-/* Базовая иконка (Центрирование) */
 .temple-nav-arrow .arrow-icon {
   width: 60% !important;
   height: 60% !important;
@@ -168,26 +163,11 @@
   background-position: center !important;
   background-repeat: no-repeat !important;
   margin: auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Только центрирование */
-  transform: translate(-50%, -50%);
 }
 
-/* ИСПРАВЛЕНИЕ: Правая стрелка с поворотом */
+/* Правая стрелка с поворотом */
 .temple-next-arrow .arrow-icon {
-  width: 60% !important;
-  height: 60% !important;
-  background-size: contain !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  margin: auto;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Центрирование + Поворот на 180 */
-  transform: translate(-50%, -50%) rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .temple-prev-arrow {
@@ -205,7 +185,6 @@
   display: flex !important;
 }
 
-/* Управление видимостью через режимы */
 .mode-intro .temple-nav-arrow {
   display: flex;
 }
@@ -720,40 +699,10 @@
     right: auto !important;
   }
 
-  /* Ховер эффект */
   .temple-nav-arrow:hover {
     opacity: 1;
     background: rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%) !important;
-  }
-
-  /* Общая иконка */
-  .temple-nav-arrow .arrow-icon {
-    width: 60% !important;
-    height: 60% !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: auto;
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-  }
-
-  /* ИСПРАВЛЕНИЕ: Правая иконка с поворотом */
-  .temple-next-arrow .arrow-icon {
-    width: 60% !important;
-    height: 60% !important;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    /* Центрируем и поворачиваем */
-    transform: translate(-50%, -50%) rotate(180deg) !important;
-    margin: auto;
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+    /* Нет transform: scale, чтобы не дергало */
   }
 
   .temple-prev-arrow {
@@ -762,18 +711,25 @@
     margin-left: -30px !important;
   }
 
-  .temple-prev-arrow:hover {
-    transform: translateX(-100%) translateY(-50%) !important;
-  }
-
   .temple-next-arrow {
     right: 0 !important;
     transform: translateX(100%) translateY(-50%) !important;
     margin-right: -30px !important;
   }
 
-  .temple-next-arrow:hover {
-    transform: translateX(100%) translateY(-50%) !important;
+  /* Общая иконка */
+  .temple-nav-arrow .arrow-icon {
+    width: 60% !important;
+    height: 60% !important;
+    margin: auto;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* Правая иконка с поворотом */
+  .temple-next-arrow .arrow-icon {
+    transform: rotate(180deg);
   }
 
   .temple-nav-arrow.hidden {
@@ -901,12 +857,10 @@
 
 /* МОБИЛЬНЫЕ УСТРОЙСТВА (до 767px) */
 @media (max-width: 767px) {
-  /* УБРАНО: margin-top: 10px, чтобы экран прижимался к верху */
   .screen {
     /* margin-top: 10px; */ 
   }
   
-  /* ИСПРАВЛЕНИЕ: Полноэкранное видео и отступы */
   .container, #frame { width: 100vw !important; height: calc(var(--vh, 1vh) * 100) !important; }
   .screen {
     height: 100%;
@@ -923,7 +877,6 @@
   .mode-intro .title-block { transform: translateY(50vh); }
   .mode-intro #dropdownsContainer { transform: translateY(50vh); }
 
-  /* КАРТОЧКИ */
   .photo-wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -946,7 +899,6 @@
     left: 4vw; right: 4vw; bottom: 1vh;
   }
 
-  /* ДРОПДАУНЫ */
   .dropdown {
     border-radius: 27px;
     max-height: 55px;
@@ -1003,7 +955,6 @@
 
 /* Для очень низких экранов (< 500px) */
 @media (max-height: 500px) {
-  /* Убран лишний margin-top для этого разрешения тоже */
   .screen {
     /* margin-top: 10px; */
   }
