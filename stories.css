@@ -970,8 +970,16 @@
   .yandex-browser .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
     font-size: 2.2vh ;
   }
+
+    .yandex-browser.stories-label {
+    top: 2.7vh;
+    left: 20px;
+    font-size: 2vh;
+    z-index: 1006;
+  }
   
 }
+
 
 
 
