@@ -758,7 +758,6 @@
   .photo-card {
     width: 100% !important;
 
-    max-height: 20vh !important; 
     height: auto !important;
 
     aspect-ratio: none !important;
@@ -1044,6 +1043,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
