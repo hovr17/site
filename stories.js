@@ -21,14 +21,10 @@ class StoriesManager {
     this.init();
   }
   
-  checkBrowserSpecifics() {
-    document.documentElement.classList.add('no-lift');
-  }
-
   init() {
-    this.checkBrowserSpecifics();
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
+    
     this.placeData = storiesData[this.placeId];
     
     if (!this.placeData) {
@@ -36,6 +32,7 @@ class StoriesManager {
     }
     
     this.updateLabel();
+    
     if (this.isDesktop && this.currentSlide === 0) {
       this.prevArrow.classList.add('hidden');
     }
@@ -55,12 +52,14 @@ class StoriesManager {
   loadImages() {
     this.slidesContainer.innerHTML = '';
     this.slides = [];
+    
     this.totalSlides = this.placeData.images.length;
     
     this.placeData.images.forEach((imageData, index) => {
       const slide = document.createElement('div');
       slide.className = `story-slide ${index === 0 ? 'active' : ''}`;
       slide.dataset.index = index;
+      
       slide.style.backgroundImage = `url(${imageData.src})`;
       
       const img = document.createElement('img');
@@ -88,42 +87,162 @@ class StoriesManager {
   }
   
   addCaptionToSlide(slide, index, captionText) {
-    const isLongText = captionText.length > 135;
+    const captionContainer = document.createElement('div');
+    captionContainer.className = 'story-caption-container';
     
-    // Создаем НИЖНЮЮ ПАНЕЛЬ (как плашка кук)
-    const bottomPanel = document.createElement('div');
-    bottomPanel.className = 'story-bottom-panel';
+    const captionContent = document.createElement('div');
+    captionContent.className = 'story-caption-content';
     
-    // Текст
-    const panelText = document.createElement('div');
-    panelText.className = 'story-panel-text';
-    panelText.textContent = isLongText 
-      ? captionText.substring(0, 135).replace(/\s+\S*$/, '...') 
-      : captionText;
-    
-    bottomPanel.appendChild(panelText);
-    
-    // Кнопка развернуть (только для длинного текста)
-    if (isLongText) {
+    if (!this.isDesktop) {
+      // Мобильная логика
+      const textElement = document.createElement('div');
+      textElement.className = 'story-caption-text';
+      textElement.textContent = captionText;
+      captionContent.appendChild(textElement);
+      
+      // Оверлей для мобильных
+      const overlay = document.createElement('div');
+      overlay.className = 'caption-overlay mobile-overlay';
+      overlay.dataset.slideIndex = index;
+      
+      const fullscreenCaption = document.createElement('div');
+      fullscreenCaption.className = 'caption-fullscreen';
+      
+      const fullscreenContent = document.createElement('div');
+      fullscreenContent.className = 'caption-fullscreen-content';
+      fullscreenContent.textContent = captionText;
+      
+      fullscreenCaption.appendChild(fullscreenContent);
+      overlay.appendChild(fullscreenCaption);
+      
+      // Кнопка раскрытия (стрелка) для мобильных
       const expandBtn = document.createElement('button');
-      expandBtn.className = 'story-panel-expand-btn';
-      expandBtn.innerHTML = `Развернуть <img src="ui/open_menu_button.svg" alt="↓">`;
+      expandBtn.className = 'caption-expand-btn mobile-expand-btn';
+      expandBtn.innerHTML = `
+        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
+      `;
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        this.showFullCaptionOverlay(captionText);
+        
+        // Показываем оверлей
+        overlay.classList.add('active');
+        captionContainer.classList.add('hidden');
+        this.isOverlayOpen = true;
+        this.container.classList.add('overlay-open');
       });
       
-      bottomPanel.appendChild(expandBtn);
+      // Обработчик клика по оверлею для закрытия
+      const handleOverlayClick = (e) => {
+        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
+          this.closeOverlay(overlay, expandBtn);
+        }
+      };
+      
+      overlay.addEventListener('click', handleOverlayClick);
+      overlay.addEventListener('touchend', handleOverlayClick);
+      
+      captionContent.appendChild(expandBtn);
+      captionContainer.appendChild(captionContent);
+      slide.appendChild(captionContainer);
+      slide.appendChild(overlay);
+      return;
     }
     
-    slide.appendChild(bottomPanel);
-    slide.classList.add('has-panel');
+    // Десктопная логика
+    const isLongText = captionText.length > 135;
+    
+    if (isLongText) {
+      const shortText = captionText.substring(0, 135);
+      const lastSpaceIndex = shortText.lastIndexOf(' ');
+      
+      const displayText = lastSpaceIndex > 0 
+        ? shortText.substring(0, lastSpaceIndex) 
+        : shortText;
+      
+      const textElement = document.createElement('div');
+      textElement.className = 'story-caption-text';
+      
+      const shortSpan = document.createElement('span');
+      shortSpan.className = 'caption-short';
+      shortSpan.textContent = displayText + '...';
+      
+      const fullSpan = document.createElement('span');
+      fullSpan.className = 'caption-full';
+      fullSpan.style.display = 'none';
+      fullSpan.textContent = captionText;
+      
+      textElement.appendChild(shortSpan);
+      textElement.appendChild(fullSpan);
+      captionContent.appendChild(textElement);
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'caption-overlay';
+      overlay.dataset.slideIndex = index;
+      
+      const fullscreenCaption = document.createElement('div');
+      fullscreenCaption.className = 'caption-fullscreen';
+      
+      const fullscreenContent = document.createElement('div');
+      fullscreenContent.className = 'caption-fullscreen-content';
+      fullscreenContent.textContent = captionText;
+      
+      fullscreenCaption.appendChild(fullscreenContent);
+      overlay.appendChild(fullscreenCaption);
+      
+      slide.appendChild(overlay);
+      
+      const expandBtn = document.createElement('button');
+      expandBtn.className = 'caption-expand-btn';
+      expandBtn.innerHTML = `
+        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
+      `;
+      
+      expandBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Показываем оверлей
+        captionContent.classList.add('no-bg');
+        captionContainer.classList.add('hidden');
+        overlay.classList.add('active');
+        this.isOverlayOpen = true;
+        
+        setTimeout(() => {
+          fullscreenCaption.scrollTop = 0;
+          fullscreenContent.scrollTop = 0;
+        }, 10);
+      });
+      
+      // Обработчик клика по оверлею для закрытия
+      const handleOverlayClick = (e) => {
+        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
+          this.closeOverlay(overlay, expandBtn);
+        }
+      };
+      
+      overlay.addEventListener('click', handleOverlayClick);
+      
+      captionContent.appendChild(expandBtn);
+      captionContent.style.maxHeight = '150px';
+      
+      captionContent.scrollTop = 0;
+      textElement.scrollTop = 0;
+    } else {
+      const textElement = document.createElement('div');
+      textElement.className = 'story-caption-text';
+      textElement.textContent = captionText;
+      captionContent.appendChild(textElement);
+      captionContent.style.maxHeight = 'none';
+    }
+    
+    captionContainer.appendChild(captionContent);
+    slide.appendChild(captionContainer);
   }
   
   createProgressBars() {
     this.progressContainer.innerHTML = '';
+    
     for (let i = 0; i < this.totalSlides; i++) {
       const progressBar = document.createElement('div');
       progressBar.className = 'progress-bar';
@@ -134,12 +253,17 @@ class StoriesManager {
       progressBar.appendChild(progressFill);
       this.progressContainer.appendChild(progressBar);
     }
+    
     this.updateProgressBars();
   }
   
   updateArrowVisibility() {
     if (this.isDesktop) {
-      this.prevArrow.classList.toggle('hidden', this.currentSlide === 0);
+      if (this.currentSlide === 0) {
+        this.prevArrow.classList.add('hidden');
+      } else {
+        this.prevArrow.classList.remove('hidden');
+      }
       this.nextArrow.classList.remove('hidden');
     } else {
       this.prevArrow.classList.add('hidden');
@@ -156,21 +280,15 @@ class StoriesManager {
       if (e.key === 'ArrowLeft') this.prevSlide();
       if (e.key === 'ArrowRight') this.nextSlide();
       if (e.key === 'Escape') {
-        // Проверяем сначала новый оверлей
-        const bottomOverlay = document.querySelector('.bottom-caption-overlay.active');
-        if (bottomOverlay) {
-          this.closeBottomCaptionOverlay();
-          return;
+        const overlay = document.querySelector('.caption-overlay.active');
+        if (overlay) {
+          const slideIndex = overlay.dataset.slideIndex;
+          const slide = this.slides[slideIndex];
+          const expandBtn = slide.querySelector('.caption-expand-btn');
+          this.closeOverlay(overlay, expandBtn);
+        } else {
+          this.closeStories();
         }
-        
-        // Потом старый оверлей
-        const oldOverlay = document.querySelector('.caption-overlay.active:not(.bottom-caption-overlay)');
-        if (oldOverlay) {
-          this.closeOverlay(oldOverlay);
-          return;
-        }
-        
-        this.closeStories();
       }
     });
     
@@ -182,18 +300,20 @@ class StoriesManager {
     this.setupTouchEvents();
     this.setupTouchZones();
     
+    // Клик по чёрному фону на мобильных — закрываем оверлей
     this.container.addEventListener('click', (e) => {
       if (!this.isDesktop && this.isOverlayOpen) {
         const activeOverlay = document.querySelector('.caption-overlay.active');
         if (activeOverlay) {
-          if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-            this.closeBottomCaptionOverlay();
-          } else {
-            this.closeOverlay(activeOverlay);
-          }
+          const slideIndex = activeOverlay.dataset.slideIndex;
+          const slide = this.slides[slideIndex];
+          const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
+          this.closeOverlay(activeOverlay, expandBtn);
           e.preventDefault();
           e.stopPropagation();
+          
           this.overlayJustClosed = true;
+          
           setTimeout(() => {
             this.overlayJustClosed = false;
           }, 300);
@@ -208,7 +328,10 @@ class StoriesManager {
     let isSwiping = false;
     
     this.container.addEventListener('touchstart', (e) => {
-      if (!this.isDesktop && this.isOverlayOpen) return;
+      if (!this.isDesktop && this.isOverlayOpen) {
+        return;
+      }
+      
       touchStartX = e.changedTouches[0].screenX;
       isSwiping = true;
     }, { passive: true });
@@ -242,16 +365,16 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-              this.closeBottomCaptionOverlay();
-            } else {
-              this.closeOverlay(activeOverlay);
-            }
+            const slideIndex = activeOverlay.dataset.slideIndex;
+            const slide = this.slides[slideIndex];
+            const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
+            this.closeOverlay(activeOverlay, expandBtn);
             e.preventDefault();
             e.stopPropagation();
             return;
           }
         }
+        
         if (this.overlayJustClosed) {
           e.preventDefault();
           e.stopPropagation();
@@ -271,16 +394,16 @@ class StoriesManager {
         if (this.isOverlayOpen) {
           const activeOverlay = document.querySelector('.caption-overlay.active');
           if (activeOverlay) {
-            if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-              this.closeBottomCaptionOverlay();
-            } else {
-              this.closeOverlay(activeOverlay);
-            }
+            const slideIndex = activeOverlay.dataset.slideIndex;
+            const slide = this.slides[slideIndex];
+            const expandBtn = slide.querySelector('.caption-expand-btn.mobile-expand-btn');
+            this.closeOverlay(activeOverlay, expandBtn);
             e.preventDefault();
             e.stopPropagation();
             return;
           }
         }
+        
         if (this.overlayJustClosed) {
           e.preventDefault();
           e.stopPropagation();
@@ -298,9 +421,14 @@ class StoriesManager {
   
   handleSwipe(startX, endX) {
     if (!this.isDesktop && this.isOverlayOpen) return;
+    
     const swipeThreshold = 50;
     const diff = startX - endX;
-    if (this.currentSlide === 0 && diff < 0) return;
+    
+    if (this.currentSlide === 0 && diff < 0) {
+      return;
+    }
+    
     if (Math.abs(diff) > swipeThreshold) {
       if (diff > 0) {
         this.nextSlide();
@@ -315,11 +443,10 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
+      const slideIndex = activeOverlay.dataset.slideIndex;
+      const slide = this.slides[slideIndex];
+      const expandBtn = slide.querySelector('.caption-expand-btn');
+      this.closeOverlay(activeOverlay, expandBtn);
     }
     
     this.goToSlide(this.currentSlide - 1, 'prev');
@@ -330,11 +457,10 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
+      const slideIndex = activeOverlay.dataset.slideIndex;
+      const slide = this.slides[slideIndex];
+      const expandBtn = slide.querySelector('.caption-expand-btn');
+      this.closeOverlay(activeOverlay, expandBtn);
     }
     
     if (this.currentSlide < this.totalSlides - 1) {
@@ -349,14 +475,14 @@ class StoriesManager {
     
     const activeOverlay = document.querySelector('.caption-overlay.active');
     if (activeOverlay) {
-      if (activeOverlay.classList.contains('bottom-caption-overlay')) {
-        this.closeBottomCaptionOverlay();
-      } else {
-        this.closeOverlay(activeOverlay);
-      }
+      const slideIndex = activeOverlay.dataset.slideIndex;
+      const slide = this.slides[slideIndex];
+      const expandBtn = slide.querySelector('.caption-expand-btn');
+      this.closeOverlay(activeOverlay, expandBtn);
     }
     
     this.isAnimating = true;
+    
     const isGoingBack = direction === 'prev';
     
     if (isGoingBack) {
@@ -393,83 +519,54 @@ class StoriesManager {
     this.updateArrowVisibility();
     
     setTimeout(() => {
+      const captionContent = this.slides[index].querySelector('.story-caption-content');
+      if (captionContent) {
+        captionContent.scrollTop = 0;
+      }
+      
+      const captionText = this.slides[index].querySelector('.story-caption-text');
+      if (captionText) {
+        captionText.scrollTop = 0;
+      }
+      
       this.isAnimating = false;
     }, 100);
   }
   
-  closeOverlay(overlay) {
-    if (!overlay) return;
+  closeOverlay(overlay, expandBtn) {
+    const slideIndex = overlay.dataset.slideIndex;
+    const slide = this.slides[slideIndex];
     
     overlay.classList.remove('active');
-    this.isOverlayOpen = false;
-    this.container.classList.remove('overlay-open');
     
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 100);
-  }
-  
-  showFullCaptionOverlay(captionText) {
-    if (this.isOverlayOpen) return;
-    
-    let overlay = document.querySelector('.bottom-caption-overlay');
-    
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'caption-overlay mobile-overlay bottom-caption-overlay';
+    if (!this.isDesktop) {
+      const captionContainer = slide.querySelector('.story-caption-container');
+      if (captionContainer) {
+        captionContainer.classList.remove('hidden');
+      }
       
-      const fullscreen = document.createElement('div');
-      fullscreen.className = 'caption-fullscreen';
-      
-      const content = document.createElement('div');
-      content.className = 'caption-fullscreen-content';
-      content.textContent = captionText;
-      
-      fullscreen.appendChild(content);
-      overlay.appendChild(fullscreen);
-      
-      this.container.appendChild(overlay);
-      
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          this.closeBottomCaptionOverlay();
-        }
-      });
+      this.container.classList.remove('overlay-open');
     } else {
-      overlay.querySelector('.caption-fullscreen-content').textContent = captionText;
+      const captionContent = slide.querySelector('.story-caption-content');
+      if (captionContent) {
+        captionContent.classList.remove('no-bg');
+      }
+      
+      const captionContainer = slide.querySelector('.story-caption-container');
+      if (captionContainer) {
+        captionContainer.classList.remove('hidden');
+      }
     }
     
-    overlay.classList.add('active');
-    this.isOverlayOpen = true;
-    this.container.classList.add('overlay-open');
-    
-    setTimeout(() => {
-      overlay.scrollTop = 0;
-      overlay.querySelector('.caption-fullscreen-content').scrollTop = 0;
-    }, 10);
-    
-    console.log('🎯 Нижний оверлей открыт');
-  }
-  
-  closeBottomCaptionOverlay() {
-    const overlay = document.querySelector('.bottom-caption-overlay');
-    if (!overlay) return;
-    
-    overlay.classList.remove('active');
     this.isOverlayOpen = false;
-    this.container.classList.remove('overlay-open');
-    
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 100);
-    
-    console.log('🎯 Нижний оверлей закрыт');
   }
   
   updateProgressBars() {
     const bars = this.progressContainer.querySelectorAll('.progress-bar');
+    
     bars.forEach((bar, index) => {
       const fill = bar.querySelector('.progress-fill');
+      
       const isViewed = index < this.currentSlide || this.visitedSlides.has(index) || index === this.currentSlide;
       
       if (isViewed) {
@@ -483,6 +580,7 @@ class StoriesManager {
   
   closeStories() {
     const referrer = document.referrer;
+    
     if (referrer && referrer !== window.location.href) {
       window.location.replace(referrer);
     } else {
