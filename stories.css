@@ -1008,6 +1008,39 @@
 
 
 
+/* Исправляем различия в размере шрифта между Chrome и Safari */
+
+@media (max-width: 750px) {
+  
+  /* 1. Подпись под фото */
+  .story-caption-content {
+    /* Вместо 2.8vh используем clamp() для адаптивности, но на основе rem/px.
+       Это гарантирует, что размер не будет скакать от интерфейса браузера. */
+    font-size: clamp(18px, 2.8vh, 22px);
+    
+    /* Принудительно устанавливаем сглаживание для одинакового вида */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    /* Если font-weight: 100 слишком скачет, попробуйте поставить 300 или 400 */
+    /* font-weight: 300; */ 
+  }
+
+  /* 2. Полноэкранный текст (при открытии) */
+  .caption-overlay.mobile-overlay .caption-fullscreen,
+  .caption-fullscreen {
+    font-size: clamp(20px, 3.2vh, 24px); /* Вместо 2.8vh */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+  }
+  
+  /* 3. Лейбл названия места */
+  .stories-label {
+    font-size: clamp(20px, 3.2vh, 26px); /* Вместо 3.2vh */
+    -webkit-font-smoothing: antialiased;
+  }
+}
 
 
 
