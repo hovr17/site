@@ -666,7 +666,7 @@
   }
 
   .stories-label {
-    font-size: 2.5vh;
+    font-size: 3.2vh;
     top: 3vh;
     z-index: 1022;
     padding-left: 0.5vh;
@@ -729,7 +729,7 @@
     max-width: 100%;
     color: #ffffff;
     font-family: 'Crooker', sans-serif;
-    font-size: 2.2vh; 
+    font-size: 2.8vh; 
     font-weight: 100;
     line-height: 1.4;
     padding: 2vh 4vw 4vh;
@@ -807,14 +807,14 @@
       rgba(0, 0, 0, 0.8) 30%, 
       rgba(0, 0, 0, 0.4) 70%, 
       transparent 100%);
-    font-size: 2.2vh; /* АДАПТИВНЫЙ РАЗМЕР ШРИФТА */
+    font-size: 2.8vh; /* АДАПТИВНЫЙ РАЗМЕР ШРИФТА */
     max-width: 100%;
     width: 100%;
     box-sizing: border-box;
   }
 
   .caption-fullscreen {
-     font-size: 2.2vh;
+     font-size: 2.8vh;
   }
 
   .caption-overlay.mobile-overlay .caption-fullscreen-content {
@@ -962,7 +962,18 @@
        padding: 2vh 4vw 19vh;
         font-size: 2.2vh;
    }
+
+/* Контент подписи */
+  .yandex-browser.story-caption-content {
+    font-size: 2.2vh; }
+  
+    .yandex.stories-label {
+    font-size: 2.5vh;
+    top: 3vh;
+    padding-left: 0.5vh;
+  }
 }
+
 
 
 
