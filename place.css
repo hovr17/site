@@ -1007,13 +1007,14 @@
    СПЕЦИАЛЬНЫЕ СТИЛИ ДЛЯ ЯНДЕКС.БРАУЗЕРА (+40px СДВИГ)
    ========================================================================= */
 @media (max-width: 767px) {
-    /* База: 50vh */
-    .yandex-browser .mode-intro .title-block { transform: calc(50vh - 110px) !important; }
-    /* База: 55vh */
-    .yandex-browser .mode-intro .hero-details { transform: calc(55vh - 110px) !important; }
-    /* База: 50vh */
-    .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh - 110px) !important; }
-    /* База: 0 (для фото) */
+    /* Добавили translateY и минус, чтобы поднять на 110px */
+    .yandex-browser .mode-intro .title-block { transform: translateY(calc(50vh - 110px)) !important; }
+    
+    .yandex-browser .mode-intro .hero-details { transform: translateY(calc(55vh - 110px)) !important; }
+    
+    .yandex-browser .mode-intro #dropdownsContainer { transform: translateY(calc(50vh - 110px)) !important; }
+    
+    /* Фот wrapper поднимаем просто на -110px (минус - это вверх) */
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(-110px) !important; }
 }
 
@@ -1047,6 +1048,7 @@
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
