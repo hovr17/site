@@ -1017,45 +1017,6 @@ html {
 
 
 
-@media (max-width: 750px) {
-
-  /* Подпись к фото (текст снизу) */
-  .story-caption-content {
-    /* Вместо 2.8vh используем 1.15rem (это около 18.4 пикселей) */
-    font-size: 1.15rem; 
-    line-height: 1.4;
-    
-    /* Добавляем выравнивание */
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* Текст при открытии оверлея */
-  .caption-overlay.mobile-overlay .caption-fullscreen,
-  .caption-fullscreen {
-    /* Вместо 2.8vh используем 1.35rem (около 21.6 пикселей) */
-    font-size: 1.35rem;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* Название места вверху */
-  .stories-label {
-    /* Вместо 3.2vh используем 1.6rem (около 25.6 пикселей) */
-    font-size: 1.6rem;
-  }
-  
-  /* Если нужно подправить для ландшафтного режима */
-  @media (max-width: 1080px) and (orientation: landscape) {
-    .story-caption-content {
-       font-size: 1rem; /* Чуть меньше при горизонтальном положении */
-    }
-    .caption-overlay.mobile-overlay .caption-fullscreen {
-       font-size: 1.2rem;
-    }
-  }
-}
-
-
 
 
 
@@ -1104,24 +1065,9 @@ html {
     padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* 4. Исправляем стиль текста (уже знаем, что с rem работает) */
-  .story-caption-content {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-    font-size: 18px !important;
-    line-height: 1.4;
-    -webkit-font-smoothing: antialiased;
-    /* Убираем overflow-y: visible, так как у нас теперь фиксированный контейнер */
-    overflow-y: auto;
-    max-height: 60vh; /* Ограничиваем высоту текста, чтобы он не улетал */
-  }
 
-  /* 5. Фикс для полноэкранного оверлея */
-  .caption-overlay.mobile-overlay .caption-fullscreen {
-    padding: 20px 20px calc(30px + env(safe-area-inset-bottom));
-    font-size: 18px !important;
-    max-height: 90vh;
-  }
 }
+
 
 
 
