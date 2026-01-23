@@ -310,30 +310,6 @@ function setupSwipeHandlers() {
     }, { passive: false });
 }
 
-function setupKeyboardHandlers() {
-    document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            return;
-        }
-        
-        switch(e.key) {
-            case 'ArrowLeft':
-                e.preventDefault();
-                navigateToPrevPlace();
-                break;
-            case 'ArrowRight':
-                e.preventDefault();
-                navigateToNextPlace();
-                break;
-            case 'Escape':
-                if (mode === "details") {
-                    e.preventDefault();
-                    setMode("intro");
-                }
-                break;
-        }
-    });
-}
 
 function initializeDropdownsAndButtons() {
     console.log('📋 Инициализация дропдаунов и кнопок...');
@@ -516,3 +492,4 @@ document.addEventListener('DOMContentLoaded', () => {
         window.initializeMenu();
     }, 50);
 });
+
