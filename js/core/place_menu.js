@@ -2,75 +2,128 @@ console.log('place_menu.js загружен');
 
 let mode = "intro";
 let isAnimating = false;
+
+// Переменные для обработки свайпов
 let touchStartX = null;
 let touchStartY = null;
 let isHorizontalSwipe = false;
 const SWIPE_THRESHOLD = 50;
 
-// =============================================================================
-// МИНИМАЛЬНАЯ ПРОВЕРКА БРАУЗЕРА (ТОЛЬКО ДЛЯ ЯНДЕКСА)
-// =============================================================================
+// ===== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ РЕЖИМОМ =====
 
-function isYandexBrowser() {
-    return /YaBrowser/i.test(navigator.userAgent);
+/**
+ * Переключение полноэкранного режима
+ */
+function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    enterFullscreen();
+  } else {
+    exitFullscreen();
+  }
 }
 
-// =============================================================================
-// АВТОМАТИЧЕСКАЯ КОРРЕКЦИЯ ОБРЕЗАНИЙ ДЛЯ ВСЕХ МОБИЛЬНЫХ БРАУЗЕРОВ
-// =============================================================================
-
-function correctMobileUI() {
-    if (window.innerWidth > 1080) return false;
-    
-    const screen = document.querySelector('.screen');
-    if (!screen) return false;
-    
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isIOS) {
-        screen.style.paddingBottom = 'env(safe-area-inset-bottom, 20px)';
-        console.log('📱 iOS: применен env() для коррекции Safe Area');
-        return true;
-    }
-    
-    if (window.visualViewport) {
-        function updatePadding() {
-            const viewportHeight = window.visualViewport.height;
-            const windowHeight = window.innerHeight;
-            const uiHeight = Math.max(0, windowHeight - viewportHeight);
-            screen.style.paddingBottom = (uiHeight > 0 ? (uiHeight + 20) + 'px' : '0px');
-        }
-        
-        updatePadding();
-        window.visualViewport.addEventListener('resize', updatePadding);
-        window.addEventListener('orientationchange', () => setTimeout(updatePadding, 100));
-        console.log('📱 Android: активен динамический фолбек');
-        return true;
-    }
-    
-    screen.style.paddingBottom = '60px';
-    console.log('📱 Применен фиксированный padding-bottom = 60px');
-    return true;
+/**
+ * Вход в полноэкранный режим
+ */
+function enterFullscreen() {
+  const elem = document.documentElement;
+  
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  }
 }
 
-// =============================================================================
-// УПРАВЛЕНИЕ ВИДИМОСТЬЮ КНОПОК НАВИГАЦИИ (ПК)
-// =============================================================================
-
-function updateNavigationVisibility() {
-    if (window.innerWidth <= 1080) return;
-    const navArrows = document.querySelectorAll('.temple-nav-arrow, .nav-arrow, .arrow');
-    const isMenuOpen = (mode === "details");
-
-    navArrows.forEach(btn => {
-        btn.style.transition = 'opacity 0.3s ease, visibility 0.3s';
-        btn.style.opacity = isMenuOpen ? '0' : '';
-        btn.style.pointerEvents = isMenuOpen ? 'none' : 'auto';
-    });
+/**
+ * Выход из полноэкранного режима
+ */
+function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
 }
 
-// =============================================================================
-// ОСНОВНАЯ ЛОГИКА МЕНЮ
-// =============================================================================
+/**
+ * Обработчик изменения состояния полноэкранного режима
+ */
+function handleFullscreenChange() {
+  const btn = document.getElementById('fullscreenBtn');
+  if (!btn) return;
+  
+  const icon = btn.querySelector('div');
+  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+  
+  if (isFullscreen) {
+    icon.classList.remove('fullscreen-icon');
+    icon.classList.add('fullscreen-exit-icon');
+  } else {
+    icon.classList.remove('fullscreen-exit-icon');
+    icon.classList.add('fullscreen-icon');
+  }
+}
+
+/**
+ * МГНОВЕННОЕ обновление видимости кнопки полноэкранного режима
+ */
+function updateFullscreenButtonVisibility() {
+  const btn = document.getElementById('fullscreenBtn');
+  if (!btn) return;
+  
+  const isMobile = window.innerWidth <= 1080;
+  const isIntroMode = mode === 'intro';
+  
+  btn.style.display = (isMobile && isIntroMode) ? 'block' : 'none';
+}
+
+/**
+ * Инициализация кнопки полноэкранного режима
+ */
+function initializeFullscreenButton() {
+  const btn = document.getElementById('fullscreenBtn');
+  if (!btn) return;
+  
+  btn.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+}
+
+// ===== ГЛОБАЛЬНЫЙ КЛИК ДЛЯ ПОЛНОЭКРАННОГО РЕЖИМА (ТОЛЬКО MOBILE) =====
+
+/**
+ * Настраивает переход в полноэкранный режим при любом клике на экране (в режиме intro)
+ */
+function setupGlobalFullscreenTrigger() {
+  const frame = document.getElementById('frame');
+  if (!frame) return;
+
+  frame.addEventListener('click', (e) => {
+    // 1. Если мы уже в полноэкранном режиме — ничего не делаем
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+
+    // 2. Работаем только в режиме intro
+    if (mode !== 'intro') return;
+
+    // 3. ✅ НОВАЯ ПРОВЕРКА: Работаем только на мобильных устройствах (ширина <= 1080px)
+    const isMobile = window.innerWidth <= 1080;
+    if (!isMobile) return;
+
+    // 4. Исключаем клики по интерактивным элементам, чтобы не ломать навигацию и кнопки
+    const isInteractive = e.target.closest(
+      'a, button, .dropdown, .entry-note, .temple-nav-arrow, .back-button, #fullscreenBtn, .small-btn'
+    );
+
+    if (isInteractive) return;
+
+    // 5. Если клик пришелся на фон или видео -> открываем полноэкранный режим
+    enterFullscreen();
+    console.log('📱 Клик по экрану (Mobile): Вход в полноэкранный режим');
+  });
+}
+
+// ===== СУЩЕСТВУЮЩИЙ КОД =====
 
 function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === newMode || isAnimating) return;
@@ -86,6 +139,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
     
+    updateFullscreenButtonVisibility();
+    
     if (videoPoster) {
         videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
         videoPoster.style.display = (newMode === 'details') ? 'block' : 'none';
@@ -98,8 +153,12 @@ function setMode(newMode, { expandUseful = false } = {}) {
     if (mode === "details") {
         frame.classList.remove("mode-intro");
         frame.classList.add("mode-details");
+        
         scrollZone.classList.add('animating');
-        if (bgVideo) bgVideo.pause();
+        
+        if (bgVideo) {
+            bgVideo.pause(); // ✅ СТАВИМ НА ПАУЗУ при открытии меню
+        }
         
         if (expandUseful && usefulDrop) {
             setTimeout(() => {
@@ -115,11 +174,11 @@ function setMode(newMode, { expandUseful = false } = {}) {
     } else {
         frame.classList.remove("mode-details");
         frame.classList.add("mode-intro");
+        
         scrollZone.classList.add('animating');
         
         if (bgVideo) {
-            // При возврате в интро пытаемся запустить видео
-            bgVideo.play().catch(e => console.log("⚠️ Play error on mode switch:", e));
+            bgVideo.play(); // ✅ ВОЗОБНОВЛЯЕМ при закрытии меню
         }
         
         smoothScrollTo(0, 700);
@@ -132,36 +191,47 @@ function setMode(newMode, { expandUseful = false } = {}) {
             isAnimating = false;
         }, 500);
     }
-
-    updateNavigationVisibility();
+    
     setTimeout(() => {
-        if (window.updateNavArrows) window.updateNavArrows();
+        if (window.updateNavArrows) {
+            window.updateNavArrows();
+        }
     }, 50);
 }
 
 function smoothScrollTo(targetY, duration = 700) {
     const scrollZone = document.getElementById('scrollZone');
     if (!scrollZone) return;
+    
     const startY = scrollZone.scrollTop;
     const distance = targetY - startY;
     const startTime = performance.now();
     
+    function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    
     function step(now) {
-        const t = Math.min(1, (now - startTime) / duration);
-        scrollZone.scrollTop = startY + distance * (t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const eased = easeInOut(t);
+        scrollZone.scrollTop = startY + distance * eased;
         if (t < 1) requestAnimationFrame(step);
     }
+    
     requestAnimationFrame(step);
 }
 
 function setupSwipeHandlers() {
     const scrollZone = document.getElementById('scrollZone');
     if (!scrollZone) return;
+    
     let isSwipeInProgress = false;
     let initialScrollTop = 0;
     
     scrollZone.addEventListener("touchstart", (e) => {
         if (isAnimating || window.spaRouter?.isAnimating) return;
+        
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         isHorizontalSwipe = false;
@@ -171,41 +241,74 @@ function setupSwipeHandlers() {
 
     scrollZone.addEventListener("touchmove", (e) => {
         if (!touchStartX || !touchStartY || isAnimating || window.spaRouter?.isAnimating) return;
-        const deltaX = e.touches[0].clientX - touchStartX;
-        const deltaY = e.touches[0].clientY - touchStartY;
+        
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
         
         if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
             isHorizontalSwipe = true;
             isSwipeInProgress = true;
-            if (e.cancelable) e.preventDefault();
+            
+            if (e.cancelable) {
+                e.preventDefault();
+            }
         }
+        
         if (mode === "details" && deltaY > 0 && !isHorizontalSwipe && initialScrollTop <= 0) {
-            if (e.cancelable) e.preventDefault();
+            if (e.cancelable) {
+                e.preventDefault();
+            }
         }
     }, { passive: false });
 
     scrollZone.addEventListener("touchend", (e) => {
         if (!touchStartX || !touchStartY || isAnimating || window.spaRouter?.isAnimating) return;
-        const deltaX = e.changedTouches[0].clientX - touchStartX;
-        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        
+        const touchX = e.changedTouches[0].clientX;
+        const touchY = e.changedTouches[0].clientY;
+        
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+        
         const isVerticalSwipe = Math.abs(deltaY) > Math.abs(deltaX);
         
         if (mode === "details" && deltaY > 30 && isVerticalSwipe && !isHorizontalSwipe) {
             const scrollTop = scrollZone.scrollTop;
-            if (scrollTop <= 0 || touchStartY < window.innerHeight * 0.25) {
+            const swipeStartedAtTop = touchStartY < window.innerHeight * 0.25;
+            
+            if (scrollTop <= 0 || swipeStartedAtTop) {
                 if (e.cancelable) e.preventDefault();
                 setMode("intro");
+                console.log('⬇️ Свайп вниз - закрытие меню');
             }
         } else if (mode === "intro" && deltaY < -30 && isVerticalSwipe && !isHorizontalSwipe) {
             if (e.cancelable) e.preventDefault();
             setMode("details");
+            console.log('⬆️ Свайп вверх - открытие меню');
         } else if (isHorizontalSwipe && Math.abs(deltaX) > SWIPE_THRESHOLD && isSwipeInProgress) {
             e.preventDefault();
+            
             const order = getCurrentPageOrder(window.spaRouter?.currentCategory);
-            if (order.length > 1) {
-                deltaX > 0 ? navigateToPrevPlace() : navigateToNextPlace();
+            if (order.length <= 1) {
+                console.log('🎯 В категории только одна страница, свайп не работает');
+                touchStartX = null;
+                touchStartY = null;
+                isHorizontalSwipe = false;
+                isSwipeInProgress = false;
+                return;
+            }
+            
+            if (deltaX > 0) {
+                console.log('➡️ Свайп вправо, переход к предыдущей странице');
+                navigateToPrevPlace();
+            } else {
+                console.log('⬅️ Свайп влево, переход к следующей странице');
+                navigateToNextPlace();
             }
         }
+        
         touchStartX = null;
         touchStartY = null;
         isHorizontalSwipe = false;
@@ -213,48 +316,86 @@ function setupSwipeHandlers() {
     }, { passive: false });
 
     scrollZone.addEventListener("wheel", (e) => {
-        if (isAnimating) { if (e.cancelable) e.preventDefault(); return; }
+        if (isAnimating) {
+            if (e.cancelable) e.preventDefault();
+            return;
+        }
+        
         if (mode === "intro" && e.deltaY > 10) {
-            if (e.cancelable) e.preventDefault(); setMode("details");
+            if (e.cancelable) e.preventDefault();
+            setMode("details");
         } else if (mode === "details" && scrollZone.scrollTop <= 0 && e.deltaY < -10) {
-            if (e.cancelable) e.preventDefault(); setMode("intro");
+            if (e.cancelable) e.preventDefault();
+            setMode("intro");
         }
     }, { passive: false });
 }
 
 function setupKeyboardHandlers() {
     document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
         switch(e.key) {
-            case 'ArrowLeft': e.preventDefault(); navigateToPrevPlace(); break;
-            case 'ArrowRight': e.preventDefault(); navigateToNextPlace(); break;
-            case 'Escape': if (mode === "details") { e.preventDefault(); setMode("intro"); } break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                navigateToPrevPlace();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                navigateToNextPlace();
+                break;
+            case 'Escape':
+                if (mode === "details") {
+                    e.preventDefault();
+                    setMode("intro");
+                }
+                break;
         }
     });
 }
 
 function initializeDropdownsAndButtons() {
+    console.log('📋 Инициализация дропдаунов и кнопок...');
+    
     const paidBtn = document.getElementById('paidBtn');
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
     const entryNote = document.querySelector(".entry-note");
     
-    [addressDrop, usefulDrop].forEach(drop => {
-        if (!drop) return;
-        const arrow = drop.querySelector(".dropdown-arrow");
+    if (addressDrop) {
+        const arrow = addressDrop.querySelector(".dropdown-arrow");
         if (arrow) {
             const newArrow = arrow.cloneNode(true);
             arrow.parentNode.replaceChild(newArrow, arrow);
+            
             newArrow.addEventListener("click", (e) => {
                 e.stopPropagation();
                 if (isAnimating) return;
-                drop.classList.toggle("open");
+                addressDrop.classList.toggle("open");
+                console.log('Дропдаун Адрес:', addressDrop.classList.contains('open') ? 'открыт' : 'закрыт');
             });
         }
-    });
+    }
+    
+    if (usefulDrop) {
+        const arrow = usefulDrop.querySelector(".dropdown-arrow");
+        if (arrow) {
+            const newArrow = arrow.cloneNode(true);
+            arrow.parentNode.replaceChild(newArrow, arrow);
+            
+            newArrow.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (isAnimating) return;
+                usefulDrop.classList.toggle("open");
+                console.log('Дропдаун Полезное:', usefulDrop.classList.contains('open') ? 'открыт' : 'закрыт');
+            });
+        }
+    }
     
     if (!window.dropdownClickHandlerAdded) {
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function(e) {
             if (!e.target.closest('.dropdown')) {
                 if (addressDrop) addressDrop.classList.remove("open");
                 if (usefulDrop) usefulDrop.classList.remove("open");
@@ -263,21 +404,25 @@ function initializeDropdownsAndButtons() {
         window.dropdownClickHandlerAdded = true;
     }
     
-    if (paidBtn) paidBtn.onclick = () => setMode("details", { expandUseful: true });
-    if (entryNote) entryNote.onclick = (e) => {
-        if (!e.target.closest("#paidBtn")) setMode("details", { expandUseful: true });
-    };
+    if (paidBtn) {
+        paidBtn.onclick = () => {
+            console.log('Клик на paidBtn, вызываем setMode с expandUseful: true');
+            setMode("details", { expandUseful: true });
+        };
+    }
+    
+    if (entryNote) {
+        entryNote.onclick = (e) => {
+            if (!e.target.closest("#paidBtn")) {
+                console.log('Клик на entryNote, вызываем setMode с expandUseful: true');
+                setMode("details", { expandUseful: true });
+            }
+        };
+    }
 }
 
-// =============================================================================
-// ИНИЦИАЛИЗАЦИЯ МЕНЮ
-// =============================================================================
-
 window.initializeMenu = function() {
-    console.log('🔄 Инициализация меню...');
-    
-    if (isYandexBrowser()) document.body.classList.add('yandex-browser');
-    correctMobileUI();
+    console.log('🔄 Инициализация меню (после перехода)...');
     
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
@@ -291,50 +436,61 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
-    // Убираем анимации при первом рендере для плавности
+    // ✅ ОТКЛЮЧАЕМ АНИМАЦИИ для мгновенного отображения
     if (shouldOpenMenu) {
+        // Добавляем класс, который отключает transitions для всей страницы
         document.body.classList.add('no-transition');
-        const els = [frame, bgVideo, scrollZone, document.querySelector('.title-block'), document.querySelector('.hero-details'), document.getElementById('dropdownsContainer'), document.querySelector('.entry-note'), document.getElementById('paidBtn')].filter(Boolean);
-        els.forEach(el => el.style.cssText = 'transition: none !important; animation: none !important;');
-        setTimeout(() => { els.forEach(el => el.style.cssText = ''); document.body.classList.remove('no-transition'); }, 10);
+        
+        // Принудительно отключаем у ключевых элементов
+        const elementsToDisable = [
+            frame,
+            bgVideo,
+            scrollZone,
+            document.querySelector('.title-block'),
+            document.querySelector('.hero-details'),
+            document.getElementById('dropdownsContainer'),
+            document.querySelector('.entry-note'),
+            document.getElementById('paidBtn')
+        ].filter(el => el);
+        
+        elementsToDisable.forEach(el => {
+            el.style.transition = 'none !important';
+            el.style.animation = 'none !important';
+        });
+        
+        // Включаем анимации обратно через очень короткий таймаут
+        setTimeout(() => {
+            elementsToDisable.forEach(el => {
+                el.style.transition = '';
+                el.style.animation = '';
+            });
+            document.body.classList.remove('no-transition');
+        }, 10);
     }
     
-    if (frame) frame.className = `container mode-${mode}`;
+    // Применяем классы без анимации
+    if (frame) {
+        if (shouldOpenMenu) {
+            frame.classList.remove('mode-intro');
+            frame.classList.add('mode-details');
+        } else {
+            frame.classList.remove('mode-details');
+            frame.classList.add('mode-intro');
+        }
+    }
     
-    // === НОВАЯ УНИВЕРСАЛЬНАЯ ЛОГИКА ВИДЕО ===
+    // ✅ УПРАВЛЕНИЕ ВИДЕО: пауза при открытом меню
     if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
-        bgVideo.setAttribute('webkit-playsinline', '');
         bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
-
-        // Функция попытки запуска (используется и при инициализации, и при смене слайдов)
-        const attemptPlay = () => {
-            if (mode !== "intro") {
-                // Если мы в режиме деталей (меню открыто), видео должно быть на паузе
-                bgVideo.pause();
-                return;
-            }
-            if (!bgVideo.currentSrc && !bgVideo.src) return; // Нет источника
-
-            const playPromise = bgVideo.play();
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => console.log('✅ Video autoplay started'))
-                    .catch(err => console.warn('⚠️ Autoplay blocked:', err.name));
-            }
-        };
-
-        // Глобальный слушатель загрузки данных (Срабатывает ПРИ КАЖДОМ смене src)
-        // УБРАЛИ { once: true }, чтобы работало при навигации между местами
-        bgVideo.addEventListener('loadeddata', () => {
-            console.log('📦 Video data loaded, state:', mode);
-            attemptPlay();
-        });
-
-        // Попытка запустить сразу, если видео уже было в кэше браузера
-        if (bgVideo.readyState >= 2) attemptPlay();
+        
+        if (shouldOpenMenu) {
+            bgVideo.pause();
+        } else {
+            setTimeout(() => bgVideo.play().catch(() => {}), 100);
+        }
     }
     
     if (videoPoster) {
@@ -347,21 +503,31 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
-    if (sessionStorage.getItem('usefulDropdownState') === 'open' && usefulDrop) usefulDrop.classList.add("open");
+    // Восстанавливаем состояние dropdown
+    const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
+    if (savedDropdownState === 'open' && usefulDrop) {
+        usefulDrop.classList.add("open");
+    } else {
+        if (usefulDrop) usefulDrop.classList.remove("open");
+    }
     
     initializeDropdownsAndButtons();
+    initializeFullscreenButton();
+    setupGlobalFullscreenTrigger();
     setupSwipeHandlers();
     setupKeyboardHandlers();
-    updateNavigationVisibility();
     
+    // Очищаем состояние
     setTimeout(() => {
         sessionStorage.removeItem('menuState');
         sessionStorage.removeItem('usefulDropdownState');
     }, 100);
     
-    console.log('✅ Меню инициализировано');
-};
+    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, видео на паузе)' : '(с закрытым меню, видео играет)');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => { window.initializeMenu(); }, 50);
+    console.log('place_menu.js: DOMContentLoaded (первая загрузка)');
+    initializeDropdownsAndButtons();
+    window.initializeMenu();
 });
