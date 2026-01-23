@@ -1,3 +1,10 @@
+html {
+  /* Это база. 1rem будет равен 16px везде, даже если пользователь изменил настройки телефона */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px; 
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1008,46 +1015,45 @@
 
 
 
-/* Исправляем различия в размере шрифта между Chrome и Safari */
+
 
 @media (max-width: 750px) {
-  
-  /* 1. Подпись под фото */
+
+  /* Подпись к фото (текст снизу) */
   .story-caption-content {
-    /* Вместо 2.8vh используем clamp() для адаптивности, но на основе rem/px.
-       Это гарантирует, что размер не будет скакать от интерфейса браузера. */
-    font-size: clamp(18px, 2.8vh, 22px);
+    /* Вместо 2.8vh используем 1.15rem (это около 18.4 пикселей) */
+    font-size: 1.15rem; 
+    line-height: 1.4;
     
-    /* Принудительно устанавливаем сглаживание для одинакового вида */
+    /* Добавляем выравнивание */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    
-    /* Если font-weight: 100 слишком скачет, попробуйте поставить 300 или 400 */
-    /* font-weight: 300; */ 
   }
 
-  /* 2. Полноэкранный текст (при открытии) */
+  /* Текст при открытии оверлея */
   .caption-overlay.mobile-overlay .caption-fullscreen,
   .caption-fullscreen {
-    font-size: clamp(20px, 3.2vh, 24px); /* Вместо 2.8vh */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    /* Вместо 2.8vh используем 1.35rem (около 21.6 пикселей) */
+    font-size: 1.35rem;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Название места вверху */
+  .stories-label {
+    /* Вместо 3.2vh используем 1.6rem (около 25.6 пикселей) */
+    font-size: 1.6rem;
   }
   
-  /* 3. Лейбл названия места */
-  .stories-label {
-    font-size: clamp(20px, 3.2vh, 26px); /* Вместо 3.2vh */
-    -webkit-font-smoothing: antialiased;
+  /* Если нужно подправить для ландшафтного режима */
+  @media (max-width: 1080px) and (orientation: landscape) {
+    .story-caption-content {
+       font-size: 1rem; /* Чуть меньше при горизонтальном положении */
+    }
+    .caption-overlay.mobile-overlay .caption-fullscreen {
+       font-size: 1.2rem;
+    }
   }
 }
-
-
-
-
-
-
-
 
 
 
