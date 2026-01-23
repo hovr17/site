@@ -428,6 +428,7 @@ window.initializeMenu = function() {
     const usefulDrop = document.getElementById('usefulDrop');
     const videoPoster = document.getElementById('videoPoster');
     
+    // Отключаем анимации для мгновенного рендеринга при возврате на страницу
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         
@@ -454,6 +455,7 @@ window.initializeMenu = function() {
         }, 10);
     }
     
+    // Установка классов контейнера
     if (frame) {
         if (shouldOpenMenu) {
             frame.classList.remove('mode-intro');
@@ -464,19 +466,52 @@ window.initializeMenu = function() {
         }
     }
     
+    // === ИСПРАВЛЕННАЯ ЛОГИКА ВИДЕО ===
     if (bgVideo) {
+        // 1. Принудительная установка атрибутов для мобильных
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
+        bgVideo.setAttribute('webkit-playsinline', '');
         bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
         
+        // 2. Функция попытки запуска
+        const attemptPlay = () => {
+            if (!bgVideo.currentSrc && !bgVideo.src) {
+                console.warn('⚠️ Video src is empty, waiting for data...');
+                return;
+            }
+
+            const playPromise = bgVideo.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => console.log('✅ Video autoplay started successfully'))
+                    .catch(err => console.warn('⚠️ Autoplay blocked or error:', err.name, err.message));
+            }
+        };
+
         if (shouldOpenMenu) {
             bgVideo.pause();
         } else {
-            setTimeout(() => bgVideo.play().catch(() => {}), 100);
+            // Проверяем, загружены ли уже метаданные
+            if (bgVideo.readyState >= 2) {
+                attemptPlay();
+            } else {
+                // Если данных еще нет, ждем события загрузки
+                bgVideo.addEventListener('loadeddata', () => {
+                    console.log('📦 Video data loaded, attempting play...');
+                    attemptPlay();
+                }, { once: true });
+                
+                // Fallback на случай, если loadeddata сработал до подписки
+                if (bgVideo.readyState > 0) {
+                     attemptPlay();
+                }
+            }
         }
     }
     
+    // Постер (обложка)
     if (videoPoster) {
         videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
         videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
