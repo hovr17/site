@@ -945,17 +945,18 @@
 @media (max-width: 1080px) {
  .yandex-browser .story-caption-container {
     /* 1. Поднимаем контейнер с текстом еще на 70px вниз (115 + 70 = 185px) */
-    bottom: 145px !important;
+    bottom: 135px !important;
   }
 
   .yandex-browser .caption-expand-btn {
     /* 2. Поднимаем кнопку раскрытия на 70px вверх (база 1vh + 70px) */
-    bottom: calc(1vh + 30px) !important;
+    bottom: calc(1vh + 0px) !important;
   }
 
   .yandex-browser .story-image {
     /* 3. Поднимаем изображение еще на 50px вверх (-50px - 50px = -100px ) */
-    margin-top: -50px !important;
+    margin-top: -30px !important;
   }
 }
+
 
