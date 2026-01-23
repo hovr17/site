@@ -33,6 +33,13 @@ class StoriesManager {
     
     this.updateLabel();
     
+    // === НОВАЯ ПРОВЕРКА: ДОБАВЛЯЕМ КЛАСС ЯНДЕКС.БРАУЗЕРА ===
+    if (/YaBrowser/i.test(navigator.userAgent)) {
+      document.body.classList.add('yandex-browser');
+      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
+    }
+    // =================================================================
+    
     if (this.isDesktop && this.currentSlide === 0) {
       this.prevArrow.classList.add('hidden');
     }
@@ -607,4 +614,5 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
