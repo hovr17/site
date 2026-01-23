@@ -86,7 +86,7 @@ class StoriesManager {
     this.createProgressBars();
   }
   
-  addCaptionToSlide(slide, index, captionText) {
+   addCaptionToSlide(slide, index, captionText) {
     const captionContainer = document.createElement('div');
     captionContainer.className = 'story-caption-container';
     
@@ -94,63 +94,81 @@ class StoriesManager {
     captionContent.className = 'story-caption-content';
     
     if (!this.isDesktop) {
-      // Мобильная логика
+      // === МОБИЛЬНАЯ ЛОГИКА (ИСПРАВЛЕНО) ===
+      
+      const isLongText = captionText.length > 135;
+      
       const textElement = document.createElement('div');
       textElement.className = 'story-caption-text';
-      textElement.textContent = captionText;
+      
+      if (isLongText) {
+        // Обрезаем текст так же, как на ПК
+        const shortText = captionText.substring(0, 135);
+        const lastSpaceIndex = shortText.lastIndexOf(' ');
+        const displayText = lastSpaceIndex > 0 
+          ? shortText.substring(0, lastSpaceIndex) 
+          : shortText;
+        
+        textElement.textContent = displayText + '...';
+      } else {
+        // Если текст короткий, выводим его целиком
+        textElement.textContent = captionText;
+      }
+      
       captionContent.appendChild(textElement);
       
-      // Оверлей для мобильных
-      const overlay = document.createElement('div');
-      overlay.className = 'caption-overlay mobile-overlay';
-      overlay.dataset.slideIndex = index;
-      
-      const fullscreenCaption = document.createElement('div');
-      fullscreenCaption.className = 'caption-fullscreen';
-      
-      const fullscreenContent = document.createElement('div');
-      fullscreenContent.className = 'caption-fullscreen-content';
-      fullscreenContent.textContent = captionText;
-      
-      fullscreenCaption.appendChild(fullscreenContent);
-      overlay.appendChild(fullscreenCaption);
-      
-      // Кнопка раскрытия (стрелка) для мобильных
-      const expandBtn = document.createElement('button');
-      expandBtn.className = 'caption-expand-btn mobile-expand-btn';
-      expandBtn.innerHTML = `
-        <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
-      `;
-      
-      expandBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+      // Если текст длинный, создаем оверлей и кнопку раскрытия.
+      // Если текст короткий, они не нужны (текст и так виден).
+      if (isLongText) {
+        const overlay = document.createElement('div');
+        overlay.className = 'caption-overlay mobile-overlay';
+        overlay.dataset.slideIndex = index;
         
-        // Показываем оверлей
-        overlay.classList.add('active');
-        captionContainer.classList.add('hidden');
-        this.isOverlayOpen = true;
-        this.container.classList.add('overlay-open');
-      });
+        const fullscreenCaption = document.createElement('div');
+        fullscreenCaption.className = 'caption-fullscreen';
+        
+        const fullscreenContent = document.createElement('div');
+        fullscreenContent.className = 'caption-fullscreen-content';
+        fullscreenContent.textContent = captionText;
+        
+        fullscreenCaption.appendChild(fullscreenContent);
+        overlay.appendChild(fullscreenCaption);
+        
+        const expandBtn = document.createElement('button');
+        expandBtn.className = 'caption-expand-btn mobile-expand-btn';
+        expandBtn.innerHTML = `
+          <img src="ui/open_menu_button.svg" alt="Раскрыть" class="expand-icon">
+        `;
+        
+        expandBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          overlay.classList.add('active');
+          captionContainer.classList.add('hidden');
+          this.isOverlayOpen = true;
+          this.container.classList.add('overlay-open');
+        });
+        
+        const handleOverlayClick = (e) => {
+          if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
+            this.closeOverlay(overlay, expandBtn);
+          }
+        };
+        
+        overlay.addEventListener('click', handleOverlayClick);
+        overlay.addEventListener('touchend', handleOverlayClick);
+        
+        captionContent.appendChild(expandBtn);
+        slide.appendChild(overlay);
+      }
       
-      // Обработчик клика по оверлею для закрытия
-      const handleOverlayClick = (e) => {
-        if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
-          this.closeOverlay(overlay, expandBtn);
-        }
-      };
-      
-      overlay.addEventListener('click', handleOverlayClick);
-      overlay.addEventListener('touchend', handleOverlayClick);
-      
-      captionContent.appendChild(expandBtn);
       captionContainer.appendChild(captionContent);
       slide.appendChild(captionContainer);
-      slide.appendChild(overlay);
       return;
+      // === КОНЕЦ МОБИЛЬНОЙ ЛОГИКИ ===
     }
     
-    // Десктопная логика
+    // ДЕСКТОПНАЯ ЛОГИКА (без изменений)
     const isLongText = captionText.length > 135;
     
     if (isLongText) {
@@ -201,8 +219,6 @@ class StoriesManager {
       
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        
-        // Показываем оверлей
         captionContent.classList.add('no-bg');
         captionContainer.classList.add('hidden');
         overlay.classList.add('active');
@@ -214,7 +230,6 @@ class StoriesManager {
         }, 10);
       });
       
-      // Обработчик клика по оверлею для закрытия
       const handleOverlayClick = (e) => {
         if (e.target === overlay || e.target === fullscreenCaption || e.target === fullscreenContent) {
           this.closeOverlay(overlay, expandBtn);
@@ -592,3 +607,4 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
