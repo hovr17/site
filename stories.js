@@ -20,35 +20,59 @@ class StoriesManager {
     
     this.init();
   }
-  
- init() {
-const urlParams = new URLSearchParams(window.location.search);
-this.placeId = urlParams.get('place');
 
-this.placeData = storiesData[this.placeId];
+  // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА НА ЭКРАНЕ ===
+  showDebugInfo(text) {
+    // Проверяем, нет ли уже блока, чтобы не дублировать
+    if (document.querySelector('.debug-browser-info')) return;
 
-if (!this.placeData) {
-console.error(`Данные для места "${this.placeId}" не найдены`);
-}
+    const debugEl = document.createElement('div');
+    debugEl.className = 'debug-browser-info';
+    debugEl.textContent = text;
+    document.body.appendChild(debugEl);
+    
+    // Также выводим в консоль для разработчика
+    console.log(`📱 DEBUG UI: ${text}`);
+  }
 
-this.updateLabel();
+  init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    this.placeId = urlParams.get('place');
 
-// === НОВАЯ ПРОВЕРКА: ДОБАВЛЯЕМ КЛАСС ЯНДЕКС.БРАУЗЕРА ===
-if (/YaBrowser/i.test(navigator.userAgent)) {
-document.body.classList.add('yandex-browser');
-console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
-}
-// =================================================================
+    this.placeData = storiesData[this.placeId];
 
-if (this.isDesktop && this.currentSlide === 0) {
-this.prevArrow.classList.add('hidden');
-}
+    if (!this.placeData) {
+      console.error(`Данные для места "${this.placeId}" не найдены`);
+    }
 
+    this.updateLabel();
 
+    // === ПРОВЕРКА БРАУЗЕРОВ (SAFARI & YANDEX) ===
+    
+    // 1. Яндекс.Браузер
+    if (/YaBrowser/i.test(navigator.userAgent)) {
+      document.body.classList.add('yandex-browser');
+      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
+      this.showDebugInfo('YANDEX.BROWSER');
+    }
 
-this.loadImages();
-this.setupEventListeners();
-this.updateArrowVisibility();
+    // 2. Safari (исключаем Chrome, CriOS, Edge, Opera, Firefox, Яндекс)
+    const isSafari = /^((?!chrome|android|crios|fxios|edg|opr|yabrowser).)*safari/i.test(navigator.userAgent);
+    
+    if (isSafari) {
+      document.body.classList.add('safari-browser');
+      console.log('🍎 Обнаружен браузер Safari (Stories)');
+      this.showDebugInfo('SAFARI');
+    }
+    // ================================================
+
+    if (this.isDesktop && this.currentSlide === 0) {
+      this.prevArrow.classList.add('hidden');
+    }
+
+    this.loadImages();
+    this.setupEventListeners();
+    this.updateArrowVisibility();
   }
   
   updateLabel() {
@@ -103,7 +127,7 @@ this.updateArrowVisibility();
     captionContent.className = 'story-caption-content';
     
     if (!this.isDesktop) {
-      // === МОБИЛЬНАЯ ЛОГИКА (ИСПРАВЛЕНО) ===
+      // === МОБИЛЬНАЯ ЛОГИКА ===
       
       const isLongText = captionText.length > 135;
       
@@ -177,7 +201,7 @@ this.updateArrowVisibility();
       // === КОНЕЦ МОБИЛЬНОЙ ЛОГИКИ ===
     }
     
-    // ДЕСКТОПНАЯ ЛОГИКА (без изменений)
+    // ДЕСКТОПНАЯ ЛОГИКА
     const isLongText = captionText.length > 135;
     
     if (isLongText) {
@@ -616,8 +640,3 @@ this.updateArrowVisibility();
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
-
-
-
-
-
