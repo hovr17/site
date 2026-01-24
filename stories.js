@@ -30,84 +30,92 @@ class StoriesManager {
   }
 
   // === МЕТОД ПРОВЕРКИ И ВРУЧНОГО ПОДЪЕМА ===
-checkLiftDebug() {
-    // Небольшая задержка, чтобы DOM отрисовался
+  // === НОВЫЙ МЕТОД: Применение значений Safe Area из библиотеки ===
+  applySafeAreaVariables() {
+    // 1. Проверяем, загружена ли библиотека
+    if (typeof safeAreaInsets === 'undefined') {
+      console.warn('safeAreaInsets library not loaded. Using default CSS env().');
+      return;
+    }
+
+    // 2. Логика чтения/записи из localStorage (как вы просили)
+    
+    // TOP (Верхняя часть)
+    if (safeAreaInsets.support && safeAreaInsets.top !== 0) {
+      localStorage.setItem('safe-area-inset-top', safeAreaInsets.top);
+    }
+    if (localStorage.getItem('safe-area-inset-top') > 0) {
+      document.documentElement.style.setProperty('--sat', localStorage.getItem('safe-area-inset-top') + "px");
+    }
+
+    // BOTTOM (Нижняя часть)
+    if (safeAreaInsets.support && safeAreaInsets.bottom !== 0) {
+      localStorage.setItem('safe-area-inset-bottom', safeAreaInsets.bottom);
+    }
+    if (localStorage.getItem('safe-area-inset-bottom') > 0) {
+      document.documentElement.style.setProperty('--sab', localStorage.getItem('safe-area-inset-bottom') + "px");
+    }
+    
+    console.log('📏 Safe Area applied:', {
+      top: getComputedStyle(document.documentElement).getPropertyValue('--sat'),
+      bottom: getComputedStyle(document.documentElement).getPropertyValue('--sab')
+    });
+  }
+
+  // === ОБНОВЛЕННЫЙ МЕТОД: Используем переменные для подьема ===
+  checkLiftDebug() {
+    // Небольшая задержка, чтобы DOM и переменные CSS загрузились
     setTimeout(() => {
       const container = document.querySelector('.story-caption-container');
       const debugEl = document.querySelector('.debug-browser-info');
 
       if (!container || !debugEl) return;
 
-      // Определяем класс, который мы добавили в init
+      // Определяем классы браузеров
+      const isSafari = document.body.classList.contains('safari-ios-only');
+      const isChrome = document.body.classList.contains('chrome-ios-only');
+      const isYandex = document.body.classList.contains('yandex-browser');
+
       let appliedLift = "ERROR";
       let liftValue = 0;
-      let safeArea = "env(safe-area-inset-bottom)";
 
-      // === ЛОГИКА "РАВНОГО ОТСТУПА" ===
+      // === ЛОГИКА ИЗМЕРЕНИЯ ПОДЪЕМА ===
       
-      // 1. САФАРИ (Нужен большой подъем, так как панель перекрывает)
-      if (document.body.classList.contains('safari-ios-only')) {
-        liftValue = 44; // Примерная высота панели Сафари
+      // 1. SAFAARI (iOS) 
+      // Панель перекрывает контент. 
+      // Подъем: ~44px (панель) + 1px (ваш запас)
+      if (isSafari) {
+        liftValue = 44;
         appliedLift = `44px (Safari)`;
       } 
-      // 2. CHROME IOS (Панель сама толкает, подъем не нужен, только запас)
-      else if (document.body.classList.contains('chrome-ios-only')) {
-        liftValue = 1; 
-        appliedLift = `1px (Chrome)`;
-      }
-      // 3. ЯНДЕКС (Ведет себя как Chrome)
-      else if (document.body.classList.contains('yandex-browser')) {
+      // 2. CHROME (iOS) или YANDEX
+      // Панель под контентом. Достаточно 1px запаса.
+      else if (isChrome || isYandex) {
         liftValue = 1;
-        appliedLift = `1px (Yandex)`;
+        appliedLift = `1px (Chrome/Yandex)`;
       }
-      // 4. ОСТАЛЬНЫЕ
+      // 3. ОСТАЛЬНЫЕ
       else {
         liftValue = 1;
         appliedLift = `1px (Standard)`;
       }
 
-      // === ВРУЧНАЯ УСТАНОВКА СТИЛЕЙ (ОБХОДИМ CSS) ===
-      // Мы устанавливаем bottom прямо через JS, чтобы убедиться,
-      // что ни один CSS-хак не нарушил нашу логику.
+      // === ПРИМЕНЯЕМ СТИЛИ С ИСПОЛЬЗОВАНИЕМ ПЕРЕМЕННЫХ БИБЛИОТЕКИ ===
       
-      // Сбрасываем padding-bottom в 0, чтобы не было суммирования
-      // с нашими классами из вашего CSS
+      // Сбрасываем padding-bottom, чтобы не было дублей с вашим CSS
       container.style.paddingBottom = "0px";
 
-      // Применяем формулу: Подъем (1 или 44) + Запас + Полоска дома
-      container.style.bottom = `calc(${liftValue}px + 1px + ${safeArea})`;
+      // Формула: Подъем (1 или 44) + Переменная из библиотеки + Ваш запас 1px
+      // var(--sab) подставит значение из localStorage
+      container.style.bottom = `calc(${liftValue}px + var(--sab, 0px) + 1px)`;
 
-      // Обновляем текст дебага
-      debugEl.textContent += ` | LIFT: ${appliedLift}`;
-      
-      // Если это Сафари, подсвечиваем дебаг зеленым для наглядности
-      if (liftValue === 44) {
-        debugEl.style.backgroundColor = "#4cd964"; // Зеленый для Сафари
-      }
+      // Обновляем дебаг с указанием использованного значения Safe Area
+      const sabValue = getComputedStyle(document.documentElement).getPropertyValue('--sab').trim();
+      debugEl.textContent += ` | LIFT: ${appliedLift} | SAB: ${sabValue}`;
 
     }, 100);
   }
-  
 
-  // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА НА ЭКРАНЕ ===
-  // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА С ИНФОРМАЦИЕЙ ОБ ОТСТУПАХ ===
-  showDebugInfo(text) {
-    const existing = document.querySelector('.debug-browser-info');
-    if (existing) {
-      // Если плашка уже есть, обновляем её (нужно если браузер определился позже)
-      existing.textContent = text;
-      return;
-    }
-
-    const debugEl = document.createElement('div');
-    debugEl.className = 'debug-browser-info';
-    debugEl.textContent = text;
-    document.body.appendChild(debugEl);
-    
-    console.log(`📱 DEBUG: ${text}`);
-  }
-
- 
   init() {
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
@@ -120,38 +128,32 @@ checkLiftDebug() {
 
     this.updateLabel();
 
-    // === СТРОГАЯ ДЕТЕКЦИЯ БРАУЗЕРОВ НА iOS ===
-    
+    // === СТРОГАЯ ДЕТЕКЦИЯ БРАУЗЕРОВ ===
     const ua = navigator.userAgent;
     const isIOS = /iPad|iPhone|iPod/.test(ua);
     
     let browserName = "UNKNOWN";
     
-    // Сбрасываем классы
+    // Сброс классов
     document.body.classList.remove('safari-ios-only', 'chrome-ios-only', 'yandex-browser');
 
     if (isIOS) {
-      // 1. Yandex Browser (Проверяем явно)
       if (/YaBrowser/.test(ua)) {
         document.body.classList.add('yandex-browser');
         browserName = "YANDEX (iOS)";
       }
-      // 2. Google Chrome (iOS) - ИЩИМ CriOS
       else if (/CriOS/.test(ua)) {
         document.body.classList.add('chrome-ios-only');
         browserName = "CHROME (iOS)";
       }
-      // 3. Safari (iOS) - Это то, что осталось, но убедимся что это не Firefox (FxiOS)
       else if (/Safari/.test(ua) && !/FxiOS/.test(ua)) {
         document.body.classList.add('safari-ios-only');
         browserName = "SAFARI (iOS)";
       }
-      // 4. Другие (Firefox, Edge и т.д.) - ведем как Chrome (подъем 1px)
       else {
         browserName = "OTHER (iOS)";
       }
     } else {
-      // Android или Desktop
       if (/YaBrowser/.test(ua)) {
         document.body.classList.add('yandex-browser');
         browserName = "YANDEX";
@@ -160,11 +162,14 @@ checkLiftDebug() {
       }
     }
     
-    // Показываем базовый дебаг
     this.showDebugInfo(browserName);
     
-    // ================================================
-
+    // === ЗАПУСК ПОДГОТОВКИ ПЕРЕМЕННЫХ И ПОДЪЕМА ===
+    
+    // 1. Применяем значения из safeAreaInsets (если есть)
+    this.applySafeAreaVariables();
+    
+    // 2. Инициализируем основной функционал
     if (this.isDesktop && this.currentSlide === 0) {
       this.prevArrow.classList.add('hidden');
     }
@@ -173,9 +178,9 @@ checkLiftDebug() {
     this.setupEventListeners();
     this.updateArrowVisibility();
 
-    // Запускаем проверку и применение отступов
+    // 3. Запускаем финальную проверку и подъем текста
     this.checkLiftDebug();
-  }
+  }}
   
   updateLabel() {
     const oldLabel = document.getElementById('storiesLabel');
@@ -742,6 +747,7 @@ checkLiftDebug() {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
