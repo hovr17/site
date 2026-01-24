@@ -240,7 +240,7 @@ width: 100%;
 max-width: 100%;
 color: #ffffff;
 font-family: 'Crooker', sans-serif;
-font-size: 18px;
+font-size: 5px; /*18*/
 font-weight: 100;
 line-height: 1.5;
 padding: 20px 25px 50px;
@@ -1010,6 +1010,7 @@ pointer-events: none; /* Чтобы плашка не перекрывала к�
 text-transform: uppercase;
 letter-spacing: 1px;
 }
+
 
 
 
