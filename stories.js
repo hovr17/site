@@ -19,7 +19,61 @@ class StoriesManager {
     this.overlayJustClosed = false;
     
     this.init();
+
+    this.loadImages();
+    this.setupEventListeners();
+    this.updateArrowVisibility();
+
+    // === ДОБАВЛЯЕМ ПРОВЕРКУ ПОСЛЕ ЗАГРУЗКИ ===
+    // Это проверит, сработали ли ваши CSS стили, и починит если нет
+    this.checkLiftDebug();
   }
+
+  // === МЕТОД ПРОВЕРКИ И ВРУЧНОГО ПОДЪЕМА ===
+  checkLiftDebug() {
+    // Небольшая задержка, чтобы CSS успел примениться
+    setTimeout(() => {
+      const container = document.querySelector('.story-caption-container');
+      const debugEl = document.querySelector('.debug-browser-info');
+
+      // Если контейнер или дебаг не найдены, ничего не делаем
+      if (!container || !debugEl) return;
+
+      // 1. Вычисляем стиль bottom, который применился из вашего CSS
+      const computedBottom = window.getComputedStyle(container).bottom;
+      
+      // 2. Проверяем, является ли браузер Сафари (по классу, который мы добавили в init)
+      const isSafari = document.body.classList.contains('safari-browser');
+
+      // 3. ЛОГИКА: 
+      // Если это Сафари, но computedBottom равен "0px", значит CSS-хак сработал НЕВЕРНО 
+      // (подъем через padding не спас текст, или хак @supports не сработал)
+      if (isSafari && computedBottom === '0px') {
+        console.warn('🐛 Safari Lift CSS not applied. Performing Manual Lift.');
+
+        // === ВРУЧНАЯ КОМПЕНСАЦИЯ ===
+        // Поднимаем контейнер через JS, чтобы текст не прятался
+        container.style.bottom = "calc(50px + env(safe-area-inset-bottom) + 1px)";
+        
+        // Сбрасываем лишний padding-bottom, чтобы не было двойного отступа 
+        // (так как мы подняли весь блок, а не контент внутри)
+        container.style.paddingBottom = "0px";
+
+        // Обновляем текст дебага
+        debugEl.textContent += " | LIFT: FAILED (Fixed by JS)";
+        debugEl.style.backgroundColor = "#ff9500"; // Оранжевый цвет, если была ошибка
+
+      } else if (isSafari && computedBottom !== '0px') {
+        // Сафари, и CSS успешно поднял блок (bottom не 0)
+        debugEl.textContent += " | LIFT: CSS OK";
+      } else {
+        // Не Сафари (например, Chrome/Yandex)
+        debugEl.textContent += " | LIFT: STD (1px)";
+      }
+
+    }, 100); // 100ms задержка на обработку
+  }
+  
 
   // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА НА ЭКРАНЕ ===
   // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА С ИНФОРМАЦИЕЙ ОБ ОТСТУПАХ ===
@@ -657,6 +711,7 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
