@@ -1021,79 +1021,8 @@ letter-spacing: 1px;
 
 
 
-@media (max-width: 750px) {
-
-/* 1. ИСПРАВЛЯЕМ КОНТЕЙНЕР С ПОДПИСЬЮ */
-.story-caption-container {
-bottom: 0; /* Прижимаем ровно к низу */
-width: 100%;
-
-/* ЗАМЕНЯЕМ VH НА PX */
-/* Было: padding: 2vh 4vw 4vh; */
-/* Стало: жесткие отступы.
-Сверху 20px, по бокам 20px, снизу 50px (место для текста и кнопки) */
-padding: 20px 20px 50px !important;
-
-/* ДОБАВЛЯЕМ УЧЕТ ДОМАШНЕЙ ПОЛОСКИ iPHONE */
-/* calc(50px + отступ под кнопку внизу экрана) */
-padding-bottom: calc(50px + env(safe-area-inset-bottom)) !important;
-
-/* Минимальная высота, чтобы контейнер не сплющивался */
-min-height: 150px;
-
-/* Убираем старые стили если они конфликтуют */
-border-radius: 0;
-}
-
-/* 2. ИСПРАВЛЯЕМ КНОПКУ РАСКРЫТИЯ */
-.caption-expand-btn {
-/* ЗАМЕНЯЕМ VH НА PX */
-/* Было: bottom: 1vh; */
-/* Стало: фиксируем кнопку над текстом */
-bottom: 10px !important;
-
-/* Фиксируем размер кнопки, чтобы иконка не скакала */
-width: 40px !important;
-height: 40px !important;
-
-z-index: 4;
-transform: translateX(-50%);
-}
-
-/* 3. Если текст длинный (без кнопки), уменьшаем нижний отступ */
-.story-caption-container:not(:has(.caption-expand-btn)) {
-padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
-}
 
 
-}
-
-
-
-/* === ХАК ДЛЯ ИСПРАВЛЕНИЯ ПАНЕЛИ В SAFARI (iOS) === */
-/* Применяется только к Webkit браузерам (Safari, Chrome на iOS) */
-@supports (-webkit-touch-callout: none) {
-
-/* Проверяем, если высота экрана совпадает с iOS (обычно до ~932px) */
-@media (max-height: 932px) and (max-width: 1080px) {
-
-.story-caption-container {
-/*
-В SAFARI мы добавляем отступ 50px (высота панели браузера)
-+ полоска дома + 1px ваш запас.
-Это гарантированно поднимет текст над панелью.
-*/
-bottom: calc(50px + env(safe-area-inset-bottom) + 1px) !important;
-}
-
-/* Также убедимся, что контейнер растянут правильно, чтобы не было белых полос */
-.stories-container {
-height: -webkit-fill-available !important;
-/* Fallback для случая если fill-available не сработал */
-height: 100dvh;
-}
-}
-}
 
 
 
