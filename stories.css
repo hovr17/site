@@ -1013,6 +1013,38 @@ letter-spacing: 1px;
 
 
 
+/* ==========================================================================
+   СТИЛИ ДЛЯ ВСЕХ БРАУЗЕРОВ КРОМЕ ЯНДЕКС (Используем dvh)
+   ========================================================================= */
+@media (max-width: 1080px) {
+  
+  /* 1. Контейнер */
+  .stories-container:not(.yandex-browser) {
+    /* 
+       height: 100dvh - это и есть "последний видимый пиксель".
+       Браузер сам вычисляет высоту экрана минус свои панели.
+       Контент не будет уходить под панель.
+    */
+    height: 100dvh !important;
+  }
+
+  /* 2. Контейнер с текстом */
+  .stories-container:not(.yandex-browser) .story-caption-container {
+    /* 
+       Фиксируем позицию на 1px выше динамического края.
+       env(safe-area-inset-bottom) добавит запас, если есть "домашняя полоска" iPhone.
+    */
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+    
+    /* Важно: убираем padding-bottom, так как мы используем bottom для позиционирования */
+    padding-bottom: 0px !important;
+  }
+
+  /* Если текст короткий и кнопки нет, логика остается той же */
+  .stories-container:not(.yandex-browser) .story-caption-container:not(:has(.caption-expand-btn)) {
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+  }
+}
 
 
 
