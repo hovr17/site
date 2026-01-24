@@ -30,48 +30,62 @@ class StoriesManager {
   }
 
   // === МЕТОД ПРОВЕРКИ И ВРУЧНОГО ПОДЪЕМА ===
-  checkLiftDebug() {
-    // Небольшая задержка, чтобы CSS успел примениться
+checkLiftDebug() {
+    // Небольшая задержка, чтобы DOM отрисовался
     setTimeout(() => {
       const container = document.querySelector('.story-caption-container');
       const debugEl = document.querySelector('.debug-browser-info');
 
-      // Если контейнер или дебаг не найдены, ничего не делаем
       if (!container || !debugEl) return;
 
-      // 1. Вычисляем стиль bottom, который применился из вашего CSS
-      const computedBottom = window.getComputedStyle(container).bottom;
+      // Определяем класс, который мы добавили в init
+      let appliedLift = "ERROR";
+      let liftValue = 0;
+      let safeArea = "env(safe-area-inset-bottom)";
+
+      // === ЛОГИКА "РАВНОГО ОТСТУПА" ===
       
-      // 2. Проверяем, является ли браузер Сафари (по классу, который мы добавили в init)
-      const isSafari = document.body.classList.contains('safari-browser');
-
-      // 3. ЛОГИКА: 
-      // Если это Сафари, но computedBottom равен "0px", значит CSS-хак сработал НЕВЕРНО 
-      // (подъем через padding не спас текст, или хак @supports не сработал)
-      if (isSafari && computedBottom === '0px') {
-        console.warn('🐛 Safari Lift CSS not applied. Performing Manual Lift.');
-
-        // === ВРУЧНАЯ КОМПЕНСАЦИЯ ===
-        // Поднимаем контейнер через JS, чтобы текст не прятался
-        container.style.bottom = "calc(50px + env(safe-area-inset-bottom) + 1px)";
-        
-        // Сбрасываем лишний padding-bottom, чтобы не было двойного отступа 
-        // (так как мы подняли весь блок, а не контент внутри)
-        container.style.paddingBottom = "0px";
-
-        // Обновляем текст дебага
-        debugEl.textContent += " | LIFT: FAILED (Fixed by JS)";
-        debugEl.style.backgroundColor = "#ff9500"; // Оранжевый цвет, если была ошибка
-
-      } else if (isSafari && computedBottom !== '0px') {
-        // Сафари, и CSS успешно поднял блок (bottom не 0)
-        debugEl.textContent += " | LIFT: CSS OK";
-      } else {
-        // Не Сафари (например, Chrome/Yandex)
-        debugEl.textContent += " | LIFT: STD (1px)";
+      // 1. САФАРИ (Нужен большой подъем, так как панель перекрывает)
+      if (document.body.classList.contains('safari-ios-only')) {
+        liftValue = 44; // Примерная высота панели Сафари
+        appliedLift = `44px (Safari)`;
+      } 
+      // 2. CHROME IOS (Панель сама толкает, подъем не нужен, только запас)
+      else if (document.body.classList.contains('chrome-ios-only')) {
+        liftValue = 1; 
+        appliedLift = `1px (Chrome)`;
+      }
+      // 3. ЯНДЕКС (Ведет себя как Chrome)
+      else if (document.body.classList.contains('yandex-browser')) {
+        liftValue = 1;
+        appliedLift = `1px (Yandex)`;
+      }
+      // 4. ОСТАЛЬНЫЕ
+      else {
+        liftValue = 1;
+        appliedLift = `1px (Standard)`;
       }
 
-    }, 100); // 100ms задержка на обработку
+      // === ВРУЧНАЯ УСТАНОВКА СТИЛЕЙ (ОБХОДИМ CSS) ===
+      // Мы устанавливаем bottom прямо через JS, чтобы убедиться,
+      // что ни один CSS-хак не нарушил нашу логику.
+      
+      // Сбрасываем padding-bottom в 0, чтобы не было суммирования
+      // с нашими классами из вашего CSS
+      container.style.paddingBottom = "0px";
+
+      // Применяем формулу: Подъем (1 или 44) + Запас + Полоска дома
+      container.style.bottom = `calc(${liftValue}px + 1px + ${safeArea})`;
+
+      // Обновляем текст дебага
+      debugEl.textContent += ` | LIFT: ${appliedLift}`;
+      
+      // Если это Сафари, подсвечиваем дебаг зеленым для наглядности
+      if (liftValue === 44) {
+        debugEl.style.backgroundColor = "#4cd964"; // Зеленый для Сафари
+      }
+
+    }, 100);
   }
   
 
@@ -93,6 +107,7 @@ class StoriesManager {
     console.log(`📱 DEBUG: ${text}`);
   }
 
+ 
   init() {
     const urlParams = new URLSearchParams(window.location.search);
     this.placeId = urlParams.get('place');
@@ -105,35 +120,49 @@ class StoriesManager {
 
     this.updateLabel();
 
-    // === ТОЧНАЯ ДЕТЕКЦИЯ БРАУЗЕРОВ ===
+    // === СТРОГАЯ ДЕТЕКЦИЯ БРАУЗЕРОВ НА iOS ===
+    
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
     
     let browserName = "UNKNOWN";
-    let liftValue = "STANDARD"; // Значение отступа
+    
+    // Сбрасываем классы
+    document.body.classList.remove('safari-ios-only', 'chrome-ios-only', 'yandex-browser');
 
-    // 1. Яндекс.Браузер
-    if (/YaBrowser/i.test(navigator.userAgent)) {
-      document.body.classList.add('yandex-browser');
-      browserName = "YANDEX";
-      // Яндекс обычно работает как Chrome (без поднятия), но вы можете задать здесь "44px" если нужно
-      liftValue = "1px"; 
-    } 
-    // 2. Настоящий Safari (проверяем строку Safari, но исключаем Chrome, CriOS, FxiOS, YaBrowser)
-    else if (/Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS|YaBrowser/.test(navigator.userAgent)) {
-      document.body.classList.add('safari-browser');
-      // ДОБАВЛЯЕМ СПЕЦИАЛЬНЫЙ КЛАСС ТОЛЬКО ДЛЯ CSS
-      document.body.classList.add('is-apple-safari');
-      
-      browserName = "SAFARI";
-      liftValue = "44px (PANEL)"; // Это подъем над панелью браузера
-    }
-    // 3. Chrome и остальные
-    else {
-      browserName = "CHROME/OTHER";
-      liftValue = "1px";
+    if (isIOS) {
+      // 1. Yandex Browser (Проверяем явно)
+      if (/YaBrowser/.test(ua)) {
+        document.body.classList.add('yandex-browser');
+        browserName = "YANDEX (iOS)";
+      }
+      // 2. Google Chrome (iOS) - ИЩИМ CriOS
+      else if (/CriOS/.test(ua)) {
+        document.body.classList.add('chrome-ios-only');
+        browserName = "CHROME (iOS)";
+      }
+      // 3. Safari (iOS) - Это то, что осталось, но убедимся что это не Firefox (FxiOS)
+      else if (/Safari/.test(ua) && !/FxiOS/.test(ua)) {
+        document.body.classList.add('safari-ios-only');
+        browserName = "SAFARI (iOS)";
+      }
+      // 4. Другие (Firefox, Edge и т.д.) - ведем как Chrome (подъем 1px)
+      else {
+        browserName = "OTHER (iOS)";
+      }
+    } else {
+      // Android или Desktop
+      if (/YaBrowser/.test(ua)) {
+        document.body.classList.add('yandex-browser');
+        browserName = "YANDEX";
+      } else {
+        browserName = "ANDROID/DESKTOP";
+      }
     }
     
-    // Выводим дебаг с информацией о том, какой подъем применен
-    this.showDebugInfo(`${browserName} | LIFT: ${liftValue}`);
+    // Показываем базовый дебаг
+    this.showDebugInfo(browserName);
+    
     // ================================================
 
     if (this.isDesktop && this.currentSlide === 0) {
@@ -143,8 +172,10 @@ class StoriesManager {
     this.loadImages();
     this.setupEventListeners();
     this.updateArrowVisibility();
-  }
 
+    // Запускаем проверку и применение отступов
+    this.checkLiftDebug();
+  }
   
   updateLabel() {
     const oldLabel = document.getElementById('storiesLabel');
@@ -711,6 +742,7 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
 
