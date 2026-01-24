@@ -1071,6 +1071,62 @@ html {
 
 
 
+@media (max-width: 750px) {
+
+  /* 1. КОНТЕЙНЕР С ПОДПИСЬЮ */
+  .story-caption-container {
+    /* Убираем отступы внутри, чтобы контролировать позицию блока целиком */
+    padding: 0 !important; 
+    
+    /* ФИКСАЦИЯ СНИЗУ
+       Логика: 
+       - env(safe-area-inset-bottom) = высота полоски дома (iPhone X+)
+       - 1px = ваш отступ от браузерной панели
+    */
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+
+    /* Flexbox, чтобы текст прижался к низу контейнера */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  /* 2. ТЕКСТ (Контент) */
+  .story-caption-content {
+    /* Отступы ОТНОСИТЕЛЬНО контейнера */
+    /* Сверху 20px, Сбоку 20px, Снизу 35px (для кнопки) */
+    padding: 20px 20px 35px !important;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 18px !important;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+
+  /* 3. КНОПКА РАСКРЫТИЯ */
+  .caption-expand-btn {
+    /* Кнопка внутри контента. 
+       Поскольку контейнер приподнят на 1px, кнопка тоже будет на 1px выше панели браузера. */
+    bottom: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 4;
+    transform: translateX(-50%);
+  }
+
+  /* 4. ЕСЛИ КНОПКИ НЕТ (короткий текст) */
+  .story-caption-container:not(:has(.caption-expand-btn)) {
+    /* Все так же на 1 пиксель выше панели + полоски */
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .story-caption-container:not(:has(.caption-expand-btn)) .story-caption-content {
+      /* Уменьшаем нижний отступ текста */
+      padding-bottom: 20px !important;
+  }
+}
 
 
 
