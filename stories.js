@@ -22,17 +22,21 @@ class StoriesManager {
   }
 
   // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА НА ЭКРАНЕ ===
+  // === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА С ИНФОРМАЦИЕЙ ОБ ОТСТУПАХ ===
   showDebugInfo(text) {
-    // Проверяем, нет ли уже блока, чтобы не дублировать
-    if (document.querySelector('.debug-browser-info')) return;
+    const existing = document.querySelector('.debug-browser-info');
+    if (existing) {
+      // Если плашка уже есть, обновляем её (нужно если браузер определился позже)
+      existing.textContent = text;
+      return;
+    }
 
     const debugEl = document.createElement('div');
     debugEl.className = 'debug-browser-info';
     debugEl.textContent = text;
     document.body.appendChild(debugEl);
     
-    // Также выводим в консоль для разработчика
-    console.log(`📱 DEBUG UI: ${text}`);
+    console.log(`📱 DEBUG: ${text}`);
   }
 
   init() {
@@ -47,23 +51,35 @@ class StoriesManager {
 
     this.updateLabel();
 
-    // === ПРОВЕРКА БРАУЗЕРОВ (SAFARI & YANDEX) ===
+    // === ТОЧНАЯ ДЕТЕКЦИЯ БРАУЗЕРОВ ===
     
+    let browserName = "UNKNOWN";
+    let liftValue = "STANDARD"; // Значение отступа
+
     // 1. Яндекс.Браузер
     if (/YaBrowser/i.test(navigator.userAgent)) {
       document.body.classList.add('yandex-browser');
-      console.log('🔧 Обнаружен Яндекс.Браузер (Stories)');
-      this.showDebugInfo('YANDEX.BROWSER');
-    }
-
-    // 2. Safari (исключаем Chrome, CriOS, Edge, Opera, Firefox, Яндекс)
-    const isSafari = /^((?!chrome|android|crios|fxios|edg|opr|yabrowser).)*safari/i.test(navigator.userAgent);
-    
-    if (isSafari) {
+      browserName = "YANDEX";
+      // Яндекс обычно работает как Chrome (без поднятия), но вы можете задать здесь "44px" если нужно
+      liftValue = "1px"; 
+    } 
+    // 2. Настоящий Safari (проверяем строку Safari, но исключаем Chrome, CriOS, FxiOS, YaBrowser)
+    else if (/Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS|YaBrowser/.test(navigator.userAgent)) {
       document.body.classList.add('safari-browser');
-      console.log('🍎 Обнаружен браузер Safari (Stories)');
-      this.showDebugInfo('SAFARI');
+      // ДОБАВЛЯЕМ СПЕЦИАЛЬНЫЙ КЛАСС ТОЛЬКО ДЛЯ CSS
+      document.body.classList.add('is-apple-safari');
+      
+      browserName = "SAFARI";
+      liftValue = "44px (PANEL)"; // Это подъем над панелью браузера
     }
+    // 3. Chrome и остальные
+    else {
+      browserName = "CHROME/OTHER";
+      liftValue = "1px";
+    }
+    
+    // Выводим дебаг с информацией о том, какой подъем применен
+    this.showDebugInfo(`${browserName} | LIFT: ${liftValue}`);
     // ================================================
 
     if (this.isDesktop && this.currentSlide === 0) {
@@ -74,6 +90,7 @@ class StoriesManager {
     this.setupEventListeners();
     this.updateArrowVisibility();
   }
+
   
   updateLabel() {
     const oldLabel = document.getElementById('storiesLabel');
@@ -640,5 +657,6 @@ class StoriesManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.storiesManager = new StoriesManager();
 });
+
 
 
