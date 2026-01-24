@@ -1130,6 +1130,30 @@ html {
 
 
 
+/* === ХАК ДЛЯ ИСПРАВЛЕНИЯ ПАНЕЛИ В SAFARI (iOS) === */
+/* Применяется только к Webkit браузерам (Safari, Chrome на iOS) */
+@supports (-webkit-touch-callout: none) {
+  
+  /* Проверяем, если высота экрана совпадает с iOS (обычно до ~932px) */
+  @media (max-height: 932px) and (max-width: 1080px) {
+    
+    .story-caption-container {
+      /* 
+         В SAFARI мы добавляем отступ 50px (высота панели браузера) 
+         + полоска дома + 1px ваш запас.
+         Это гарантированно поднимет текст над панелью.
+      */
+      bottom: calc(50px + env(safe-area-inset-bottom) + 1px) !important;
+    }
+
+    /* Также убедимся, что контейнер растянут правильно, чтобы не было белых полос */
+    .stories-container {
+       height: -webkit-fill-available !important;
+       /* Fallback для случая если fill-available не сработал */
+       height: 100dvh; 
+    }
+  }
+}
 
 
 
