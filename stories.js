@@ -21,19 +21,7 @@ this.overlayJustClosed = false;
 this.init();
 }
 
-// === НОВЫЙ МЕТОД ДЛЯ ОТОБРАЖЕНИЯ ДЕБАГА НА ЭКРАНЕ ===
-showDebugInfo(text) {
-// Проверяем, нет ли уже блока, чтобы не дублировать
-if (document.querySelector('.debug-browser-info')) return;
 
-const debugEl = document.createElement('div');
-debugEl.className = 'debug-browser-info';
-debugEl.textContent = text;
-document.body.appendChild(debugEl);
-
-// Также выводим в консоль для разработчика
-console.log(`📱 DEBUG UI: ${text}`);
-}
 
 init() {
 const urlParams = new URLSearchParams(window.location.search);
@@ -640,3 +628,4 @@ window.location.replace(`${this.placeId}.html`);
 document.addEventListener('DOMContentLoaded', () => {
 window.storiesManager = new StoriesManager();
 });
+
