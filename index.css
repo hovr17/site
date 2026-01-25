@@ -208,3 +208,49 @@
         margin-bottom: 2vh;
     }
 }
+
+
+
+
+
+/* =============================================================================
+   ПОЗИЦИОНИРОВАНИЕ КНОПКИ "ОТКРЫТЬ" 
+   - Яндекс.Браузер на мобильных (до 767px): 80px от низа
+   - Все остальные случаи (включая Яндекс на десктопе): 5px от низа
+   ========================================================================= */
+
+/* По умолчанию (все браузеры на десктопе и планшетах): 5px от низа */
+.open-btn {
+    bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Только мобильные устройства (телефоны до 767px) */
+@media (max-width: 767px) {
+    /* Яндекс.Браузер: 80px от низа */
+    .yandex-browser .open-btn {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+/* Десктоп (min-width: 1081px) - явно сбрасываем для Яндекса */
+@media (min-width: 1081px) {
+    .open-btn {
+        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    
+    /* На десктопе Яндекс ведет себя как все остальные - 5px от низа */
+    .yandex-browser .open-btn {
+        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+/* Очень короткие экраны на десктопах (min-width: 1079px и max-height: 900px) */
+@media (min-width: 1079px) and (max-height: 900px) {
+    .open-btn {
+        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    
+    .yandex-browser .open-btn {
+        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
