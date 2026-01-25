@@ -10,7 +10,7 @@
 </head>
 <body>
     <script>
-        // Определение браузера и настройка позиционирования (подход из вашего примера)
+        // Определение браузера и настройка viewport (подход из вашего примера)
         (function() {
             const isMobile = window.matchMedia('(max-width: 1080px)').matches || 
                              /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -24,52 +24,36 @@
                 document.body.classList.add('yandex-browser');
             } else {
                 document.body.classList.add('other-mobile-browser');
-                initDynamicButtonPosition();
+                initVisualViewport();
             }
             
-            function initDynamicButtonPosition() {
-                const btn = document.querySelector('.open-btn');
-                if (!btn) return;
-                
-                // Используем Visual Viewport API для точного определения видимой области
+            function initVisualViewport() {
+                const container = document.querySelector('.container');
                 const vv = window.visualViewport;
                 
-                function updatePosition() {
-                    if (!vv) return;
+                if (!vv || !container) return;
+                
+                function updateViewport() {
+                    // Устанавливаем высоту контейнера равной видимой высоте экрана
+                    // Это обрезает фон ровно по границе панели браузера
+                    container.style.height = vv.height + 'px';
                     
-                    // Получаем высоту видимой области (исключая панели инструментов)
-                    const visibleHeight = vv.height;
-                    const visibleBottom = vv.pageTop + visibleHeight;
-                    
-                    // Получаем позицию контейнера относительно страницы
-                    const container = document.querySelector('.container');
-                    const containerRect = container.getBoundingClientRect();
-                    const containerTop = containerRect.top + window.scrollY;
-                    
-                    // Вычисляем позицию кнопки: 5px от низа видимой области
-                    // Если контейнер ограничен 100dvh, но видимая область меньше,
-                    // кнопка должна быть на 5px от видимого низа
-                    const buttonBottomFromContainerBottom = (containerTop + containerRect.height) - visibleBottom + 5;
-                    
-                    // Применяем позицию (минимум 5px, чтобы не ушла за экран)
-                    btn.style.bottom = `${Math.max(5, buttonBottomFromContainerBottom)}px`;
+                    // Кнопка всегда на 5px от низа видимой области
+                    const btn = document.querySelector('.open-btn');
+                    if (btn) {
+                        btn.style.bottom = '5px';
+                    }
                 }
                 
-                // Обновляем при любом изменении видимой области (скрытие/показ address bar)
-                vv.addEventListener('resize', updatePosition);
-                vv.addEventListener('scroll', updatePosition);
-                window.addEventListener('scroll', updatePosition);
-                window.addEventListener('resize', updatePosition);
+                // Обновляем при изменении размера viewport (показ/скрытие панелей)
+                vv.addEventListener('resize', updateViewport);
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(updateViewport, 100);
+                });
                 
-                // Начальная установка после полной загрузки
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', updatePosition);
-                } else {
-                    updatePosition();
-                }
-                
-                // Дополнительное обновление после загрузки изображений (чтобы высота контейнера точно определилась)
-                window.addEventListener('load', updatePosition);
+                // Начальная установка
+                updateViewport();
+                window.addEventListener('load', updateViewport);
             }
         })();
     </script>
