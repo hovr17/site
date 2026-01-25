@@ -954,7 +954,7 @@ padding-left: 0.5vh;
 }
 }
 
-/*
+
 @media (max-width: 1080px) {
 .yandex-browser .story-caption-container {
 
@@ -987,49 +987,43 @@ font-size: 2.2vh ;
 font-size: 2.7vh !important;
 }
 
-}*/
-
-
-
-/* ==========================================================================
-   УНИВЕРСАЛЬНЫЕ СТИЛИ ДЛЯ ВСЕХ БРАУЗЕРОВ (ВКЛЮЧАЯ ЯНДЕКС)
-   Определяем последний видимый пиксель и ставим текст на 1px выше.
-   ========================================================================= */
-@media (max-width: 1080px) {
-
-  /* 1. Главный контейнер */
-  .stories-container {
-    /* 
-       height: 100dvh - динамическая высота.
-       Это "последний видимый пиксель" за вычетом панелей браузера.
-    */
-    height: 100dvh !important;
-  }
-
-  /* 2. Контейнер с текстом */
-  .story-caption-container {
-    /* 
-       bottom: calc(1px + env(safe-area-inset-bottom))
-       Прижимаем к самому низу видимой области (дну контейнера) 
-       и добавляем отступ 1px + полоска дома.
-    */
-    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
-    
-    /* Сбрасываем старые padding, чтобы они не мешали расчету bottom */
-    padding-bottom: 0px !important;
-  }
-
-  /* Если текст короткий (без кнопки) */
-  .story-caption-container:not(:has(.caption-expand-btn)) {
-    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
-  }
 }
 
 
 
 
+/* ==========================================================================
+   СТИЛИ ДЛЯ ВСЕХ БРАУЗЕРОВ КРОМЕ ЯНДЕКС (Используем dvh)
+   ========================================================================= */
+@media (max-width: 1080px) {
+  
+  /* 1. Контейнер */
+  .stories-container:not(.yandex-browser) {
+    /* 
+       height: 100dvh - это и есть "последний видимый пиксель".
+       Браузер сам вычисляет высоту экрана минус свои панели.
+       Контент не будет уходить под панель.
+    */
+    height: 100dvh !important;
+  }
 
+  /* 2. Контейнер с текстом */
+  .stories-container:not(.yandex-browser) .story-caption-container {
+    /* 
+       Фиксируем позицию на 1px выше динамического края.
+       env(safe-area-inset-bottom) добавит запас, если есть "домашняя полоска" iPhone.
+    */
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+    
+    /* Важно: убираем padding-bottom, так как мы используем bottom для позиционирования */
+    padding-bottom: 0px !important;
+  }
 
+  /* Если текст короткий и кнопки нет, логика остается той же */
+  .stories-container:not(.yandex-browser) .story-caption-container:not(:has(.caption-expand-btn)) {
+    bottom: calc(1px + env(safe-area-inset-bottom)) !important;
+  }
+}
 
 
 
