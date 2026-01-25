@@ -212,30 +212,21 @@
 
 
 
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА В ПОРТРЕТНОЙ ОРИЕНТАЦИИ ===== */
 @media (max-width: 1080px) and (orientation: portrait) {
     
-    /* Все мобильные браузеры: высота = видимая область (JS управляет) */
+    /* Все браузеры: высота = видимая область */
     body.is-mobile .container {
-        /* JS устанавливает height = visualViewport.height */
-        /* Fallback до загрузки JS */
-        height: 100svh;
-        padding-bottom: 0; /* Убираем safe-area, т.к. JS точно вычисляет видимую область */
+        height: 100svh; /* Fallback */
+        padding-bottom: 0;
     }
     
-    /* Яндекс.Браузер: кнопка на 25vh от низа (JS вычисляет точное значение в px) */
-    body.yandex-browser .open-btn {
+    /* Все кнопки одинаково: 5px от низа */
+    body.is-mobile .open-btn {
         position: absolute;
+        bottom: 5vh; /* JS перезапишет это же значение */
         left: 50%;
         transform: translateX(-50%);
-        /* JS устанавливает bottom в пикселях */
-    }
-    
-    /* Другие браузеры: кнопка на 5px от низа */
-    body.other-mobile-browser .open-btn {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        /* JS устанавливает bottom: 5px */
     }
 }
 
