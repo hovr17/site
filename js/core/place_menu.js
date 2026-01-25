@@ -157,13 +157,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
     if (videoPoster) {
         videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
         videoPoster.style.display = (newMode === 'details') ? 'block' : 'none';
-        
-        // !!! ФИКС Z-INDEX: Поднимаем фон поверх видео при открытии меню !!!
-        if (newMode === 'details') {
-            videoPoster.style.zIndex = '2'; // Больше, чем у bgVideo (обычно 1)
-        } else {
-            videoPoster.style.zIndex = '0'; // Возвращаем назад
-        }
     }
     
     if (bgVideo) {
@@ -493,7 +486,7 @@ window.initializeMenu = function() {
     
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
-    const videoPoster = document.getElementById('videoPoster');
+    const videoPoster = document.getElementById('videoPoster'); // <--- Получаем элемент
     const scrollZone = document.getElementById('scrollZone');
     const usefulDrop = document.getElementById('usefulDrop');
     
@@ -501,6 +494,7 @@ window.initializeMenu = function() {
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         
+        // !!! ИСПРАВЛЕНИЕ: Добавляем videoPoster в массив, чтобы отключить на нем анимации !!!
         const elementsToDisable = [
             frame, 
             bgVideo, 
@@ -510,7 +504,7 @@ window.initializeMenu = function() {
             document.getElementById('dropdownsContainer'),
             document.querySelector('.entry-note'),
             document.getElementById('paidBtn'),
-            videoPoster
+            videoPoster  // <--- ДОБАВЛЕНО
         ].filter(el => el);
         
         elementsToDisable.forEach(el => {
@@ -557,16 +551,10 @@ window.initializeMenu = function() {
         }
     }
     
+    // !!! ИСПРАВЛЕНИЕ ДЛЯ БЕЛОГО ФОНА !!!
     if (videoPoster) {
         videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
         videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
-        
-        // !!! ФИКС Z-INDEX ПРИ ИНИЦИАЛИЗАЦИИ !!!
-        if (shouldOpenMenu) {
-            videoPoster.style.zIndex = '2';
-        } else {
-            videoPoster.style.zIndex = '0';
-        }
     }
     
     if (scrollZone) {
