@@ -161,11 +161,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
     }
     
     if (mode === "details") {
-        // >>> СОХРАНЯЕМ СОСТОЯНИЕ ОТКРЫТОГО МЕНЮ <<<
-        // Это запомнит, что меню открыто, даже если пользователь уйдет со страницы
-        sessionStorage.setItem('menuState', 'open');
-        // >>> ================================== <<<
-
         frame?.classList.remove("mode-intro");
         frame?.classList.add("mode-details");
         
@@ -185,11 +180,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
             isAnimating = false;
         }, 1000);
     } else {
-        // >>> УДАЛЯЕМ СОСТОЯНИЕ (МЕНЮ ЗАКРЫТО) <<<
-        // Это нужно, чтобы при возвращении меню не открывалось само, если его закрыли
-        sessionStorage.removeItem('menuState');
-        // >>> ================================== <<<
-
         frame?.classList.remove("mode-details");
         frame?.classList.add("mode-intro");
         
@@ -648,3 +638,46 @@ window.reinitMenu = function() {
 
 console.log('✅ place_menu.js полностью загружен с поддержкой SPA');
 
+// =============================================================================
+// НОВОЕ: ПАУЗА ВИДЕО ПРИ ВОЗВРАТЕ НА СТРАНИЦУ С ОТКРЫТЫМ МЕНЮ
+// =============================================================================
+
+// Обработчик для случая, когда страница восстанавливается из кэша (кнопка "назад")
+window.addEventListener('pageshow', (event) => {
+    // event.persisted = true, если страница восстановлена из bfcache (back-forward cache)
+    if (event.persisted) {
+        console.log('🔄 Страница восстановлена из кэша, проверяем видео...');
+        
+        const bgVideo = document.getElementById('bgVideo');
+        const frame = document.getElementById('frame');
+        
+        // Если меню открыто (mode-details) - ставим видео на паузу
+        if (bgVideo && frame?.classList.contains('mode-details')) {
+            bgVideo.pause();
+            bgVideo.style.filter = 'blur(5px)';
+            console.log('⏸️ Видео поставлено на паузу (возврат из кэша)');
+        }
+    }
+});
+
+// Переопределяем initializeMenu для добавления дополнительной проверки
+const originalInitializeMenu = window.initializeMenu;
+window.initializeMenu = function() {
+    // Вызываем оригинальную функцию
+    originalInitializeMenu.apply(this, arguments);
+    
+    // Дополнительная проверка видео после инициализации
+    cleanupRegistry.setTimeout(() => {
+        const bgVideo = document.getElementById('bgVideo');
+        const frame = document.getElementById('frame');
+        
+        if (bgVideo && frame?.classList.contains('mode-details')) {
+            if (!bgVideo.paused) {
+                bgVideo.pause();
+                console.log('⏸️ Видео поставлено на паузу (проверка при инициализации)');
+            }
+            // Убедимся что блюр применен
+            bgVideo.style.filter = 'blur(5px)';
+        }
+    }, 150);
+};
