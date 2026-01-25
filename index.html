@@ -54,6 +54,28 @@
 
     <script src="script.js"></script>
 
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Определяем мобильное устройство (по ширине или user agent)
+    const isMobile = window.matchMedia('(max-width: 1080px)').matches || 
+                     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        document.body.classList.add('is-mobile');
+        
+        // Проверка на Яндекс.Браузер (твой код из примера)
+        if (/YaBrowser/i.test(navigator.userAgent)) {
+            document.body.classList.add('yandex-browser');
+            console.log('Browser: Yandex Mobile');
+        } else {
+            document.body.classList.add('other-mobile-browser');
+            console.log('Browser: Other Mobile');
+        }
+    }
+});
+</script>
+
 </body>
 
 </html>
+
