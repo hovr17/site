@@ -200,4 +200,15 @@
     .buttons-container {
         gap: 8vh;
     }
+
+}
+
+
+@media (max-width: 1080px) and (orientation: portrait) {
+    
+    /* Все мобильные браузеры: высота = видимая область (JS управляет) */
+    body.is-mobile .container {
+        height: 100svh; /* Fallback до загрузки JS */
+        padding-bottom: 0; /* Убираем safe-area, т.к. JS точно вычисляет видимую область */
+    }
 }
