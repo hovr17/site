@@ -154,10 +154,16 @@ function setMode(newMode, { expandUseful = false } = {}) {
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
     
-    // !!! ИСПРАВЛЕНИЕ: Применяем стили с !important для гарантии !!!
+    // Применяем стили к videoPoster (белый фон)
     if (videoPoster) {
-        videoPoster.style.setProperty('background', (newMode === 'details') ? 'white' : 'transparent', 'important');
-        videoPoster.style.setProperty('display', (newMode === 'details') ? 'block' : 'none', 'important');
+        if (newMode === 'details') {
+            videoPoster.style.setProperty('background', 'white', 'important');
+            videoPoster.style.setProperty('display', 'block', 'important');
+            videoPoster.style.setProperty('transition', 'none', 'important');
+        } else {
+            videoPoster.style.setProperty('background', 'transparent', 'important');
+            videoPoster.style.setProperty('display', 'none', 'important');
+        }
     }
     
     if (bgVideo) {
@@ -171,6 +177,24 @@ function setMode(newMode, { expandUseful = false } = {}) {
         scrollZone?.classList.add('animating');
         
         if (bgVideo) bgVideo.pause();
+        
+        // Создаем белую полосу снизу если нужно
+        let bottomStripe = document.getElementById('videoBottomStripe');
+        if (!bottomStripe && videoPoster) {
+            bottomStripe = document.createElement('div');
+            bottomStripe.id = 'videoBottomStripe';
+            bottomStripe.style.cssText = `
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 80px;
+                background: white;
+                z-index: 3;
+                pointer-events: none;
+            `;
+            videoPoster.appendChild(bottomStripe);
+        }
         
         if (expandUseful && usefulDrop) {
             cleanupRegistry.setTimeout(() => {
@@ -188,6 +212,10 @@ function setMode(newMode, { expandUseful = false } = {}) {
         frame?.classList.add("mode-intro");
         
         scrollZone?.classList.add('animating');
+        
+        // Удаляем белую полосу снизу
+        const bottomStripe = document.getElementById('videoBottomStripe');
+        if (bottomStripe) bottomStripe.remove();
         
         if (bgVideo) {
             bgVideo.pause(); 
@@ -240,7 +268,7 @@ function smoothScrollTo(targetY, duration = 700) {
 }
 
 // =============================================================================
-// НОВАЯ ФУНКЦИЯ: ОХРАНА ВИДЕО ОТ ЯНДЕКС БРАУЗЕРА
+// ОХРАНА ВИДЕО ОТ ЯНДЕКС БРАУЗЕРА
 // =============================================================================
 
 function setupVideoGuards() {
@@ -259,7 +287,7 @@ function setupVideoGuards() {
 }
 
 // =============================================================================
-// ОБРАБОТЧИКИ СВАЙПОВ И СКРОЛЛА (с возможностью очистки)
+// ОБРАБОТЧИКИ СВАЙПОВ И СКРОЛЛА
 // =============================================================================
 
 function setupSwipeHandlers() {
@@ -504,7 +532,7 @@ window.initializeMenu = function() {
             document.getElementById('dropdownsContainer'),
             document.querySelector('.entry-note'),
             document.getElementById('paidBtn'),
-            videoPoster  // Добавлен videoPoster
+            videoPoster
         ].filter(el => el);
         
         elementsToDisable.forEach(el => {
@@ -521,7 +549,7 @@ window.initializeMenu = function() {
         }, 10);
     }
     
-    // Применение классов и стилей
+    // Применение классов
     if (frame) {
         if (shouldOpenMenu) {
             frame.classList.remove('mode-intro');
@@ -532,11 +560,11 @@ window.initializeMenu = function() {
         }
     }
     
+    // Управление видео
     if (bgVideo) {
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
-        // !!! ИСПРАВЛЕНИЕ: Устанавливаем blur с !important !!!
         bgVideo.style.setProperty('filter', shouldOpenMenu ? 'blur(5px)' : 'none', 'important');
         
         if (shouldOpenMenu) {
@@ -554,16 +582,45 @@ window.initializeMenu = function() {
     
     // !!! КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Белый фон при открытом меню !!!
     if (videoPoster) {
-        // Используем setProperty с !important для гарантированного применения
-        videoPoster.style.setProperty('background', shouldOpenMenu ? 'white' : 'transparent', 'important');
-        videoPoster.style.setProperty('display', shouldOpenMenu ? 'block' : 'none', 'important');
+        if (shouldOpenMenu) {
+            // Применяем стили как в CSS .mode-details .video-background
+            videoPoster.style.setProperty('background', 'white', 'important');
+            videoPoster.style.setProperty('display', 'block', 'important');
+            videoPoster.style.setProperty('transition', 'none', 'important');
+            videoPoster.style.setProperty('opacity', '1', 'important');
+            videoPoster.style.setProperty('visibility', 'visible', 'important');
+            
+            // Создаем белую полосу снизу (аналог ::after из CSS)
+            let bottomStripe = document.getElementById('videoBottomStripe');
+            if (!bottomStripe) {
+                bottomStripe = document.createElement('div');
+                bottomStripe.id = 'videoBottomStripe';
+                bottomStripe.style.cssText = `
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 80px;
+                    background: white;
+                    z-index: 3;
+                    pointer-events: none;
+                `;
+                videoPoster.appendChild(bottomStripe);
+            }
+            
+            console.log('🎨 VideoPoster: БЕЛЫЙ ФОН ВКЛЮЧЕН (возврат с открытым меню)');
+        } else {
+            // Скрываем фон для режима intro
+            videoPoster.style.setProperty('background', 'transparent', 'important');
+            videoPoster.style.setProperty('display', 'none', 'important');
+            
+            // Удаляем белую полосу
+            const bottomStripe = document.getElementById('videoBottomStripe');
+            if (bottomStripe) bottomStripe.remove();
+        }
         
-        // Принудительный reflow для мгновенного применения стилей
+        // Принудительный reflow
         void videoPoster.offsetHeight;
-        
-        console.log('🎨 VideoPoster:', shouldOpenMenu ? 'БЕЛЫЙ ФОН ВКЛЮЧЕН' : 'прозрачный');
-    } else {
-        console.error('❌ Элемент #videoPoster не найден!');
     }
     
     if (scrollZone) {
@@ -571,6 +628,7 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
+    // Восстанавливаем состояние dropdown
     const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
     if (savedDropdownState === 'open' && usefulDrop) {
         usefulDrop.classList.add("open");
@@ -584,7 +642,7 @@ window.initializeMenu = function() {
     setupVideoGuards();
     updateNavigationVisibility();
     
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, белый фон активен)' : '(с закрытым меню)');
+    console.log('✅ Меню инициализировано:', shouldOpenMenu ? 'открыто (белый фон активен)' : 'закрыто');
 };
 
 // =============================================================================
