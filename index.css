@@ -212,45 +212,23 @@
 
 
 
-
-/* =============================================================================
-   ПОЗИЦИОНИРОВАНИЕ КНОПКИ "ОТКРЫТЬ" 
-   - Яндекс.Браузер на мобильных (до 767px): 80px от низа
-   - Все остальные случаи (включая Яндекс на десктопе): 5px от низа
-   ========================================================================= */
-
-/* По умолчанию (все браузеры на десктопе и планшетах): 5px от низа */
-.open-btn {
-    bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-/* Только мобильные устройства (телефоны до 767px) */
-@media (max-width: 767px) {
-    /* Яндекс.Браузер: 80px от низа */
-    .yandex-browser .open-btn {
-        bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-}
-
-/* Десктоп (min-width: 1081px) - явно сбрасываем для Яндекса */
-@media (min-width: 1081px) {
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА: Позиционирование кнопки ===== */
+@media (max-width: 1080px) {
+    /* Сбрасываем базовый bottom для мобильных */
     .open-btn {
-        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+        bottom: auto;
     }
     
-    /* На десктопе Яндекс ведет себя как все остальные - 5px от низа */
-    .yandex-browser .open-btn {
-        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+    /* ДРУГИЕ БРАУЗЕРЫ: 5px от последнего видимого пикселя 
+       (с учетом safe-area для iPhone с вырезом) */
+    body.is-mobile.other-mobile-browser .open-btn {
+        bottom: calc(5px + env(safe-area-inset-bottom));
+    }
+    
+    /* ЯНДЕКС.БРАУЗЕР: фиксированные 80px от низа */
+    body.is-mobile.yandex-browser .open-btn {
+        bottom: 80px;
     }
 }
 
-/* Очень короткие экраны на десктопах (min-width: 1079px и max-height: 900px) */
-@media (min-width: 1079px) and (max-height: 900px) {
-    .open-btn {
-        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-    
-    .yandex-browser .open-btn {
-        bottom: calc(5px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-}
+
