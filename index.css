@@ -227,8 +227,9 @@
     
     /* ЯНДЕКС.БРАУЗЕР: фиксированные 80px от низа */
     body.is-mobile.yandex-browser .open-btn {
-        bottom: 80px;
+        bottom: 150px;
     }
 }
+
 
 
