@@ -217,14 +217,14 @@
     
     /* Яндекс.Браузер: кнопка на 25vh от низа */
     body.yandex-browser .open-btn {
-        bottom: 25vh;
+        bottom: 26vh;
         /* Отключаем safe-area для точных 25vh, 
            если нужно с учетом safe-area: calc(25vh + env(safe-area-inset-bottom)) */
     }
     
     /* Другие браузеры: 1vh от низа с учетом safe-area (iPhone с вырезом) */
     body.other-mobile-browser .open-btn {
-        bottom: calc(1vh + env(safe-area-inset-bottom));
+        bottom: calc(15vh + env(safe-area-inset-bottom));
     }
 }
 
@@ -243,6 +243,7 @@
         bottom: calc(6vh + env(safe-area-inset-bottom));
     }
 }
+
 
 
 
