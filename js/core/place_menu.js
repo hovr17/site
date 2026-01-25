@@ -144,6 +144,13 @@ function setMode(newMode, { expandUseful = false } = {}) {
     isAnimating = true;
     mode = newMode;
     
+    // Сохраняем состояние меню
+    if (newMode === 'details') {
+        sessionStorage.setItem('menuState', 'open');
+    } else if (newMode === 'intro') {
+        sessionStorage.setItem('menuState', 'closed');
+    }
+
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
     const videoPoster = document.getElementById('videoPoster');
@@ -185,7 +192,14 @@ function setMode(newMode, { expandUseful = false } = {}) {
         
         scrollZone?.classList.add('animating');
         
-        if (bgVideo) bgVideo.play();
+        // Для Яндекса и Chrome: сначала ставим на паузу (если вдруг играло), затем play
+        if (bgVideo) {
+            bgVideo.pause(); 
+            // Небольшая задержка перед play, чтобы браузер успел обработать смену фокуса
+            requestAnimationFrame(() => {
+                if (mode === 'intro') bgVideo.play().catch(() => {});
+            });
+        }
         
         smoothScrollTo(0, 700);
         if (addressDrop) addressDrop.classList.remove("open");
@@ -228,6 +242,29 @@ function smoothScrollTo(targetY, duration = 700) {
     }
     
     requestAnimationFrame(step);
+}
+
+// =============================================================================
+// НОВАЯ ФУНКЦИЯ: ОХРАНА ВИДЕО ОТ ЯНДЕКС БРАУЗЕРА
+// =============================================================================
+
+function setupVideoGuards() {
+    const bgVideo = document.getElementById('bgVideo');
+    if (!bgVideo) return;
+
+    // Обработчик-перехватчик события 'play'
+    const guardPlay = () => {
+        // Если мы в режиме деталей (меню открыто), видео играть НЕ должно.
+        // Это решает проблему Яндекса, который принудительно запускает видео при возврате.
+        if (mode === 'details') {
+            console.log('🛡️ Попытка автозапуска в режиме "details" -> ПАУЗА');
+            bgVideo.pause();
+        }
+    };
+
+    // Слушаем событие play
+    bgVideo.addEventListener('play', guardPlay);
+    cleanupRegistry.add(() => bgVideo.removeEventListener('play', guardPlay));
 }
 
 // =============================================================================
@@ -468,6 +505,7 @@ window.initializeMenu = function() {
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
     
+    // Устанавливаем режим
     mode = shouldOpenMenu ? "details" : "intro";
     
     const frame = document.getElementById('frame');
@@ -486,7 +524,7 @@ window.initializeMenu = function() {
             document.querySelector('.hero-details'),
             document.getElementById('dropdownsContainer'),
             document.querySelector('.entry-note'),
-            paidBtn
+            document.getElementById('paidBtn')
         ].filter(el => el);
         
         elementsToDisable.forEach(el => {
@@ -522,6 +560,13 @@ window.initializeMenu = function() {
         
         if (shouldOpenMenu) {
             bgVideo.pause();
+            // Дополнительная страховка для Яндекса: сброс текущего времени помогает сбить буфер
+            if (isYandexBrowser()) {
+                const currentTime = bgVideo.currentTime;
+                bgVideo.currentTime = 0;
+                bgVideo.currentTime = currentTime;
+            }
+            console.log('⏸️ Видео на паузе (меню открыто)');
         } else {
             cleanupRegistry.setTimeout(() => bgVideo.play().catch(() => {}), 100);
         }
@@ -549,13 +594,11 @@ window.initializeMenu = function() {
     initializeDropdownsAndButtons();
     setupSwipeHandlers();
     setupKeyboardHandlers();
-    updateNavigationVisibility();
     
-    // Очистка sessionStorage после восстановления
-    cleanupRegistry.setTimeout(() => {
-        sessionStorage.removeItem('menuState');
-        sessionStorage.removeItem('usefulDropdownState');
-    }, 100);
+    // !!! ВЫЗЫВАЕМ ОХРАНУ ВИДЕО !!!
+    setupVideoGuards();
+    
+    updateNavigationVisibility();
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
 };
@@ -636,48 +679,4 @@ window.reinitMenu = function() {
     window.initializeMenu();
 };
 
-console.log('✅ place_menu.js полностью загружен с поддержкой SPA');
-
-// =============================================================================
-// НОВОЕ: ПАУЗА ВИДЕО ПРИ ВОЗВРАТЕ НА СТРАНИЦУ С ОТКРЫТЫМ МЕНЮ
-// =============================================================================
-
-// Обработчик для случая, когда страница восстанавливается из кэша (кнопка "назад")
-window.addEventListener('pageshow', (event) => {
-    // event.persisted = true, если страница восстановлена из bfcache (back-forward cache)
-    if (event.persisted) {
-        console.log('🔄 Страница восстановлена из кэша, проверяем видео...');
-        
-        const bgVideo = document.getElementById('bgVideo');
-        const frame = document.getElementById('frame');
-        
-        // Если меню открыто (mode-details) - ставим видео на паузу
-        if (bgVideo && frame?.classList.contains('mode-details')) {
-            bgVideo.pause();
-            bgVideo.style.filter = 'blur(5px)';
-            console.log('⏸️ Видео поставлено на паузу (возврат из кэша)');
-        }
-    }
-});
-
-// Переопределяем initializeMenu для добавления дополнительной проверки
-const originalInitializeMenu = window.initializeMenu;
-window.initializeMenu = function() {
-    // Вызываем оригинальную функцию
-    originalInitializeMenu.apply(this, arguments);
-    
-    // Дополнительная проверка видео после инициализации
-    cleanupRegistry.setTimeout(() => {
-        const bgVideo = document.getElementById('bgVideo');
-        const frame = document.getElementById('frame');
-        
-        if (bgVideo && frame?.classList.contains('mode-details')) {
-            if (!bgVideo.paused) {
-                bgVideo.pause();
-                console.log('⏸️ Видео поставлено на паузу (проверка при инициализации)');
-            }
-            // Убедимся что блюр применен
-            bgVideo.style.filter = 'blur(5px)';
-        }
-    }, 150);
-};
+console.log('✅ place_menu.js полностью загружен с поддержкой SPA и фиксами для Яндекса');
