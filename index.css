@@ -222,14 +222,15 @@
     /* ДРУГИЕ БРАУЗЕРЫ: 5px от последнего видимого пикселя 
        (с учетом safe-area для iPhone с вырезом) */
     body.is-mobile.other-mobile-browser .open-btn {
-        bottom: calc(3vh + env(safe-area-inset-bottom));
+        bottom: calc(10vh + env(safe-area-inset-bottom));
     }
     
     /* ЯНДЕКС.БРАУЗЕР: фиксированные 80px от низа */
     body.is-mobile.yandex-browser .open-btn {
-        bottom: 20vh;
+        bottom: 30vh;
     }
 }
+
 
 
 
