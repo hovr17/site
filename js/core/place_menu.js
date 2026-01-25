@@ -21,19 +21,16 @@ const cleanupRegistry = {
     },
     
     clear() {
-        // Удаляем обработчики
         this.handlers.forEach(fn => {
             try { fn(); } catch(e) { console.error('Cleanup error:', e); }
         });
         this.handlers = [];
         
-        // Отключаем наблюдатели
         this.observers.forEach(obs => {
             try { obs.disconnect(); } catch(e) {}
         });
         this.observers = [];
         
-        // Очищаем таймауты
         this.timeouts.forEach(id => clearTimeout(id));
         this.timeouts = [];
         
@@ -144,7 +141,6 @@ function setMode(newMode, { expandUseful = false } = {}) {
     isAnimating = true;
     mode = newMode;
     
-    // Сохраняем состояние меню
     if (newMode === 'details') {
         sessionStorage.setItem('menuState', 'open');
     } else if (newMode === 'intro') {
@@ -192,10 +188,8 @@ function setMode(newMode, { expandUseful = false } = {}) {
         
         scrollZone?.classList.add('animating');
         
-        // Для Яндекса и Chrome: сначала ставим на паузу (если вдруг играло), затем play
         if (bgVideo) {
             bgVideo.pause(); 
-            // Небольшая задержка перед play, чтобы браузер успел обработать смену фокуса
             requestAnimationFrame(() => {
                 if (mode === 'intro') bgVideo.play().catch(() => {});
             });
@@ -252,17 +246,13 @@ function setupVideoGuards() {
     const bgVideo = document.getElementById('bgVideo');
     if (!bgVideo) return;
 
-    // Обработчик-перехватчик события 'play'
     const guardPlay = () => {
-        // Если мы в режиме деталей (меню открыто), видео играть НЕ должно.
-        // Это решает проблему Яндекса, который принудительно запускает видео при возврате.
         if (mode === 'details') {
             console.log('🛡️ Попытка автозапуска в режиме "details" -> ПАУЗА');
             bgVideo.pause();
         }
     };
 
-    // Слушаем событие play
     bgVideo.addEventListener('play', guardPlay);
     cleanupRegistry.add(() => bgVideo.removeEventListener('play', guardPlay));
 }
@@ -278,7 +268,6 @@ function setupSwipeHandlers() {
     let isSwipeInProgress = false;
     let initialScrollTop = 0;
     
-    // Именованные функции для возможности удаления
     function onTouchStart(e) {
         if (isAnimating || window.spaRouter?.isAnimating) return;
         
@@ -376,13 +365,11 @@ function setupSwipeHandlers() {
         }
     }
     
-    // Добавляем обработчики
     scrollZone.addEventListener("touchstart", onTouchStart, { passive: true });
     scrollZone.addEventListener("touchmove", onTouchMove, { passive: false });
     scrollZone.addEventListener("touchend", onTouchEnd, { passive: false });
     scrollZone.addEventListener("wheel", onWheel, { passive: false });
     
-    // Регистрируем для очистки
     cleanupRegistry.add(() => {
         scrollZone.removeEventListener("touchstart", onTouchStart);
         scrollZone.removeEventListener("touchmove", onTouchMove);
@@ -403,7 +390,6 @@ function initializeDropdownsAndButtons() {
     const usefulDrop = document.getElementById('usefulDrop');
     const entryNote = document.querySelector(".entry-note");
     
-    // Обработчики для дропдаунов
     function createDropdownHandler(dropdown) {
         return function(e) {
             e.stopPropagation();
@@ -431,7 +417,6 @@ function initializeDropdownsAndButtons() {
         }
     }
     
-    // Глобальный обработчик клика для закрытия дропдаунов
     const globalClickHandler = function(e) {
         if (!e.target.closest('.dropdown')) {
             if (addressDrop) addressDrop.classList.remove("open");
@@ -442,7 +427,6 @@ function initializeDropdownsAndButtons() {
     document.addEventListener('click', globalClickHandler);
     cleanupRegistry.add(() => document.removeEventListener('click', globalClickHandler));
     
-    // Кнопки
     if (paidBtn) {
         const paidHandler = () => {
             console.log('Клик на paidBtn');
@@ -486,45 +470,41 @@ function setupKeyboardHandlers() {
 window.initializeMenu = function() {
     console.log('🔄 Инициализация меню...');
     
-    // Очищаем предыдущие обработчики (критично для SPA!)
     cleanupRegistry.clear();
-    
-    // Сбрасываем состояние
     isAnimating = false;
     
-    // Проверка Яндекс.Браузера
     if (isYandexBrowser()) {
         document.body.classList.add('yandex-browser');
         console.log('🔧 Обнаружен Яндекс.Браузер');
     }
     
-    // Коррекция UI для мобильных
     correctMobileUI();
     
-    // Восстановление состояния из sessionStorage
     const savedMenuState = sessionStorage.getItem('menuState');
     const shouldOpenMenu = savedMenuState === 'open';
-    
-    // Устанавливаем режим
     mode = shouldOpenMenu ? "details" : "intro";
     
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
+    const videoPoster = document.getElementById('videoPoster'); // <--- Получаем элемент
     const scrollZone = document.getElementById('scrollZone');
     const usefulDrop = document.getElementById('usefulDrop');
-    const videoPoster = document.getElementById('videoPoster');
     
     // Применение начального состояния без анимации
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         
+        // !!! ИСПРАВЛЕНИЕ: Добавляем videoPoster в массив, чтобы отключить на нем анимации !!!
         const elementsToDisable = [
-            frame, bgVideo, scrollZone,
+            frame, 
+            bgVideo, 
+            scrollZone,
             document.querySelector('.title-block'),
             document.querySelector('.hero-details'),
             document.getElementById('dropdownsContainer'),
             document.querySelector('.entry-note'),
-            document.getElementById('paidBtn')
+            document.getElementById('paidBtn'),
+            videoPoster  // <--- ДОБАВЛЕНО
         ].filter(el => el);
         
         elementsToDisable.forEach(el => {
@@ -560,7 +540,6 @@ window.initializeMenu = function() {
         
         if (shouldOpenMenu) {
             bgVideo.pause();
-            // Дополнительная страховка для Яндекса: сброс текущего времени помогает сбить буфер
             if (isYandexBrowser()) {
                 const currentTime = bgVideo.currentTime;
                 bgVideo.currentTime = 0;
@@ -572,6 +551,7 @@ window.initializeMenu = function() {
         }
     }
     
+    // !!! ИСПРАВЛЕНИЕ ДЛЯ БЕЛОГО ФОНА !!!
     if (videoPoster) {
         videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
         videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
@@ -582,7 +562,6 @@ window.initializeMenu = function() {
         scrollZone.style.pointerEvents = "auto";
     }
     
-    // Восстановление состояния дропдауна
     const savedDropdownState = sessionStorage.getItem('usefulDropdownState');
     if (savedDropdownState === 'open' && usefulDrop) {
         usefulDrop.classList.add("open");
@@ -590,32 +569,25 @@ window.initializeMenu = function() {
         if (usefulDrop) usefulDrop.classList.remove("open");
     }
     
-    // Инициализация компонентов
     initializeDropdownsAndButtons();
     setupSwipeHandlers();
     setupKeyboardHandlers();
-    
-    // !!! ВЫЗЫВАЕМ ОХРАНУ ВИДЕО !!!
     setupVideoGuards();
-    
     updateNavigationVisibility();
     
     console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
 };
 
 // =============================================================================
-// SPA ИНТЕГРАЦИЯ (критично для работы переходов!)
+// SPA ИНТЕГРАЦИЯ
 // =============================================================================
 
-// 1. Первоначальная загрузка
 document.addEventListener('DOMContentLoaded', () => {
     console.log('place_menu.js: DOMContentLoaded');
     cleanupRegistry.setTimeout(window.initializeMenu, 50);
 });
 
-// 2. Наблюдатель за изменениями DOM (для SPA роутеров, которые заменяют контент)
 const spaObserver = new MutationObserver((mutations) => {
-    // Проверяем, появился ли новый frame (основной контейнер)
     const frame = document.getElementById('frame');
     if (frame && !frame.dataset.menuInitialized) {
         frame.dataset.menuInitialized = 'true';
@@ -624,16 +596,13 @@ const spaObserver = new MutationObserver((mutations) => {
     }
 });
 
-// Запускаем наблюдение
 spaObserver.observe(document.body, { 
     childList: true, 
     subtree: true 
 });
 
-// Сохраняем ссылку для возможной очистки
 cleanupRegistry.observe(spaObserver);
 
-// 3. Интеграция с History API (если роутер использует pushState)
 const originalPushState = history.pushState;
 history.pushState = function(...args) {
     originalPushState.apply(this, args);
@@ -647,15 +616,12 @@ history.replaceState = function(...args) {
     cleanupRegistry.setTimeout(window.initializeMenu, 100);
 };
 
-// 4. Обработка popstate (кнопки назад/вперед)
 window.addEventListener('popstate', () => {
     console.log('🔄 Popstate event');
     cleanupRegistry.setTimeout(window.initializeMenu, 100);
 });
 
-// 5. Интеграция с вашим роутером (если есть window.spaRouter)
 if (window.spaRouter) {
-    // Перехватываем метод navigate если он есть
     if (window.spaRouter.navigate) {
         const originalNavigate = window.spaRouter.navigate;
         window.spaRouter.navigate = function(...args) {
@@ -665,7 +631,6 @@ if (window.spaRouter) {
         };
     }
     
-    // Подписываемся на событие смены страницы если оно есть
     if (window.spaRouter.on) {
         window.spaRouter.on('pageChange', () => {
             cleanupRegistry.setTimeout(window.initializeMenu, 100);
@@ -673,10 +638,9 @@ if (window.spaRouter) {
     }
 }
 
-// 6. Ручной триггер для отладки (доступен в консоли)
 window.reinitMenu = function() {
     console.log('🔄 Ручная переинициализация меню');
     window.initializeMenu();
 };
 
-console.log('✅ place_menu.js полностью загружен с поддержкой SPA и фиксами для Яндекса');
+console.log('✅ place_menu.js полностью загружен');
