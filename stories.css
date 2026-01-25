@@ -955,7 +955,7 @@ padding-left: 0.5vh;
 }
 
 
-@media (max-width: 1080px) {
+/*@media (max-width: 1080px) {
 .yandex-browser .story-caption-container {
 
 bottom: 135px !important;
@@ -987,7 +987,7 @@ font-size: 2.2vh ;
 font-size: 2.7vh !important;
 }
 
-}
+}*/
 
 
 
@@ -1028,6 +1028,7 @@ font-size: 2.7vh !important;
     bottom: calc(1px + env(safe-area-inset-bottom)) !important;
   }
 }
+
 
 
 
