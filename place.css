@@ -1038,7 +1038,7 @@ height: auto ;
 
     /* Дропдауны: Используем мобильную базу 50vh и поднимаем на 110px */
     .yandex-browser .mode-intro #dropdownsContainer {
-        transform: translateY(calc(50vh - 110px)) !important;
+        transform: translateY(calc(50vh - 145px)) !important;
     }
 
     .yandex-browser #usefulDrop.open {
@@ -1065,6 +1065,7 @@ height: auto ;
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
