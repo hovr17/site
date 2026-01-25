@@ -10,7 +10,7 @@
 </head>
 <body>
     <script>
-        // Унифицированная логика visual viewport для всех мобильных браузеров
+        // Унифицированная логика для всех мобильных браузеров
         (function() {
             const isMobile = window.matchMedia('(max-width: 1080px)').matches || 
                              /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -19,49 +19,29 @@
             
             document.body.classList.add('is-mobile');
             
-            // Определяем тип браузера для позиционирования кнопки
-            const isYandex = /YaBrowser/i.test(navigator.userAgent);
-            if (isYandex) {
-                document.body.classList.add('yandex-browser');
-            } else {
-                document.body.classList.add('other-mobile-browser');
-            }
+            const container = document.querySelector('.container');
+            const btn = document.querySelector('.open-btn');
+            const vv = window.visualViewport;
             
-            initVisualViewport();
+            if (!vv || !container) return;
             
-            function initVisualViewport() {
-                const container = document.querySelector('.container');
-                const btn = document.querySelector('.open-btn');
-                const vv = window.visualViewport;
+            function updateViewport() {
+                // Обрезаем контейнер по видимой области (для всех браузеров)
+                container.style.height = vv.height + 'px';
                 
-                if (!vv || !container) return;
-                
-                function updateViewport() {
-                    // Для всех браузеров: высота = видимая область (обрезка под панелью)
-                    container.style.height = vv.height + 'px';
-                    
-                    if (!btn) return;
-                    
-                    // Разное позиционирование кнопки
-                    if (isYandex) {
-                        // Яндекс: 25vh от низа видимой области
-                        btn.style.bottom = (vv.height * 0.25) + 'px';
-                    } else {
-                        // Другие: 5px от низа видимой области
-                        btn.style.bottom = '5px';
-                    }
+                // Кнопка на 5px от низа для ВСЕХ браузеров
+                if (btn) {
+                    btn.style.bottom = '5px';
                 }
-                
-                // Обновляем при изменении размера viewport (показ/скрытие панелей)
-                vv.addEventListener('resize', updateViewport);
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(updateViewport, 100);
-                });
-                
-                // Начальная установка
-                updateViewport();
-                window.addEventListener('load', updateViewport);
             }
+            
+            vv.addEventListener('resize', updateViewport);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(updateViewport, 100);
+            });
+            
+            updateViewport();
+            window.addEventListener('load', updateViewport);
         })();
     </script>
 
@@ -80,21 +60,11 @@
                     <a href="about.html" class="footer-link">О проекте</a>
                     <img src="ui/sokol.png" class="footer-logo">
                 </div>
-                
                 <div class="footer-separator"></div>
-                
                 <div class="footer-text-container">
-                    <p class="footer-disclaimer">
-                        Данный интернет-сайт и его содержимое носит исключительно информационный характер и ни при каких условиях информационные материалы, каталоги, статьи и цены, размещенные на сайте, не является публичной офертой, определяемой положениями Статьи 437 Гражданского кодекса РФ.
-                    </p>
-                    
-                    <p class="footer-copy-info">
-                        Использование или копирование фото- и видеоматериалов допускается исключительно с обязательным указанием активной гиперссылки на данный сайт.
-                    </p>
-                    
-                    <p class="footer-copyright">
-                        2026©
-                    </p>
+                    <p class="footer-disclaimer">Данный интернет-сайт и его содержимое носит исключительно информационный характер...</p>
+                    <p class="footer-copy-info">Использование или копирование фото- и видеоматериалов...</p>
+                    <p class="footer-copyright">2026©</p>
                 </div>
             </div>
         </footer>
