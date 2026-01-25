@@ -212,24 +212,38 @@
 
 
 
-/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА: Позиционирование кнопки ===== */
-@media (max-width: 1080px) {
-    /* Сбрасываем базовый bottom для мобильных */
-    .open-btn {
-        bottom: auto;
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА В ПОРТРЕТНОЙ ОРИЕНТАЦИИ ===== */
+@media (max-width: 1080px) and (orientation: portrait) {
+    
+    /* Яндекс.Браузер: кнопка на 25vh от низа */
+    body.yandex-browser .open-btn {
+        bottom: 25vh;
+        /* Отключаем safe-area для точных 25vh, 
+           если нужно с учетом safe-area: calc(25vh + env(safe-area-inset-bottom)) */
     }
     
-    /* ДРУГИЕ БРАУЗЕРЫ: 5px от последнего видимого пикселя 
-       (с учетом safe-area для iPhone с вырезом) */
-    body.is-mobile.other-mobile-browser .open-btn {
-        bottom: calc(10vh + env(safe-area-inset-bottom));
-    }
-    
-    /* ЯНДЕКС.БРАУЗЕР: фиксированные 80px от низа */
-    body.is-mobile.yandex-browser .open-btn {
-        bottom: 30vh;
+    /* Другие браузеры: 1vh от низа с учетом safe-area (iPhone с вырезом) */
+    body.other-mobile-browser .open-btn {
+        bottom: calc(1vh + env(safe-area-inset-bottom));
     }
 }
+
+/* ===== МОБИЛЬНЫЕ В ГОРИЗОНТАЛЬНОЙ ОРИЕНТАЦИИ (опционально) ===== */
+@media (max-width: 1080px) and (orientation: landscape) {
+    /* Для горизонтальной ориентации можно задать другое значение или оставить базовое */
+    .open-btn {
+        bottom: calc(5vh + env(safe-area-inset-bottom));
+    }
+}
+
+
+@media (min-width: 1079px) and (max-height: 900px) {
+    .open-btn {
+        /* Ваш исходный стиль для коротких экранов */
+        bottom: calc(6vh + env(safe-area-inset-bottom));
+    }
+}
+
 
 
 
