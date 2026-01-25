@@ -6,9 +6,39 @@
     <title>Путеводитель по Суздалю</title>
     <link rel="stylesheet" href="common.css">
     <link rel="stylesheet" href="categories.css">
-        <link rel="stylesheet" href="footer.css">
+    <link rel="stylesheet" href="footer.css">
 </head>
 <body>
+    <script>
+        // Унифицированная логика обрезки по visual viewport для всех мобильных браузеров
+        (function() {
+            const isMobile = window.matchMedia('(max-width: 1080px)').matches || 
+                             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile) return;
+            
+            document.body.classList.add('is-mobile');
+            
+            const container = document.querySelector('.container');
+            const vv = window.visualViewport;
+            
+            if (!vv || !container) return;
+            
+            function updateViewport() {
+                // Обрезаем контейнер ровно по границе видимой области (без панелей инструментов)
+                container.style.height = vv.height + 'px';
+            }
+            
+            vv.addEventListener('resize', updateViewport);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(updateViewport, 100);
+            });
+            
+            updateViewport();
+            window.addEventListener('load', updateViewport);
+        })();
+    </script>
+
     <div class="container">
         <!-- Кнопка назад -->
         <a href="index.html" class="back-button">
@@ -27,33 +57,31 @@
         </div>
 
         <footer class="footer">
-    <div class="footer-content">
-        <div class="footer-header">
-            <a href="about.html" class="footer-link">О проекте</a>
-            <img src="ui/sokol.png" class="footer-logo">
-        </div>
-        
-        <div class="footer-separator"></div>
-        
-        <div class="footer-text-container">
-            <p class="footer-disclaimer">
-                Данный интернет-сайт и его содержимое носит исключительно информационный характер и ни при каких условиях информационные материалы, каталоги, статьи и цены, размещенные на сайте, не является публичной офертой, определяемой положениями Статьи 437 Гражданского кодекса РФ.
-            </p>
-            
-            <p class="footer-copy-info">
-                Использование или копирование фото- и видеоматериалов допускается исключительно с обязательным указанием активной гиперссылки на данный сайт.
-            </p>
-            
-            <p class="footer-copyright">
-                2026©
-            </p>
-        </div>
-    </div>
-</footer>
+            <div class="footer-content">
+                <div class="footer-header">
+                    <a href="about.html" class="footer-link">О проекте</a>
+                    <img src="ui/sokol.png" class="footer-logo">
+                </div>
+                
+                <div class="footer-separator"></div>
+                
+                <div class="footer-text-container">
+                    <p class="footer-disclaimer">
+                        Данный интернет-сайт и его содержимое носит исключительно информационный характер и ни при каких условиях информационные материалы, каталоги, статьи и цены, размещенные на сайте, не является публичной офертой, определяемой положениями Статьи 437 Гражданского кодекса РФ.
+                    </p>
+                    
+                    <p class="footer-copy-info">
+                        Использование или копирование фото- и видеоматериалов допускается исключительно с обязательным указанием активной гиперссылки на данный сайт.
+                    </p>
+                    
+                    <p class="footer-copyright">
+                        2026©
+                    </p>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script src="script.js"></script>
-
-
 </body>
 </html>
