@@ -946,7 +946,7 @@ height: auto ;
   .dropdown-icon { width: 8vw; height: 8vw; }
   .dropdown-arrow { width: 6.5vw; height: 6.5vw; }
   .dropdown-body p { font-size: clamp(16px, 4vmin, 50px); }
-  .dropdown-body { padding: 0.2vw 4vw; }
+  .dropdown-body { padding: 0 4vw; padding-top: 0.4vw;}
 
   .temple-nav-arrows, .temple-nav-arrow { display: none; pointer-events: none; }
   
@@ -1070,6 +1070,7 @@ height: auto ;
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
