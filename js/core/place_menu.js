@@ -154,13 +154,14 @@ function setMode(newMode, { expandUseful = false } = {}) {
     const addressDrop = document.getElementById('addressDrop');
     const usefulDrop = document.getElementById('usefulDrop');
     
+    // !!! ИСПРАВЛЕНИЕ: Применяем стили с !important для гарантии !!!
     if (videoPoster) {
-        videoPoster.style.background = (newMode === 'details') ? 'white' : 'transparent';
-        videoPoster.style.display = (newMode === 'details') ? 'block' : 'none';
+        videoPoster.style.setProperty('background', (newMode === 'details') ? 'white' : 'transparent', 'important');
+        videoPoster.style.setProperty('display', (newMode === 'details') ? 'block' : 'none', 'important');
     }
     
     if (bgVideo) {
-        bgVideo.style.filter = (newMode === 'details') ? 'blur(5px)' : 'none';
+        bgVideo.style.setProperty('filter', (newMode === 'details') ? 'blur(5px)' : 'none', 'important');
     }
     
     if (mode === "details") {
@@ -486,7 +487,7 @@ window.initializeMenu = function() {
     
     const frame = document.getElementById('frame');
     const bgVideo = document.getElementById('bgVideo');
-    const videoPoster = document.getElementById('videoPoster'); // <--- Получаем элемент
+    const videoPoster = document.getElementById('videoPoster');
     const scrollZone = document.getElementById('scrollZone');
     const usefulDrop = document.getElementById('usefulDrop');
     
@@ -494,7 +495,6 @@ window.initializeMenu = function() {
     if (shouldOpenMenu) {
         document.body.classList.add('no-transition');
         
-        // !!! ИСПРАВЛЕНИЕ: Добавляем videoPoster в массив, чтобы отключить на нем анимации !!!
         const elementsToDisable = [
             frame, 
             bgVideo, 
@@ -504,18 +504,18 @@ window.initializeMenu = function() {
             document.getElementById('dropdownsContainer'),
             document.querySelector('.entry-note'),
             document.getElementById('paidBtn'),
-            videoPoster  // <--- ДОБАВЛЕНО
+            videoPoster  // Добавлен videoPoster
         ].filter(el => el);
         
         elementsToDisable.forEach(el => {
-            el.style.transition = 'none !important';
-            el.style.animation = 'none !important';
+            el.style.setProperty('transition', 'none', 'important');
+            el.style.setProperty('animation', 'none', 'important');
         });
         
         cleanupRegistry.setTimeout(() => {
             elementsToDisable.forEach(el => {
-                el.style.transition = '';
-                el.style.animation = '';
+                el.style.removeProperty('transition');
+                el.style.removeProperty('animation');
             });
             document.body.classList.remove('no-transition');
         }, 10);
@@ -536,7 +536,8 @@ window.initializeMenu = function() {
         bgVideo.muted = true;
         bgVideo.setAttribute('muted', '');
         bgVideo.setAttribute('playsinline', '');
-        bgVideo.style.filter = shouldOpenMenu ? 'blur(5px)' : 'none';
+        // !!! ИСПРАВЛЕНИЕ: Устанавливаем blur с !important !!!
+        bgVideo.style.setProperty('filter', shouldOpenMenu ? 'blur(5px)' : 'none', 'important');
         
         if (shouldOpenMenu) {
             bgVideo.pause();
@@ -551,10 +552,18 @@ window.initializeMenu = function() {
         }
     }
     
-    // !!! ИСПРАВЛЕНИЕ ДЛЯ БЕЛОГО ФОНА !!!
+    // !!! КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Белый фон при открытом меню !!!
     if (videoPoster) {
-        videoPoster.style.background = shouldOpenMenu ? 'white' : 'transparent';
-        videoPoster.style.display = shouldOpenMenu ? 'block' : 'none';
+        // Используем setProperty с !important для гарантированного применения
+        videoPoster.style.setProperty('background', shouldOpenMenu ? 'white' : 'transparent', 'important');
+        videoPoster.style.setProperty('display', shouldOpenMenu ? 'block' : 'none', 'important');
+        
+        // Принудительный reflow для мгновенного применения стилей
+        void videoPoster.offsetHeight;
+        
+        console.log('🎨 VideoPoster:', shouldOpenMenu ? 'БЕЛЫЙ ФОН ВКЛЮЧЕН' : 'прозрачный');
+    } else {
+        console.error('❌ Элемент #videoPoster не найден!');
     }
     
     if (scrollZone) {
@@ -575,7 +584,7 @@ window.initializeMenu = function() {
     setupVideoGuards();
     updateNavigationVisibility();
     
-    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню)' : '(с закрытым меню)');
+    console.log('✅ Меню инициализировано', shouldOpenMenu ? '(с открытым меню, белый фон активен)' : '(с закрытым меню)');
 };
 
 // =============================================================================
