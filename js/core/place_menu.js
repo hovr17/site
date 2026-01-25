@@ -161,6 +161,11 @@ function setMode(newMode, { expandUseful = false } = {}) {
     }
     
     if (mode === "details") {
+        // >>> СОХРАНЯЕМ СОСТОЯНИЕ ОТКРЫТОГО МЕНЮ <<<
+        // Это запомнит, что меню открыто, даже если пользователь уйдет со страницы
+        sessionStorage.setItem('menuState', 'open');
+        // >>> ================================== <<<
+
         frame?.classList.remove("mode-intro");
         frame?.classList.add("mode-details");
         
@@ -180,6 +185,11 @@ function setMode(newMode, { expandUseful = false } = {}) {
             isAnimating = false;
         }, 1000);
     } else {
+        // >>> УДАЛЯЕМ СОСТОЯНИЕ (МЕНЮ ЗАКРЫТО) <<<
+        // Это нужно, чтобы при возвращении меню не открывалось само, если его закрыли
+        sessionStorage.removeItem('menuState');
+        // >>> ================================== <<<
+
         frame?.classList.remove("mode-details");
         frame?.classList.add("mode-intro");
         
@@ -637,3 +647,4 @@ window.reinitMenu = function() {
 };
 
 console.log('✅ place_menu.js полностью загружен с поддержкой SPA');
+
