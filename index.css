@@ -214,35 +214,28 @@
 
 @media (max-width: 1080px) and (orientation: portrait) {
     
-    /* Яндекс.Браузер: стандартная высота, кнопка на 25vh */
-    body.yandex-browser .container {
-        height: 100dvh;
-        padding-bottom: env(safe-area-inset-bottom);
+    /* Все мобильные браузеры: высота = видимая область (JS управляет) */
+    body.is-mobile .container {
+        /* JS устанавливает height = visualViewport.height */
+        /* Fallback до загрузки JS */
+        height: 100svh;
+        padding-bottom: 0; /* Убираем safe-area, т.к. JS точно вычисляет видимую область */
     }
     
+    /* Яндекс.Браузер: кнопка на 25vh от низа (JS вычисляет точное значение в px) */
     body.yandex-browser .open-btn {
         position: absolute;
-        bottom: 25vh;
         left: 50%;
         transform: translateX(-50%);
+        /* JS устанавливает bottom в пикселях */
     }
     
-    /* Другие браузеры: высота = видимая область (JS), кнопка на 5px от низа */
-    body.other-mobile-browser .container {
-        /* JS устанавливает height = visualViewport.height */
-        /* Убираем safe-area-padding, т.к. высота уже учитывает видимую область */
-        padding-bottom: 0;
-        height: 100svh; /* Fallback до загрузки JS */
-    }
-    
+    /* Другие браузеры: кнопка на 5px от низа */
     body.other-mobile-browser .open-btn {
         position: absolute;
-        bottom: 5px; /* 5px от последнего видимого пикселя */
         left: 50%;
         transform: translateX(-50%);
-        /* Отключаем env(safe-area-inset-bottom), т.к. кнопка должна быть 
-           именно на 5px от видимого края, а не выше */
+        /* JS устанавливает bottom: 5px */
     }
 }
-
 
