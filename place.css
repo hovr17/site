@@ -675,6 +675,17 @@
 .page-enter-parallax-right .entry-note,
 .page-enter-parallax-right #paidBtn { animation: parallaxInUILeft 0.4s ease-out forwards; }
 
+.page-exit-parallax .back-button,
+.page-enter-parallax .back-button,
+.page-exit-parallax-left .back-button,
+.page-enter-parallax-left .back-button,
+.page-exit-parallax-right .back-button,
+.page-enter-parallax-right .back-button {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
 
 /* ================= MEDIA QUERIES ================= */
 
@@ -1085,3 +1096,4 @@ height: auto ;
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
