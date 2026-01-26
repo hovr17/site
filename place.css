@@ -55,18 +55,26 @@
   z-index: 2;
 }
 
-/* Кнопка "Назад" - без эффектов parallax */
+/* Кнопка "Назад" */
 .back-button {
   position: absolute;
   top: 3vh;
   left: 3vw;
   width: min(60px, 9vmin);
   height: min(30px, 5vmin);
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  /* ИСПРАВЛЕНИЕ: Убраны все визуальные эффекты и интерактивность */
+  filter: none !important;
+  transition: none !important;
+  cursor: default !important;
   z-index: 10;
   text-decoration: none;
-  /* Убираем transition для transform, оставляем только для opacity (появление/исчезновение) */
-  transition: opacity 0.3s ease;
+}
+
+/* ИСПРАВЛЕНИЕ: Отключаем hover/active эффекты для кнопки "Назад" */
+.back-button:hover, .back-button:active {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 .back-button img,
@@ -249,7 +257,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative; /* Добавлено для позиционирования entry-note */
+  position: relative;
 }
 
 .mode-intro .hero-details {
@@ -265,7 +273,6 @@
   color: white;
 }
 
-/* Entry note - вынесен из title-block, позиционируется абсолютно */
 .entry-note {
   font-family: 'Crooker', sans-serif;
   margin-bottom: 8px;
@@ -279,28 +286,18 @@
   font-weight: 100;
   color: white;
   cursor: pointer;
-  /* Абсолютное позиционирование для независимой анимации */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 6;
 }
 
-/* Позиционирование в режиме intro */
 .mode-intro .entry-note {
   opacity: 1;
   pointer-events: auto;
-  top: calc(22vh - 200px + 100%); /* Под title-block */
-  margin-top: 8px;
 }
 
-/* Позиционирование в режиме details */
 .mode-details .entry-note {
   opacity: 0;
   pointer-events: none;
   max-height: 0;
   margin-top: 0;
-  top: 0;
 }
 
 .small-btn {
@@ -611,12 +608,17 @@
 /* ПАРАЛЛАКС АНИМАЦИИ */
 @keyframes parallaxOutBack { to { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; } }
 @keyframes parallaxOutContent { to { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; } }
-@keyframes parallaxOutUILeft { to { transform: translateX(-50px) translateY(50px); opacity: 0; } }
-@keyframes parallaxOutUIRight { to { transform: translateX(50px) translateY(50px); opacity: 0; } }
+
+/* ИСПРАВЛЕНИЕ: Удален translateY, теперь движение строго горизонтальное */
+@keyframes parallaxOutUILeft { to { transform: translateX(-50px); opacity: 0; } }
+@keyframes parallaxOutUIRight { to { transform: translateX(50px); opacity: 0; } }
+
 @keyframes parallaxInBack { from { transform: translateZ(-300px) scale(1.5) rotateY(-5deg); opacity: 0; } to { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; } }
 @keyframes parallaxInContent { from { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; } to { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; } }
-@keyframes parallaxInUILeft { from { transform: translateX(-50px) translateY(-50px); opacity: 0; } to { transform: translateX(0) translateY(0); opacity: 1; } }
-@keyframes parallaxInUIRight { from { transform: translateX(50px) translateY(-50px); opacity: 0; } to { transform: translateX(0) translateY(0); opacity: 1; } }
+
+/* ИСПРАВЛЕНИЕ: Удален translateY, теперь движение строго горизонтальное */
+@keyframes parallaxInUILeft { from { transform: translateX(-50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes parallaxInUIRight { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
 /* Parallax Back variants */
 @keyframes parallaxOutBackLeft { 0% { transform: translateZ(0) scale(1) rotateY(0); opacity: 1; } 100% { transform: translateZ(-300px) scale(1.5) rotateY(5deg); opacity: 0; } }
@@ -633,50 +635,45 @@
 .page-exit-parallax .temple-video,
 .page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
 .page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
-.page-exit-parallax .temple-nav-arrows,
-.page-exit-parallax #entryNote,
-.page-exit-parallax #paidBtn { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+.page-exit-parallax .back-button,
+.page-exit-parallax .temple-nav-arrows { animation: parallaxOutUI 0.4s ease-out forwards; }
 
 .page-enter-parallax .temple-video,
 .page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
 .page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
-.page-enter-parallax .temple-nav-arrows,
-.page-enter-parallax #entryNote,
-.page-enter-parallax #paidBtn { animation: parallaxInUIRight 0.4s ease-out forwards; }
 
-/* Parallax Specifics - убран .back-button из UI анимаций */
+/* Parallax Specifics */
 .page-exit-parallax-left .temple-video,
 .page-exit-parallax-left .video-background { animation: parallaxOutBackLeft 0.6s ease-out forwards; }
 .page-exit-parallax-left .screen { animation: parallaxOutContentLeft 0.5s ease-out forwards; }
+.page-exit-parallax-left .back-button,
 .page-exit-parallax-left .temple-nav-arrows,
-.page-exit-parallax-left #entryNote,
+.page-exit-parallax-left .entry-note,
 .page-exit-parallax-left #paidBtn { animation: parallaxOutUILeft 0.4s ease-out forwards; }
-/* Back-button просто исчезает без движения */
-.page-exit-parallax-left .back-button { opacity: 0; transition: opacity 0.4s ease; }
 
 .page-enter-parallax-left .temple-video,
 .page-enter-parallax-left .video-background { animation: parallaxInBackLeft 0.6s ease-out forwards; }
 .page-enter-parallax-left .screen { animation: parallaxInContentLeft 0.5s ease-out forwards; }
+.page-enter-parallax-left .back-button,
 .page-enter-parallax-left .temple-nav-arrows,
-.page-enter-parallax-left #entryNote,
+.page-enter-parallax-left .entry-note,
 .page-enter-parallax-left #paidBtn { animation: parallaxInUIRight 0.4s ease-out forwards; }
-.page-enter-parallax-left .back-button { opacity: 1; transition: opacity 0.4s ease; }
 
 .page-exit-parallax-right .temple-video,
 .page-exit-parallax-right .video-background { animation: parallaxOutBackRight 0.6s ease-out forwards; }
 .page-exit-parallax-right .screen { animation: parallaxOutContentRight 0.5s ease-out forwards; }
+.page-exit-parallax-right .back-button,
 .page-exit-parallax-right .temple-nav-arrows,
-.page-exit-parallax-right #entryNote,
+.page-exit-parallax-right .entry-note,
 .page-exit-parallax-right #paidBtn { animation: parallaxOutUIRight 0.4s ease-out forwards; }
-.page-exit-parallax-right .back-button { opacity: 0; transition: opacity 0.4s ease; }
 
 .page-enter-parallax-right .temple-video,
 .page-enter-parallax-right .video-background { animation: parallaxInBackRight 0.6s ease-out forwards; }
 .page-enter-parallax-right .screen { animation: parallaxInContentRight 0.5s ease-out forwards; }
+.page-enter-parallax-right .back-button,
 .page-enter-parallax-right .temple-nav-arrows,
-.page-enter-parallax-right #entryNote,
+.page-enter-parallax-right .entry-note,
 .page-enter-parallax-right #paidBtn { animation: parallaxInUILeft 0.4s ease-out forwards; }
-.page-enter-parallax-right .back-button { opacity: 1; transition: opacity 0.4s ease; }
 
 
 /* ================= MEDIA QUERIES ================= */
@@ -769,11 +766,6 @@
   .entry-note { font-size: clamp(14px, 1.5vmin, 18px); gap: 0.5vh; }
   .mode-intro .hero-details { transform: translateY(47vh); }
   .mode-intro #dropdownsContainer { transform: translateY(47vh); }
-
-  /* Позиционирование entry-note для ПК */
-  .mode-intro .entry-note {
-    top: calc(43vh + 100%);
-  }
 
   /* === ИСПРАВЛЕННЫЕ КНОПКИ ФОТО (НЕ СЖИМАЮТСЯ, ВЛЕЗАЮТ В КОНТЕЙНЕР) === */
   .photo-card {
@@ -881,11 +873,6 @@ height: auto ;
   .mode-intro .hero-details { transform: translateY(45vh); }
   .mode-intro #dropdownsContainer { transform: translateY(50vh); }
 
-  /* Позиционирование entry-note для планшетов */
-  .mode-intro .entry-note {
-    top: calc(40vh + 100%);
-  }
-
   .video-background {
     position: absolute; inset: 0; width: 100%; height: 100%; min-height: 100vh; z-index: -1;
     background: white; transition: none;
@@ -920,11 +907,6 @@ height: auto ;
   .mode-intro .hero-details { transform: translateY(55vh); }
   .mode-intro .title-block { transform: translateY(50vh); }
   .mode-intro #dropdownsContainer { transform: translateY(50vh); }
-
-  /* Позиционирование entry-note для мобильных */
-  .mode-intro .entry-note {
-    top: calc(50vh + 100%);
-  }
 
   .photo-wrapper {
     display: grid;
@@ -1000,11 +982,6 @@ height: auto ;
     transform: translateY(calc(50vh - 60px));
   }
   .mode-intro .hero-details { transform: translateY(calc(55vh - 60px)); }
-  
-  /* Корректировка позиции entry-note */
-  .mode-intro .entry-note {
-    top: calc(50vh - 60px + 100%);
-  }
 }
 
 /* Для очень низких экранов (< 500px) */
@@ -1020,11 +997,6 @@ height: auto ;
 
   .mode-intro .hero-details { transform: translateY(-10vh); }
   .mode-intro .title-block { transform: translateY(-25vh); }
-
-  /* Корректировка позиции entry-note */
-  .mode-intro .entry-note {
-    top: calc(-25vh + 100%);
-  }
 
   .photo-wrapper { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4vw; justify-items: center; }
   .photo-card {
@@ -1084,11 +1056,6 @@ height: auto ;
         transform: translateY(calc(50vh - 110px)) !important;
     }
 
-    /* Entry note для Яндекс.Браузера */
-    .yandex-browser .mode-intro .entry-note {
-        top: calc(50vh - 100px + 100%) !important;
-    }
-
     .yandex-browser #usefulDrop.open {
         margin-bottom: 80px;
     }
@@ -1117,9 +1084,4 @@ height: auto ;
     .yandex-browser .mode-intro .hero-details { transform: calc(-10vh + 40px) !important; }
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
-    
-    /* Entry note для Яндекс.Браузера на низких экранах */
-    .yandex-browser .mode-intro .entry-note {
-        top: calc(-25vh + 100%) !important;
-    }
 }
