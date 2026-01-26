@@ -617,48 +617,99 @@
 @keyframes parallaxInContentLeft { 0% { transform: translateX(100%) translateZ(0) rotateY(10deg); opacity: 0; } 100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; } }
 @keyframes parallaxInContentRight { 0% { transform: translateX(-100%) translateZ(0) rotateY(-10deg); opacity: 0; } 100% { transform: translateX(0) translateZ(0) rotateY(0); opacity: 1; } }
 
+/* === ОБЩИЕ ПАРАЛЛАКС АНИМАЦИИ === */
 .page-exit-parallax .temple-video,
-.page-exit-parallax .video-background { animation: parallaxOutBack 0.6s ease-out forwards; }
-.page-exit-parallax .screen { animation: parallaxOutContent 0.5s ease-out forwards; }
-.page-exit-parallax .back-button,
-.page-exit-parallax .temple-nav-arrows { animation: parallaxOutUI 0.4s ease-out forwards; }
+.page-exit-parallax .video-background,
+.page-exit-parallax .back-button {
+  animation: parallaxOutBack 0.6s ease-out forwards;
+}
+
+.page-exit-parallax .screen {
+  animation: parallaxOutContent 0.5s ease-out forwards;
+}
+
+.page-exit-parallax .temple-nav-arrows,
+.page-exit-parallax .entry-note,
+.page-exit-parallax #paidBtn {
+  animation: parallaxOutUI 0.4s ease-out forwards;
+}
 
 .page-enter-parallax .temple-video,
-.page-enter-parallax .video-background { animation: parallaxInBack 0.6s ease-out forwards; }
-.page-enter-parallax .screen { animation: parallaxInContent 0.5s ease-out forwards; }
+.page-enter-parallax .video-background,
+.page-enter-parallax .back-button {
+  animation: parallaxInBack 0.6s ease-out forwards;
+}
 
-/* Parallax Specifics */
+.page-enter-parallax .screen {
+  animation: parallaxInContent 0.5s ease-out forwards;
+}
+
+/* === СВАЙП ВЛЕВО (NEXT) === */
 .page-exit-parallax-left .temple-video,
-.page-exit-parallax-left .video-background { animation: parallaxOutBackLeft 0.6s ease-out forwards; }
-.page-exit-parallax-left .screen { animation: parallaxOutContentLeft 0.5s ease-out forwards; }
-.page-exit-parallax-left .back-button,
+.page-exit-parallax-left .video-background,
+.page-exit-parallax-left .back-button {
+  animation: parallaxOutBackLeft 0.6s ease-out forwards;
+}
+
+.page-exit-parallax-left .screen {
+  animation: parallaxOutContentLeft 0.5s ease-out forwards;
+}
+
+/* UI элементы с горизонтальной траекторией (entry-note здесь!) */
 .page-exit-parallax-left .temple-nav-arrows,
 .page-exit-parallax-left .entry-note,
-.page-exit-parallax-left #paidBtn { animation: parallaxOutUILeft 0.4s ease-out forwards; }
+.page-exit-parallax-left #paidBtn {
+  animation: parallaxOutUILeft 0.4s ease-out forwards;
+}
 
 .page-enter-parallax-left .temple-video,
-.page-enter-parallax-left .video-background { animation: parallaxInBackLeft 0.6s ease-out forwards; }
-.page-enter-parallax-left .screen { animation: parallaxInContentLeft 0.5s ease-out forwards; }
-.page-enter-parallax-left .back-button,
+.page-enter-parallax-left .video-background,
+.page-enter-parallax-left .back-button {
+  animation: parallaxInBackLeft 0.6s ease-out forwards;
+}
+
+.page-enter-parallax-left .screen {
+  animation: parallaxInContentLeft 0.5s ease-out forwards;
+}
+
 .page-enter-parallax-left .temple-nav-arrows,
 .page-enter-parallax-left .entry-note,
-.page-enter-parallax-left #paidBtn { animation: parallaxInUIRight 0.4s ease-out forwards; }
+.page-enter-parallax-left #paidBtn {
+  animation: parallaxInUIRight 0.4s ease-out forwards;
+}
 
+/* === СВАЙП ВПРАВО (PREV) === */
 .page-exit-parallax-right .temple-video,
-.page-exit-parallax-right .video-background { animation: parallaxOutBackRight 0.6s ease-out forwards; }
-.page-exit-parallax-right .screen { animation: parallaxOutContentRight 0.5s ease-out forwards; }
-.page-exit-parallax-right .back-button,
+.page-exit-parallax-right .video-background,
+.page-exit-parallax-right .back-button {
+  animation: parallaxOutBackRight 0.6s ease-out forwards;
+}
+
+.page-exit-parallax-right .screen {
+  animation: parallaxOutContentRight 0.5s ease-out forwards;
+}
+
 .page-exit-parallax-right .temple-nav-arrows,
 .page-exit-parallax-right .entry-note,
-.page-exit-parallax-right #paidBtn { animation: parallaxOutUIRight 0.4s ease-out forwards; }
+.page-exit-parallax-right #paidBtn {
+  animation: parallaxOutUIRight 0.4s ease-out forwards;
+}
 
 .page-enter-parallax-right .temple-video,
-.page-enter-parallax-right .video-background { animation: parallaxInBackRight 0.6s ease-out forwards; }
-.page-enter-parallax-right .screen { animation: parallaxInContentRight 0.5s ease-out forwards; }
-.page-enter-parallax-right .back-button,
+.page-enter-parallax-right .video-background,
+.page-enter-parallax-right .back-button {
+  animation: parallaxInBackRight 0.6s ease-out forwards;
+}
+
+.page-enter-parallax-right .screen {
+  animation: parallaxInContentRight 0.5s ease-out forwards;
+}
+
 .page-enter-parallax-right .temple-nav-arrows,
 .page-enter-parallax-right .entry-note,
-.page-enter-parallax-right #paidBtn { animation: parallaxInUILeft 0.4s ease-out forwards; }
+.page-enter-parallax-right #paidBtn {
+  animation: parallaxInUILeft 0.4s ease-out forwards;
+}
 
 
 /* ================= MEDIA QUERIES ================= */
@@ -1070,6 +1121,7 @@ height: auto ;
     .yandex-browser .mode-intro #dropdownsContainer { transform: calc(50vh + 40px) !important; }
     .yandex-browser .mode-intro .photo-wrapper { transform: translateY(40px) !important; }
 }
+
 
 
 
